@@ -164,16 +164,15 @@
 </head>
 <body>
 
-    <!-- Left Sidebar -->
     <div class="sidebar">
         <h1>Punk Archives</h1>
         <ul>
-            <li><a href="index.html#">Home</a></li>
+            <li><a href="index.html#"><font face="MyCustomFont">Home</a></li>
             <li><a href="bands.html#">All Bands</a></li>
             <li><a href="info.html#">Add Info</a></li>
             <li><a href="https://discordapp.com/users/767006494595350578">Contact</a></li>
         <ul>
-            <li><a id="randomBandButton">Random Band</a></li>
+            <li><a id="randomBandButton">Random Band</font></a></li>
         </ul>
         </ul>
     </div>
@@ -306,43 +305,67 @@ function searchBands() {
 <div class="main-container">
         <div class="content">
             <h1>All Bands</h1>
+<div id="letterNav" style="text-align: center; margin-bottom: 20px;">
+    <!-- A-Z Navigation Buttons -->
+    <script>
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+        document.write('<div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 5px;">');
+        letters.forEach(letter => {
+            document.write(`<button onclick="scrollToLetter('${letter}')" style="background-color: #660000; color: white; border: none; padding: 5px 10px; cursor: pointer;">${letter}</button>`);
+        });
+        document.write('</div>');
+    </script>
+</div>
             <ul id="artistList" class="artist-list"></ul>
         </div>
     </div>
-    <script>
-        fetch("banddata.json")
-            .then(response => response.json())
-            .then(bands => {
-                const artistList = document.getElementById("artistList");
-                bands.forEach(band => {
-                    let li = document.createElement("li");
-                    let a = document.createElement("a");
-                    a.textContent = band.band_name;
-                    a.href = `band.html?band=${encodeURIComponent(band.band_name)}`;
-                    li.appendChild(a);
-                    artistList.appendChild(li);
-                });
-            })
-            .catch(error => console.error("Error loading band data:", error));
-    </script>
+
 
 <center><p>Is this page incomplete? Help by submitting info.</p></center>
 
 <script>
-document.getElementById("randomBandButton").addEventListener("click", function () {
     fetch("banddata.json")
         .then(response => response.json())
         .then(bands => {
-            if (bands.length === 0) {
-                alert("No bands available.");
-                return;
-            }
-            const randomBand = bands[Math.floor(Math.random() * bands.length)];
-            window.location.href = `band.html?band=${encodeURIComponent(randomBand.band_name)}`;
+            const artistList = document.getElementById("artistList");
+
+            // Sort bands alphabetically by name
+            bands.sort((a, b) => a.band_name.localeCompare(b.band_name));
+
+            let currentLetter = "";
+            
+            bands.forEach(band => {
+                let firstLetter = band.band_name.charAt(0).toUpperCase();
+                
+                // Add a letter heading if it's a new letter
+                if (firstLetter !== currentLetter) {
+                    currentLetter = firstLetter;
+                    let letterHeader = document.createElement("h2");
+                    letterHeader.id = `letter-${currentLetter}`; // Add ID for scrolling
+                    letterHeader.textContent = currentLetter;
+                    artistList.appendChild(letterHeader);
+                }
+
+                // Create band list item
+                let li = document.createElement("li");
+                let a = document.createElement("a");
+                a.textContent = band.band_name;
+                a.href = `band.html?band=${encodeURIComponent(band.band_name)}`;
+                li.appendChild(a);
+                artistList.appendChild(li);
+            });
         })
         .catch(error => console.error("Error loading band data:", error));
-});
+
+    // Function to scroll to letter section
+    function scrollToLetter(letter) {
+        let section = document.getElementById(`letter-${letter}`);
+        if (section) {
+            section.scrollIntoView({ behavior: "smooth" });
+        }
+    }
 </script>
+
 
 
 </body>
