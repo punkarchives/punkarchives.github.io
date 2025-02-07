@@ -144,7 +144,7 @@
         "cover_image": "https://www.metal-archives.com/images/1/7/0/6/170603.jpg?2338",
         "label": "625 Thrashcore",
         "year": "October, 2007",
-        "release_type": "Full-length",
+        "release_type": "Album",
         "physical_format": "CD",
         "limitation": "N/A",
         "extra_info": "N/A",
@@ -531,7 +531,7 @@
         "cover_image": "https://m.media-amazon.com/images/I/71x4r3NEKdL._UF1000,1000_QL80_.jpg",
         "label": "SST Records",
         "year": "1981",
-        "release_type": "Full-length",
+        "release_type": "Album",
         "physical_format": "Vinyl 12-inch 33 RPM",
         "limitation": "",
         "extra_info": "",
@@ -553,7 +553,7 @@
         "cover_image": "https://upload.wikimedia.org/wikipedia/en/5/5b/Black_Flag_-_Slip_It_In_cover.jpg",
         "label": "SST Records",
         "year": "1984",
-        "release_type": "Full-length",
+        "release_type": "Album",
         "physical_format": "Vinyl 12-inch 33 RPM",
         "limitation": "",
         "extra_info": "",
@@ -564,7 +564,7 @@
         "cover_image": "https://upload.wikimedia.org/wikipedia/en/b/b8/Black_Flag_-_My_War_cover.jpg",
         "label": "SST Records",
         "year": "1984",
-        "release_type": "Full-length",
+        "release_type": "Album",
         "physical_format": "Vinyl 12-inch 33 RPM",
         "limitation": "",
         "extra_info": "",
@@ -575,7 +575,7 @@
         "cover_image": "https://upload.wikimedia.org/wikipedia/en/8/82/Black_Flag_-_Family_Man_cover.jpg",
         "label": "SST Records",
         "year": "1984",
-        "release_type": "Full-length",
+        "release_type": "Album",
         "physical_format": "Vinyl 12-inch 33 RPM",
         "limitation": "",
         "extra_info": "",
@@ -597,7 +597,7 @@
         "cover_image": "https://i.discogs.com/ajgjmUUXJjySXn6_KmHaOOCsMBeunNrqZv4CzG7BxuM/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTg3MDUw/OC0xMzM5OTc0NDUy/LTI2NzAuanBlZw.jpeg",
         "label": "SST Records",
         "year": "1985",
-        "release_type": "Full-length",
+        "release_type": "Album",
         "physical_format": "Vinyl 12-inch 33 RPM",
         "limitation": "",
         "extra_info": "",
@@ -608,7 +608,7 @@
         "cover_image": "https://i.discogs.com/11W_-3D9iYAuQMi009eoyaMyb98tsjWKdtZ4DvNWq70/rs:fit/g:sm/q:90/h:598/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTQxNzk3/OC0xMzM5OTc0MTU4/LTQ3NDcuanBlZw.jpeg",
         "label": "SST Records",
         "year": "1985",
-        "release_type": "Full-length",
+        "release_type": "Album",
         "physical_format": "Vinyl 12-inch 33 RPM",
         "limitation": "",
         "extra_info": "",
@@ -619,7 +619,7 @@
         "cover_image": "https://i.discogs.com/h57dLdzljZa6z1VcK4ZtHOsZ_4W38wCZJokTWcvUsoU/rs:fit/g:sm/q:90/h:592/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTUxNjYz/OTQtMTYwODU3NTQ0/Ni03MjIyLmpwZWc.jpeg",
         "label": "SST Records",
         "year": "2013",
-        "release_type": "Full-length",
+        "release_type": "Album",
         "physical_format": "Vinyl 12-inch 33 RPM",
         "limitation": "",
         "extra_info": "",
@@ -629,5 +629,129 @@
     "extra_images": [
       ""
     ]
+  },
+  
+   {
+    "band_name": "The Great Redneck Hope",
+    "genre": ["Mathcore, Mathgrind"],
+    "location": "Colorado Springs, Colorado (CO), USA",
+    "years_active": "2000-2007",
+    "description": "",
+    "view_count": 0,
+    "related_bands": [],
+"official_links": {
+  "bandcamp": "https://tgrh.bandcamp.com/",
+  "spotify": "https://open.spotify.com/artist/0V6pmKUuBorwTEnk9SWKRG"
+},
+    "members": [
+        {
+          "name": "Dan Harvey",
+          "instrument": "Drums",
+          "time_active": "2000-2007",
+          "status": "Current"
+        },
+		        {
+          "name": "Jeremy Grobsmith",
+          "instrument": "Guitar",
+          "time_active": "2000-2007",
+          "status": "Current"
+        },
+				        {
+          "name": "‎Bradley Roach",
+          "instrument": "‎Vocals",
+          "time_active": "‎(2004 or 2005?)-2007",
+          "status": "‎Current"
+        },
+				        {
+          "name": "‎ ",
+          "instrument": "‎ ",
+          "time_active": "‎ ",
+          "status": "‎ "
+        },
+		        {
+          "name": "Derek Barnett",
+          "instrument": "Vocals",
+          "time_active": "2000-(2004 or 2005?)",
+          "status": "Former"
+        },
+		        {
+          "name": "Aaron Retka",
+          "instrument": "Bass",
+          "time_active": "2000-2006",
+          "status": "Former"
+        }
+      ],
+    "releases": [
+      {
+        "title": "Cross The Line",
+        "cover_image": "https://i.discogs.com/4_hLAyiV67g4YaLzEYI5_O1XzCZ7CzFJc6s_5kbkHAQ/rs:fit/g:sm/q:90/h:559/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTIyMjEz/MjEwLTE3MTg3MTc0/MzQtNTQ4MC5qcGVn.jpeg",
+        "label": "",
+        "year": "May 15, 2002",
+        "release_type": "Demo",
+        "physical_format": "Mini CD-R",
+        "limitation": "",
+        "extra_info": "Each cd is painted with different sayings",
+        "tracks": ["Putting The 'Gay' Back In 'Gangsta'", "Constructing A Graboid Lure Out Of A Can Of Dr. Scholls And A Torn T-Shirt", "You're Not A Man 'Till You've Been With A Man", "Pass The Harpoon So I Can Stab Dad In The Neck", "Die Turkey Die!", "Punching Cattle In The Middle Of Kansas On A Jackrabbit", "Die Turkey Die! (Remix)"]
+      },
+	        {
+        "title": "Why Humans Think Computers Can't",
+        "cover_image": "https://i.discogs.com/94jatbT6x2qqoPGLj7Gb57x3iesc788I8E5oX5txvjA/rs:fit/g:sm/q:90/h:598/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTQxNTk0/NDYtMTY1NzMxODU0/Ni0yNjI0LmpwZWc.jpeg",
+        "label": "Soulless Lemming Records",
+        "year": "2002",
+        "release_type": "EP",
+        "physical_format": "Vinyl 7-inch 45 RPM",
+        "limitation": "400 Copies",
+        "extra_info": "Hot pink vinyl",
+        "tracks": ["You Can Take Dan's Balls Out Of The Jungle, But You Can't Take The Jungle Out Of Dan's Balls", "Ninjas Are Awesome, And By Awesome I Mean Totally Sweet", "Dear Grandma, I Sodomized A Lawn Midget", "Abortion Doesn't Kill Babies I Do"]
+      },
+	        {
+        "title": "'Splosion!!",
+        "cover_image": "https://i.discogs.com/zRKEGIzmC6i6QT44J69m8nK4Q-w-wcE-imMN8glPeYY/rs:fit/g:sm/q:90/h:200/w:200/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTExMzA5/NTctMTE5NDU0NTI3/Ni5qcGVn.jpeg",
+        "label": "Thinker Thought Records",
+        "year": "2003",
+        "release_type": "Album",
+        "physical_format": "Vinyl 10-inch",
+        "limitation": "",
+        "extra_info": "Picture-disc",
+        "tracks": ["Hey Goth Girl, Isn't It A Little Hot To Be Wearing Pants?", "A Rhetorical Question: What Do Christian Kids Talk About? (Ex: 'God Is Awesome' 'Totally')", "I Don't Lift Weights To Impress The Bitches. I Lift Weights To Knock A Sucka's Teeth Out.", "Three Easy Steps To Digging Up And Reanimating Your Ass, Only To Rock It Into The Ground Once Again.", "You're Fired, You're Fired, You're Fired. Goddamn It, I'm Spike Lee.", "Girl, Are You Down With Bacteria? And If So, Would You Like To See The Inside Of Our Van?", "Oh My God. Omigod. Oohhh My God. I Thought Nailguns Had A Safety.", "I'm Pretty Sure I Got My Cat Pregnant", "They Say The People Elect The Government They Deserve, But I Don't Remember Knife-Raping Any Retarded Nuns."]
+      },
+	        {
+        "title": "Behold The Fuck Thunder",
+        "cover_image": "https://i.discogs.com/7lXo0JndWlvGUmSj3ke5Dgm4t-ruLB2iGoO-DoE_Wro/rs:fit/g:sm/q:90/h:565/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTExMzA5/MDItMTQ4Mzc1NDIy/OS02NjA3LnBuZw.jpeg",
+        "label": "Thinker Thought Records",
+        "year": "2004",
+        "release_type": "Album",
+        "physical_format": "Vinyl 12-inch",
+        "limitation": "",
+        "extra_info": "Clear vinyl, Single-sided",
+        "tracks": ["Whoa, Frankenstein! I Didn't Program You To Make Out With Boys!", "Let's Fall In Love Over AIM So We Can Fuck When We Meet At Cornerstone.", "It Sure Does Get Lonely Out Here In The Boondocks. Thank God For Cock.", "Call Me Old-Fashioned, But I Think Trains Are Kick-Ass.", "Girl, Are You Pregnant? It’s Not My Fault! You Seduced Me!", "Did You Ever Notice That 'Stat' Is 'Tats' Backward? Dude, That's So Tribal.", "Cheeseburger Karma 2004: A Jam Odyssey.", "Pssst! Hey, The Lord Is Awesome. Pass It On.", "My Other Car Is A Centaur", "Killing The Wheelchair-Bound As They Exit Church With Missiles Fired From Helicopters Is My Milieu.", "Are You There, God? Please Help Me Stop Masturbating."]
+      },
+	        {
+        "title": "The Great Redneck Hope / Bleeding Kansas",
+        "cover_image": "https://i.discogs.com/1bkrWeWU-uXq0iN6cdCuwvEdtbBTnhFeawBieUp7egI/rs:fit/g:sm/q:90/h:504/w:504/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5ODYz/OTEtMTI5NzQ1NTEx/Ni5qcGVn.jpeg",
+        "label": "Lots Of Love Records",
+        "year": "2004",
+        "release_type": "Split",
+        "physical_format": "Vinyl 7-inch 45 RPM",
+        "limitation": "400",
+        "extra_info": "Translucent green vinyl",
+        "tracks": ["The Great Redneck Hope: Come On, Jesus, Let's Fucking Party", "The Great Redneck Hope: Babes, Blowholes, And Blood-Clotting Screams (And I Think It's Gonna Be A Long, Long Time)", "The Great Redneck Hope: No, Bleeding Kansas, We Will Not Cyber With You", "The Great Redneck Hope: Never Mind The Amputees. Let's Have Sex", "Bleeding Kansas: Rock And Suffocation", "Bleeding Kansas: Retract The Altitude"]
+      },
+	        {
+        "title": "Live + Cross The Line",
+        "cover_image": "https://i.discogs.com/8_SkCGGm-RQPAx17ywKQt3HEnxElRmV7_a6PPsmvGpo/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE4MjE4/NzIyLTE2MTc5NjYy/MTItOTEwMC5qcGVn.jpeg",
+        "label": "Wax Vessel",
+        "year": "2020",
+        "release_type": "Live",
+        "physical_format": "Vinyl 12-inch",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["(tracks from 'Cross The Line' demo)", "Live @ WIUW In Chicago, IL"]
+      }
+    ],
+    "extra_images": [
+      ""
+    ]
   }
+
 ]

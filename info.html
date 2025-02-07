@@ -160,10 +160,33 @@
             font-family: 'MyCustomFont2';
             src: url('Crass.ttf') format('truetype');
         }
+
+        /* Latest Additions Box */
+        .latest-additions {
+            background-color: #121212;
+            border: 2px solid #660000;
+            width: 125px;
+            color: #ffffff;
+        }
+
+        .latest-additions h2 {
+            font-size: 18px;
+            color: #660000;
+        }
+
+        .latest-additions ul {
+            list-style: none;
+            padding: 0;
+            font-size: 14px;
+        }
+
+        .latest-additions ul li {
+        }
     </style>
 </head>
 <body>
 
+    <!-- Left Sidebar -->
     <div class="sidebar">
         <h1>Punk Archives</h1>
         <ul>
@@ -182,7 +205,21 @@
     <div class="search-container">
         <input type="text" id="searchBar" placeholder="Search..." oninput="searchBands()">
         <ul id="searchResults" style="list-style: none; padding: 0; display: none; background: #121212; border: 1px solid #660000; position: absolute; width: 140px; max-height: 200px; overflow-y: auto;"></ul>
-    </div>
+    </div><br>
+        <center><div class="latest-additions">
+            <h2>Latest Additions</h2>
+            <ul>
+                <a href="band.html?band=The%20Great%20Redneck%20Hope"><u><font color="#ffffff">The Great Redneck Hope</font></u></a><br><br>
+                <a href="band.html?band=Black%20Flag"><u><font color="#ffffff">Black Flag</font></u></a><br><br>
+                <a href="band.html?band=Insect%20Warfare"><u><font color="#ffffff">Insect Warfare</font></u></a><br><br>
+            </ul>
+        </div></center>
+<br>
+        <center><div class="latest-additions">
+            <h2>Latest Updates</h2>
+            <ul>
+            </ul>
+        </div></center>
 </div>
 
 <script>
@@ -270,13 +307,26 @@ function searchBands() {
 </script>
 
 
-    <!-- Main Container -->
+<!-- Main Container -->
     <div class="main-container">
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdOuLl9jYT6HH6FHLX444HS8nlUo7-3cKaQTIlMTDfbmWBlJA/viewform?embedded=true" width="640" height="1429" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+        <div class="content">
+            <h1>Submission FAQ:</h1>
+<h2>"Is ___ Accepted?":</h2>
+<p><font size="4" face="Verdana"><u>The band must have been musically punk at some point</u>. Yes, pop punk, folk punk, and even later waves of emo are included in this. Lesser known bands are preferred over everything else though.</font></p>
+<h2>"What if I don't know everything?":</h2>
+<p><font size="4" face="Verdana">No matter how little of info you have on a band, submit it anyways. You can submit as many forms as you want, and it won't inconvenience me.</font></p>
+
+
+            <center><iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdOuLl9jYT6HH6FHLX444HS8nlUo7-3cKaQTIlMTDfbmWBlJA/viewform?embedded=true" width="640" height="1429" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe></center>
+        </div>
     </div>
 
+    <!-- Main Container -->
+    <div class="main-container">
+<div class="content">
+    </div>
+</div>
 
-<center><p>Is this page incomplete? Help by submitting info.</p></center>
 
 <script>
 document.getElementById("randomBandButton").addEventListener("click", function () {

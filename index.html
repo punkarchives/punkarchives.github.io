@@ -160,6 +160,28 @@
             font-family: 'MyCustomFont2';
             src: url('Crass.ttf') format('truetype');
         }
+
+        /* Latest Additions Box */
+        .latest-additions {
+            background-color: #121212;
+            border: 2px solid #660000;
+            width: 125px;
+            color: #ffffff;
+        }
+
+        .latest-additions h2 {
+            font-size: 18px;
+            color: #660000;
+        }
+
+        .latest-additions ul {
+            list-style: none;
+            padding: 0;
+            font-size: 14px;
+        }
+
+        .latest-additions ul li {
+        }
     </style>
 </head>
 <body>
@@ -183,7 +205,21 @@
     <div class="search-container">
         <input type="text" id="searchBar" placeholder="Search..." oninput="searchBands()">
         <ul id="searchResults" style="list-style: none; padding: 0; display: none; background: #121212; border: 1px solid #660000; position: absolute; width: 140px; max-height: 200px; overflow-y: auto;"></ul>
-    </div>
+    </div><br>
+        <center><div class="latest-additions">
+            <h2>Latest Additions</h2>
+            <ul>
+                <a href="band.html?band=The%20Great%20Redneck%20Hope"><u><font color="#ffffff">The Great Redneck Hope</font></u></a><br><br>
+                <a href="band.html?band=Black%20Flag"><u><font color="#ffffff">Black Flag</font></u></a><br><br>
+                <a href="band.html?band=Insect%20Warfare"><u><font color="#ffffff">Insect Warfare</font></u></a><br><br>
+            </ul>
+        </div></center>
+<br>
+        <center><div class="latest-additions">
+            <h2>Latest Updates</h2>
+            <ul>
+            </ul>
+        </div></center>
 </div>
 
 <script>
@@ -280,9 +316,7 @@ function searchBands() {
             <h2>News <span style="font-size: 12px;">(Month/Day/Year)</span></h2>
             <div class="news-item">
                 <h3>(02/07/25) The Site Has Been Created</h3>
-                <p>Make sure to submit any info you can for bands, even if it's just a band name. In the meantime, please answer the question below on whether thrash should be allowed or not. And for those who are interested, the first band added was Insect Warfare.</p>
-<center><iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeQw64Q4AWnxNuqNE9qp29cdLdngS-pPxES6qUeT8Cg2__QTQ/viewform?embedded=true" width="800" height="400" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe></center>
-<p>If you find any bugs, you can message me by pressing contact. If you have some good ideas, you can suggest features too.</p>
+                <p>Make sure to submit any info you can for bands, even if it's just a band name. Expect small, frequent changes throughout today and tomorrow. Also for those who are interested, Insect Warfare was the first band added. If you find any bugs, you can message me by pressing contact. If you have some good ideas, you can suggest features too.</p>
             </div>
 
             <h2>Info</h2>
