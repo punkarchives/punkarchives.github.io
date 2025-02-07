@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1000, user-scalable=yes">
+    <title>Punk Archives</title>
+    <style>
+        /* Global Styles */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+        }
+
+        /* Main flex container */
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-left: 150px; /* Matches sidebar width */
+            padding-right: 150px; /* Matches sidebar width */
+            padding: 20px;
+        }
+
+        /* Left Sidebar */
+        .sidebar {
+            width: 150px;
+            background-color: #121212;
+            color: #fff;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding: 20px 5px;
+            box-sizing: border-box;
+            border-right: 2px solid #660000;
+        }
+
+        .sidebar h1 {
+            font-family: 'MyCustomFont2', sans-serif;
+            color: #660000;
+            font-size: 20px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 20px;
+            display: block;
+            text-align: right;
+            padding: 5px;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #660000;
+        }
+
+        /* Right Sidebar */
+        .sidebar2 {
+            width: 150px;
+            background-color: #121212;
+            color: #fff;
+            height: 100vh;
+            position: fixed;
+            right: 0;
+            top: 0;
+            padding: 20px 5px;
+            box-sizing: border-box;
+            border-left: 2px solid #660000;
+        }
+
+        .sidebar2 h1 {
+            font-family: 'MyCustomFont2', sans-serif;
+            color: #660000;
+            font-size: 20px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .sidebar2 ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar2 ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar2 ul li a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 20px;
+            display: block;
+            text-align: left;
+            padding: 5px;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .sidebar2 ul li a:hover {
+            background-color: #660000;
+        }
+
+        /* Main Content */
+        .content {
+            width: 100%;
+            max-width: 70%;
+            padding: 20px;
+        }
+
+        /* Headings */
+        .content h1 {
+            font-family: 'MyCustomFont2', sans-serif;
+            color: #660000;
+            font-size: 22px;
+            text-transform: uppercase;
+            border-bottom: 3px solid #660000;
+            padding-bottom: 10px;
+        }
+
+        .content h2 {
+            font-size: 20px;
+            border-bottom: 2px solid #ffffff;
+            padding-bottom: 10px;
+            color: #660000;
+        }
+
+        /* News Items */
+        .news-item h3 {
+            font-size: 18px;
+            color: #660000;
+            margin: 10px 0;
+        }
+
+        .news-item p {
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        /* Custom Fonts */
+        @font-face {
+            font-family: 'MyCustomFont';
+            src: url('Modest.woff') format('woff');
+        }
+        @font-face {
+            font-family: 'MyCustomFont2';
+            src: url('Crass.ttf') format('truetype');
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+        <h1>Punk Archives</h1>
+        <ul>
+            <li><a href="index.html#">Home</a></li>
+            <li><a href="bands.html#">All Bands</a></li>
+            <li><a href="https://forms.gle/jSymVQ8Myuj2is5w9">Add Info</a></li>
+            <li><a href="https://discordapp.com/users/767006494595350578">Contact</a></li>
+        <ul>
+            <li><a id="randomBandButton">Random Band</a></li>
+        </ul>
+        </ul>
+    </div>
+
+<!-- Right Sidebar -->
+<div class="sidebar2">
+    <div class="search-container">
+        <input type="text" id="searchBar" placeholder="Search..." oninput="searchBands()">
+        <ul id="searchResults" style="list-style: none; padding: 0; display: none; background: #121212; border: 1px solid #660000; position: absolute; width: 140px; max-height: 200px; overflow-y: auto;"></ul>
+    </div>
+</div>
+
+<script>
+const DEBUG = true; // Set to true for debugging
+
+function searchBands() {
+    const query = document.getElementById("searchBar").value.toLowerCase();
+    const resultsList = document.getElementById("searchResults");
+
+    if (query.length === 0) {
+        resultsList.style.display = "none";
+        return;
+    }
+
+    fetch("banddata.json")
+        .then(response => response.json())
+        .then(bands => {
+            resultsList.innerHTML = "";
+            let matches = [];
+
+            bands.forEach(band => {
+                let matchText = "";
+                let priority = Infinity; // Lower is better
+
+                function updatePriority(field, text) {
+                    if (typeof field === "string") {
+                        let pos = field.toLowerCase().indexOf(query);
+                        if (pos !== -1 && pos < priority) {
+                            priority = pos;
+                            matchText = text;
+                        }
+                    }
+                }
+
+                updatePriority(band.band_name, `Band Name: ${band.band_name}`);
+                updatePriority(band.location, `Location: ${band.location}`);
+
+                if (Array.isArray(band.genre)) {
+                    for (let g of band.genre) {
+                        updatePriority(g, `Genre: ${band.genre.join(", ")}`);
+                    }
+                }
+
+                if (Array.isArray(band.releases)) {
+    for (let release of band.releases) {
+        if (release.title) updatePriority(release.title, `Release: ${release.title}`);
+        if (release.label) updatePriority(release.label, `Label: ${release.label}`);
+    }
+}
+
+                if (priority !== Infinity) {
+                    matches.push({ band, matchText, priority });
+                }
+            });
+
+            // **Sort by priority (lower index appears first)**
+            matches.sort((a, b) => a.priority - b.priority);
+
+            if (matches.length === 0) {
+                resultsList.innerHTML = "<li style='color: #888; padding: 5px;'>No results</li>";
+            } else {
+                matches.forEach(({ band, matchText }) => {
+                    let li = document.createElement("li");
+                    li.style.padding = "5px";
+                    li.style.cursor = "pointer";
+                    li.style.color = "#ffffff";
+
+                    li.innerHTML = `<strong>Band:</strong> ${band.band_name}`;
+                    if (matchText) {
+                        li.innerHTML += `<br><span style="color: #888; font-size: 14px;">${matchText}</span>`;
+                    }
+
+                    li.onclick = function() {
+                        window.location.href = `band.html?band=${encodeURIComponent(band.band_name)}`;
+                    };
+
+                    resultsList.appendChild(li);
+                });
+            }
+
+            resultsList.style.display = "block";
+        })
+        .catch(error => console.error("Error loading band data:", error));
+}
+</script>
+
+    <!-- Main Container -->
+    <div class="main-container">
+
+    </div>
+
+<style>
+    /* Styling for the floating album cover */
+    #album-cover {
+        display: none;
+        position: absolute;
+        width: 200px;
+        height: auto;
+        border: 2px solid white;
+        background: black;
+        padding: 5px;
+        z-index: 1000;
+        pointer-events: none; /* Prevents interference with mouse movement */
+    }
+</style>
+
+<style>
+    /* Table for release details */
+    .release-details {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10px;
+    }
+    .release-details td {
+        border: 1px solid white;
+        padding: 5px;
+        font-size: 14px;
+    }
+</style>
+<div class="main-container">
+        <div class="content">
+            <h1>All Bands</h1>
+            <ul id="artistList" class="artist-list"></ul>
+        </div>
+    </div>
+    <script>
+        fetch("banddata.json")
+            .then(response => response.json())
+            .then(bands => {
+                const artistList = document.getElementById("artistList");
+                bands.forEach(band => {
+                    let li = document.createElement("li");
+                    let a = document.createElement("a");
+                    a.textContent = band.band_name;
+                    a.href = `band.html?band=${encodeURIComponent(band.band_name)}`;
+                    li.appendChild(a);
+                    artistList.appendChild(li);
+                });
+            })
+            .catch(error => console.error("Error loading band data:", error));
+    </script>
+
+<center><p>Is this page incomplete? Help by submitting info.</p></center>
+
+<script>
+document.getElementById("randomBandButton").addEventListener("click", function () {
+    fetch("banddata.json")
+        .then(response => response.json())
+        .then(bands => {
+            if (bands.length === 0) {
+                alert("No bands available.");
+                return;
+            }
+            const randomBand = bands[Math.floor(Math.random() * bands.length)];
+            window.location.href = `band.html?band=${encodeURIComponent(randomBand.band_name)}`;
+        })
+        .catch(error => console.error("Error loading band data:", error));
+});
+</script>
+
+
+</body>
+</html>
