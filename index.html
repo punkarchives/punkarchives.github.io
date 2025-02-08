@@ -220,6 +220,36 @@
             <ul>
             </ul>
         </div></center>
+<br>
+<center>
+  <div class="latest-additions">
+    <h2>Top Users</h2>
+    <ul id="top-users-list"></ul>
+  </div>
+</center>
+
+<script>
+  fetch('users.json')
+    .then(response => response.json())
+    .then(users => {
+      // Sort users by score in descending order
+      users.sort((a, b) => b.score - a.score);
+
+      // Select the top 5 users
+      const topUsers = users.slice(0, 5);
+
+      // Get the list element
+      const list = document.getElementById("top-users-list");
+
+      // Populate the list
+      topUsers.forEach(user => {
+        const listItem = document.createElement("li");
+        listItem.textContent = `${user.username}: ${user.score}`;
+        list.appendChild(listItem);
+      });
+    })
+    .catch(error => console.error("Error loading users:", error));
+</script>
 </div>
 
 <script>
