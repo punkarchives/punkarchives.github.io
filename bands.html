@@ -198,6 +198,13 @@
             <li><a id="randomBandButton">Random Band</font></a></li>
         </ul>
         </ul>
+        <h1>Stupid Stuff:</h1>
+		<ul>
+            <li><a href="bandname.html#"><font face="MyCustomFont">Band Name Generator</a></li>
+            <li><a href="straightedge.html#">Straight edge-ifier</a></li>
+            <li><a href="madlibs.html#">Punk Mad-Libs</a></li>
+            <li><a href="speech.html#">Scott Vogel Speech Generator</a></font></li>
+        <ul>
     </div>
 
 <!-- Right Sidebar -->
@@ -206,20 +213,54 @@
         <input type="text" id="searchBar" placeholder="Search..." oninput="searchBands()">
         <ul id="searchResults" style="list-style: none; padding: 0; display: none; background: #121212; border: 1px solid #660000; position: absolute; width: 140px; max-height: 200px; overflow-y: auto;"></ul>
     </div><br>
-        <center><div class="latest-additions">
-            <h2>Latest Additions</h2>
-            <ul>
-                <a href="band.html?band=The%20Great%20Redneck%20Hope"><u><font color="#ffffff">The Great Redneck Hope</font></u></a><br><br>
-                <a href="band.html?band=Black%20Flag"><u><font color="#ffffff">Black Flag</font></u></a><br><br>
-                <a href="band.html?band=Insect%20Warfare"><u><font color="#ffffff">Insect Warfare</font></u></a><br><br>
-            </ul>
-        </div></center>
-<br>
-        <center><div class="latest-additions">
-            <h2>Latest Updates</h2>
-            <ul>
-            </ul>
-        </div></center>
+<center>
+    <div class="latest-additions">
+        <h2>Latest Additions</h2>
+        <ul id="latest-additions-list"></ul>
+    </div>
+</center>
+
+<script>
+    fetch('latest_additions.json')
+        .then(response => response.json())
+        .then(data => {
+            let list = document.getElementById("latest-additions-list");
+            data.latest_additions.forEach(band => {
+                let link = document.createElement("a");
+                link.href = band.url;
+                link.innerHTML = `<u><font color="#ffffff">${band.name}</font></u>`;
+                list.appendChild(link);
+                list.appendChild(document.createElement("br"));
+                list.appendChild(document.createElement("br"));
+            });
+        })
+        .catch(error => console.error('Error loading latest additions:', error));
+</script>
+
+<center>
+    <div class="latest-additions">
+        <h2>Latest Updates</h2>
+        <ul id="latest-updates-list"></ul>
+    </div>
+</center>
+
+<script>
+    fetch('latest_updates.json')
+        .then(response => response.json())
+        .then(data => {
+            let list = document.getElementById("latest-updates-list");
+            data.latest_additions.forEach(band => {
+                let link = document.createElement("a");
+                link.href = band.url;
+                link.innerHTML = `<u><font color="#ffffff">${band.name}</font></u>`;
+                list.appendChild(link);
+                list.appendChild(document.createElement("br"));
+                list.appendChild(document.createElement("br"));
+            });
+        })
+        .catch(error => console.error('Error loading latest updates:', error));
+</script>
+
 <br>
 <center>
   <div class="latest-additions">

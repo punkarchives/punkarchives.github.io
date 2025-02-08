@@ -118,7 +118,7 @@
         /* Main Content */
         .content {
             width: 100%;
-            max-width: 70%;
+            max-width: 70%; /* Prevents extreme width */
             padding: 20px;
         }
 
@@ -203,7 +203,7 @@
             <li><a href="bandname.html#"><font face="MyCustomFont">Band Name Generator</a></li>
             <li><a href="straightedge.html#">Straight edge-ifier</a></li>
             <li><a href="madlibs.html#">Punk Mad-Libs</a></li>
-            <li><a href="speech.html#">Scott Vogel Speech Generator</a></font></li>
+            <li><a href="speech">Scott Vogel Speech Generator</a></font></li>
         <ul>
     </div>
 
@@ -377,223 +377,98 @@ function searchBands() {
 }
 </script>
 
+
+
+
     <!-- Main Container -->
     <div class="main-container">
-        <!-- Band Content will be updated here -->
-        <div id="band-content" class="content">
-            <h1>Loading...</h1>
-        </div>
-    </div>
+        <div class="content">
+    <center><h1>Scott Vogel Speech Generator</h1><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scott Vogel Speech Generator</title>
+    <style>
+        body { background-color: black; color: white; font-family: Arial, sans-serif; text-align: center; }
+        button { background-color: red; color: white; padding: 10px; border: none; cursor: pointer; font-size: 18px; }
+        button:hover { background-color: darkred; }
+        #speech { margin-top: 20px; font-size: 20px; }
+    </style>
+</head>
+<body>
+    <button onclick="generateSpeech()">Generate Speech</button>
+    <p id="speech"></p>
 
-<style>
-    /* Styling for the floating album cover */
-    #album-cover {
-        display: none;
-        position: absolute;
-        width: 200px;
-        height: auto;
-        border: 2px solid white;
-        background: black;
-        padding: 5px;
-        z-index: 1000;
-        pointer-events: none; /* Prevents interference with mouse movement */
-    }
-</style>
+    <script>
+        const intros = [
+            "This is hardcore!",
+            "Alright, listen up!",
+            "What the fuck is up?",
+            "How many of you are seeing Terror for the first time?",
+            "Every single person in this room...",
+            "Hold up a second."
+        ];
 
-<style>
-    /* Table for release details */
-    .release-details {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 10px;
-    }
-    .release-details td {
-        border: 1px solid white;
-        padding: 5px;
-        font-size: 14px;
-    }
-</style>
+        const commands = [
+            "Get up here!",
+            "I wanna see you move!",
+            "Open up that pit!",
+            "Let's see some fucking energy!",
+            "If you stand still, you're dead!",
+            "This is your last chance to go off!"
+        ];
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const bandName = urlParams.get("band");
+        const breakdownHype = [
+            "When this shit drops, you better go fucking crazy!",
+            "I wanna see everyone climbing up here!",
+            "I don't want anyone to get hurt here.",
+            "Tear this shit apart!",
+            "Hardcore is fucking alive!",
+            "Go fucking wild!"
+        ];
 
-        if (!bandName) {
-            document.getElementById("band-content").innerHTML = "<h1>No band selected.</h1>";
-            return;
+        const communityLove = [
+            "Hardcore is more than music. It's a fucking family!",
+            "Hardcore is about looking out for one another!",
+            "No one gets left behind in hardcore!",
+            "Support each other, support your local bands!",
+            "This music brings us together. We stand strong as one.",
+            "Hardcore is about unity and respect."
+        ];
+
+        const communityLove2 = [
+            "Hardcore is every single one of you in this room. Every single one of you is part of something special.",
+            "Hardcore is about standing together no matter what. I don't care about the color of your skin, what bands you like, fuck all that. This is a community.",
+            "We're all here because this music means something to us. Hardcore is about being yourself, and being fucking connected in things like this.",
+            "This isn't just a hardcore show. This is a community. I love the the hardcore community and every single one of you in the crowd.",
+            "This is hardcore. We don't give a fuck about the color of your skin, the length of your hair, how long you've been around, what bands you're in, you know what I'm saying?",
+            "Hardcore is open minded. I don't want anyone getting hurt. The last thing I want is a fight. If a nazi comes through that door though, he's in for a fight."
+        ];
+
+        const outros = [
+            "Lets have fun! Positive aggression!",
+            "Positive aggression, step on somebody!",
+            "Fucking destroy this!",
+            "Much love to everyone here!",
+            "Feel free to express yourself! Feel free to create some energy!",
+            "Make some energy! Jump! Crawl! Do your fucking mosh!"
+        ];
+
+        function generateSpeech() {
+            let speech = `${random(intros)} ${random(commands)} ${random(breakdownHype)} ${random(communityLove)} ${random(communityLove2)} ${random(outros)}`;
+            document.getElementById("speech").innerText = speech;
         }
 
-        fetch("banddata.json")
-            .then(response => response.json())
-            .then(bands => {
-                const band = bands.find(b => b.band_name === bandName);
-                if (!band) {
-                    document.getElementById("band-content").innerHTML = "<h1>Band not found.</h1>";
-                    return;
-                }
+        function random(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+    </script>
+</body>
+</html>
 
-                let bandHTML = 
-                    `<h1>${band.band_name}</h1>
-                    <p><strong>Genres:</strong> ${band.genre.join(", ")}</p>
-                    <p><strong>Location:</strong> ${band.location}</p>
-                    <p><strong>Years Active:</strong> ${band.years_active}</p>
-                    <p><strong>Related Bands:</strong> ${band.related_bands.join(", ")}</p>
-                    <p><strong>Links:</strong></p>
-                    <ul>
-                        ${Object.entries(band.official_links).map(([key, url]) => `<li><a href="${url}" target="_blank">${key}</a></li>`).join("")}
-                    </ul>
-					
-                    <p><strong>Added By:<strong> ${band.description}</p>`;
-
-                // **Band Members Table**
-                if (band.members && band.members.length > 0) {
-                    bandHTML += `<hr><h2>Band Members</h2>
-                    <table border="1" style="border-collapse: collapse; width: 100%; text-align: left; border: 2px #660000;">
-                        <tr>
-                            <th>Name</th>
-                            <th>Instrument</th>
-                            <th>Time Active</th>
-                            <th>Status</th>
-                        </tr>`;
-                    band.members.forEach(member => {
-                        bandHTML += `
-                        <tr>
-                            <td>${member.name}</td>
-                            <td>${member.instrument}</td>
-                            <td>${member.time_active}</td>
-                            <td>${member.status}</td>
-                        </tr>`;
-                    });
-                    bandHTML += `</table>`;
-                }
-
-                // **Discography Section**
-                if (band.releases && band.releases.length > 0) {
-    bandHTML += `<hr><h2>Discography</h2>`;
-    band.releases.forEach((release, index) => {
-        bandHTML += `
-            <div style="margin-bottom: 10px;">
-                <u>
-                    <h3 class="release-title" data-image="${release.cover_image}" 
-                        style="margin-bottom: 5px; cursor: pointer; display: inline-block;">
-                        ${release.title}
-                    </h3>
-                </u>
-                <button class="download-image" data-image="${release.cover_image}" style="margin-left: 10px;">Download Image</button>
-<table class="release-details" style="border-collapse: collapse; border: 2px solid #660000;">
-    <tr><td style="border: 1px solid #660000;"><strong>Label:</strong></td><td style="border: 1px solid #660000;">${release.label || "N/A"}</td></tr>
-    <tr><td style="border: 1px solid #660000;"><strong>Release Date:</strong></td><td style="border: 1px solid #660000;">${release.year || "Unknown"}</td></tr>
-    <tr><td style="border: 1px solid #660000;"><strong>Type:</strong></td><td style="border: 1px solid #660000;">${release.release_type || "N/A"}</td></tr>
-    <tr><td style="border: 1px solid #660000;"><strong>Format:</strong></td><td style="border: 1px solid #660000;">${release.physical_format || "N/A"}</td></tr>
-    <tr><td style="border: 1px solid #660000;"><strong>Limitation:</strong></td><td style="border: 1px solid #660000;">${release.limitation || "N/A"}</td></tr>
-    <tr><td style="border: 1px solid #660000;"><strong>Extra Info:</strong></td><td style="border: 1px solid #660000;">${release.extra_info || "N/A"}</td></tr>
-</table>
-
-                
-                <!-- Collapsible Tracklist -->
-                <button class="toggle-tracks" data-index="${index}" 
-                    style="display: block; margin-top: 5px; background: black; color: white; border: 1px solid red; padding: 5px;">
-                    Show Tracklist
-                </button>
-                <ol class="tracklist" id="tracklist-${index}" 
-                    style="display: none; margin-top: 5px; padding-left: 20px;">
-                    ${release.tracks.map(track => `<li>${track}</li>`).join("")}
-                </ol>
-            </div>`;
-    });
-}
-
-setTimeout(() => {
-    document.querySelectorAll(".toggle-tracks").forEach(button => {
-        button.addEventListener("click", function () {
-            const index = this.getAttribute("data-index");
-            const tracklist = document.getElementById(`tracklist-${index}`);
-            if (tracklist.style.display === "none") {
-                tracklist.style.display = "block";
-                this.textContent = "Hide Tracklist";
-            } else {
-                tracklist.style.display = "none";
-                this.textContent = "Show Tracklist";
-            }
-        });
-    });
-}, 100);
-
-                document.getElementById("band-content").innerHTML = bandHTML;
-
-                // **Album Cover Hover Feature**
-                const albumCover = document.createElement("img");
-                albumCover.id = "album-cover";
-                albumCover.style.position = "absolute";
-                albumCover.style.width = "200px";
-                albumCover.style.border = "2px solid white";
-                albumCover.style.display = "none";
-                albumCover.style.background = "black";
-                albumCover.style.padding = "5px";
-                albumCover.style.zIndex = "1000";
-                albumCover.style.pointerEvents = "none";
-                document.body.appendChild(albumCover);
-
-                document.querySelectorAll(".release-title").forEach(title => {
-                    title.addEventListener("mouseover", function (event) {
-                        const imageUrl = this.getAttribute("data-image");
-                        if (imageUrl) {
-                            albumCover.src = imageUrl;
-                            albumCover.style.display = "block";
-                        }
-                    });
-
-                    title.addEventListener("mousemove", function (event) {
-                        albumCover.style.top = `${event.pageY + 10}px`;
-                        albumCover.style.left = `${event.pageX + 10}px`;
-                    });
-
-                    title.addEventListener("mouseleave", function () {
-                        albumCover.style.display = "none";
-                    });
-                });
-
-                // **Download Image Feature**
-                document.querySelectorAll(".download-image").forEach(button => {
-                    button.addEventListener("click", function () {
-                        const imageUrl = this.getAttribute("data-image");
-                        if (imageUrl) {
-                            const link = document.createElement("a");
-                            link.href = imageUrl;
-                            link.download = imageUrl.split("/").pop();
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                        }
-                    });
-                });
-
-                // **Extra Images Carousel Feature**
-                if (band.extra_images && band.extra_images.length > 0) {
-                    let currentImageIndex = 0;
-
-                    document.getElementById("image-carousel").style.display = "block";
-                    document.getElementById("carousel-image").src = band.extra_images[currentImageIndex];
-
-                    document.getElementById("prev-image").addEventListener("click", function () {
-                        currentImageIndex = (currentImageIndex - 1 + band.extra_images.length) % band.extra_images.length;
-                        document.getElementById("carousel-image").src = band.extra_images[currentImageIndex];
-                    });
-
-                    document.getElementById("next-image").addEventListener("click", function () {
-                        currentImageIndex = (currentImageIndex + 1) % band.extra_images.length;
-                        document.getElementById("carousel-image").src = band.extra_images[currentImageIndex];
-                    });
-                }
-            })
-            .catch(error => console.error("Error loading band data:", error));
-    });
-</script>
-
-
-<center><p>Is this page incomplete? Help by submitting info.</p></center>
-
+        </div>
+    </div>
 <script>
 document.getElementById("randomBandButton").addEventListener("click", function () {
     fetch("banddata.json")
@@ -609,7 +484,6 @@ document.getElementById("randomBandButton").addEventListener("click", function (
         .catch(error => console.error("Error loading band data:", error));
 });
 </script>
-
 
 </body>
 </html>

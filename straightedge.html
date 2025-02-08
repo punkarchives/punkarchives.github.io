@@ -118,7 +118,7 @@
         /* Main Content */
         .content {
             width: 100%;
-            max-width: 70%;
+            max-width: 70%; /* Prevents extreme width */
             padding: 20px;
         }
 
@@ -377,223 +377,61 @@ function searchBands() {
 }
 </script>
 
+
+
+
     <!-- Main Container -->
     <div class="main-container">
-        <!-- Band Content will be updated here -->
-        <div id="band-content" class="content">
-            <h1>Loading...</h1>
+        <div class="content">
+    <center><h1>Straight Edge-ifier</h1>
+    <textarea id="input" placeholder="Enter text here..."></textarea><br>
+    <button onclick="straightEdgeify()">Straight Edge-ify</button>
+    <div id="output"></div>
+
+    <script>
+        function straightEdgeify() {
+            let text = document.getElementById("input").value;
+            let replacements = {
+                // Alcohol
+                "beer": "root beer", "beers": "root beers", "whiskey": "soda", "whisky": "apple juice", "whiskey": "apple juice",
+                "bourbon": "apple cider", "vodka": "ice cold water", "rum": "coconut water", "tequila": "dedication to sobriety", 
+                "gin": "herbal tea", "brandy": "almond milk", "absinthe": "cucumber water", "champagne": "sparkling water", 
+                "wine": "grape juice", "red wine": "organic grape juice", "white wine": "sparkling apple cider", 
+                "booze": "x on your fist", "alcohol": "commitment to purity", "drunk": "enlightened", "hammered": "extra hydrated", 
+                "wasted": "fully focused", "tipsy": "mildly joyful", "bar": "earth crisis show", "liquor": "sparkling water", "sake": "tea",
+                
+                // Drugs & Smoking
+                "weed": "seaweed", "marijuana": "kale", "pot": "herbal supplements", "420": "sobriety", 
+                "joint": "seaweed", "blunt": "celery stick", "bong": "smoothie blender", "spliff": "organic incense", 
+                "vape": "peppermint diffuser", "cigarette": "cinnamon gum", "cigarettes": "minty fresh breath", "cig": "cinnamon gum", 
+                "smoking": "deep breathing", "nicotine": "strong willpower", "tobacco": "essential oils", "juul": "essential oil diffuser", 
+                "crack": "fresh air", "cocaine": "pixie sticks", "heroin": "straight-edge passion", "meth": "positive mental attitude", 
+                "speed": "morning jog", "LSD": "vivid imagination", "acid": "open mind", "mushrooms": "vegan meal", 
+                "ecstasy": "a good hardcore show", "molly": "strong friendships", "ketamine": "cold shower", "drugs": "crowd-killing", "drug": "straight-edge dedication", "fent": "lack of sleep", "fentanyl": "lack of sleep", "cart": "essential oil diffuser", "yart": "essential oil diffuser",
+                
+                // Meat & Animal Products
+                "steak": "tofu", "bacon": "tofu", "sausage": "tofu", "burger": "veggie burger", 
+                "cheeseburger": "dairy-free veggie burger", "chicken": "eco terrorism", "fried chicken": "fried tofu", "beef": "eco terrorism", 
+                "pork": "tofu", "ribs": "tofu", "hot dog": "tofu", "meat": "cruelty-free protein", 
+                "fish": "cutting fishing nets", "sushi": "seaweed", "shrimp": "cutting fishing nets", "lobster": "cutting fishing nets", 
+                "cheese": "freeing a veal cow", "milk": "oat milk", "dairy": "oat milk",
+                
+                // General Party/Non-SxE Culture
+                "party": "sober gathering", "rave": "hardcore show", "club": "hardcore venue", "festival": "benefit show", 
+                "hangover": "tired after a show", "blackout": "deep meditation", "buzzed": "excited", 
+                "bartender": "scum"
+            };
+            
+            for (let [key, value] of Object.entries(replacements)) {
+                let regex = new RegExp("\\b" + key + "\\b", "gi");
+                text = text.replace(regex, value);
+            }
+            
+            document.getElementById("output").textContent = "X" + text + "X";
+        }
+    </script>
         </div>
     </div>
-
-<style>
-    /* Styling for the floating album cover */
-    #album-cover {
-        display: none;
-        position: absolute;
-        width: 200px;
-        height: auto;
-        border: 2px solid white;
-        background: black;
-        padding: 5px;
-        z-index: 1000;
-        pointer-events: none; /* Prevents interference with mouse movement */
-    }
-</style>
-
-<style>
-    /* Table for release details */
-    .release-details {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 10px;
-    }
-    .release-details td {
-        border: 1px solid white;
-        padding: 5px;
-        font-size: 14px;
-    }
-</style>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const bandName = urlParams.get("band");
-
-        if (!bandName) {
-            document.getElementById("band-content").innerHTML = "<h1>No band selected.</h1>";
-            return;
-        }
-
-        fetch("banddata.json")
-            .then(response => response.json())
-            .then(bands => {
-                const band = bands.find(b => b.band_name === bandName);
-                if (!band) {
-                    document.getElementById("band-content").innerHTML = "<h1>Band not found.</h1>";
-                    return;
-                }
-
-                let bandHTML = 
-                    `<h1>${band.band_name}</h1>
-                    <p><strong>Genres:</strong> ${band.genre.join(", ")}</p>
-                    <p><strong>Location:</strong> ${band.location}</p>
-                    <p><strong>Years Active:</strong> ${band.years_active}</p>
-                    <p><strong>Related Bands:</strong> ${band.related_bands.join(", ")}</p>
-                    <p><strong>Links:</strong></p>
-                    <ul>
-                        ${Object.entries(band.official_links).map(([key, url]) => `<li><a href="${url}" target="_blank">${key}</a></li>`).join("")}
-                    </ul>
-					
-                    <p><strong>Added By:<strong> ${band.description}</p>`;
-
-                // **Band Members Table**
-                if (band.members && band.members.length > 0) {
-                    bandHTML += `<hr><h2>Band Members</h2>
-                    <table border="1" style="border-collapse: collapse; width: 100%; text-align: left; border: 2px #660000;">
-                        <tr>
-                            <th>Name</th>
-                            <th>Instrument</th>
-                            <th>Time Active</th>
-                            <th>Status</th>
-                        </tr>`;
-                    band.members.forEach(member => {
-                        bandHTML += `
-                        <tr>
-                            <td>${member.name}</td>
-                            <td>${member.instrument}</td>
-                            <td>${member.time_active}</td>
-                            <td>${member.status}</td>
-                        </tr>`;
-                    });
-                    bandHTML += `</table>`;
-                }
-
-                // **Discography Section**
-                if (band.releases && band.releases.length > 0) {
-    bandHTML += `<hr><h2>Discography</h2>`;
-    band.releases.forEach((release, index) => {
-        bandHTML += `
-            <div style="margin-bottom: 10px;">
-                <u>
-                    <h3 class="release-title" data-image="${release.cover_image}" 
-                        style="margin-bottom: 5px; cursor: pointer; display: inline-block;">
-                        ${release.title}
-                    </h3>
-                </u>
-                <button class="download-image" data-image="${release.cover_image}" style="margin-left: 10px;">Download Image</button>
-<table class="release-details" style="border-collapse: collapse; border: 2px solid #660000;">
-    <tr><td style="border: 1px solid #660000;"><strong>Label:</strong></td><td style="border: 1px solid #660000;">${release.label || "N/A"}</td></tr>
-    <tr><td style="border: 1px solid #660000;"><strong>Release Date:</strong></td><td style="border: 1px solid #660000;">${release.year || "Unknown"}</td></tr>
-    <tr><td style="border: 1px solid #660000;"><strong>Type:</strong></td><td style="border: 1px solid #660000;">${release.release_type || "N/A"}</td></tr>
-    <tr><td style="border: 1px solid #660000;"><strong>Format:</strong></td><td style="border: 1px solid #660000;">${release.physical_format || "N/A"}</td></tr>
-    <tr><td style="border: 1px solid #660000;"><strong>Limitation:</strong></td><td style="border: 1px solid #660000;">${release.limitation || "N/A"}</td></tr>
-    <tr><td style="border: 1px solid #660000;"><strong>Extra Info:</strong></td><td style="border: 1px solid #660000;">${release.extra_info || "N/A"}</td></tr>
-</table>
-
-                
-                <!-- Collapsible Tracklist -->
-                <button class="toggle-tracks" data-index="${index}" 
-                    style="display: block; margin-top: 5px; background: black; color: white; border: 1px solid red; padding: 5px;">
-                    Show Tracklist
-                </button>
-                <ol class="tracklist" id="tracklist-${index}" 
-                    style="display: none; margin-top: 5px; padding-left: 20px;">
-                    ${release.tracks.map(track => `<li>${track}</li>`).join("")}
-                </ol>
-            </div>`;
-    });
-}
-
-setTimeout(() => {
-    document.querySelectorAll(".toggle-tracks").forEach(button => {
-        button.addEventListener("click", function () {
-            const index = this.getAttribute("data-index");
-            const tracklist = document.getElementById(`tracklist-${index}`);
-            if (tracklist.style.display === "none") {
-                tracklist.style.display = "block";
-                this.textContent = "Hide Tracklist";
-            } else {
-                tracklist.style.display = "none";
-                this.textContent = "Show Tracklist";
-            }
-        });
-    });
-}, 100);
-
-                document.getElementById("band-content").innerHTML = bandHTML;
-
-                // **Album Cover Hover Feature**
-                const albumCover = document.createElement("img");
-                albumCover.id = "album-cover";
-                albumCover.style.position = "absolute";
-                albumCover.style.width = "200px";
-                albumCover.style.border = "2px solid white";
-                albumCover.style.display = "none";
-                albumCover.style.background = "black";
-                albumCover.style.padding = "5px";
-                albumCover.style.zIndex = "1000";
-                albumCover.style.pointerEvents = "none";
-                document.body.appendChild(albumCover);
-
-                document.querySelectorAll(".release-title").forEach(title => {
-                    title.addEventListener("mouseover", function (event) {
-                        const imageUrl = this.getAttribute("data-image");
-                        if (imageUrl) {
-                            albumCover.src = imageUrl;
-                            albumCover.style.display = "block";
-                        }
-                    });
-
-                    title.addEventListener("mousemove", function (event) {
-                        albumCover.style.top = `${event.pageY + 10}px`;
-                        albumCover.style.left = `${event.pageX + 10}px`;
-                    });
-
-                    title.addEventListener("mouseleave", function () {
-                        albumCover.style.display = "none";
-                    });
-                });
-
-                // **Download Image Feature**
-                document.querySelectorAll(".download-image").forEach(button => {
-                    button.addEventListener("click", function () {
-                        const imageUrl = this.getAttribute("data-image");
-                        if (imageUrl) {
-                            const link = document.createElement("a");
-                            link.href = imageUrl;
-                            link.download = imageUrl.split("/").pop();
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                        }
-                    });
-                });
-
-                // **Extra Images Carousel Feature**
-                if (band.extra_images && band.extra_images.length > 0) {
-                    let currentImageIndex = 0;
-
-                    document.getElementById("image-carousel").style.display = "block";
-                    document.getElementById("carousel-image").src = band.extra_images[currentImageIndex];
-
-                    document.getElementById("prev-image").addEventListener("click", function () {
-                        currentImageIndex = (currentImageIndex - 1 + band.extra_images.length) % band.extra_images.length;
-                        document.getElementById("carousel-image").src = band.extra_images[currentImageIndex];
-                    });
-
-                    document.getElementById("next-image").addEventListener("click", function () {
-                        currentImageIndex = (currentImageIndex + 1) % band.extra_images.length;
-                        document.getElementById("carousel-image").src = band.extra_images[currentImageIndex];
-                    });
-                }
-            })
-            .catch(error => console.error("Error loading band data:", error));
-    });
-</script>
-
-
-<center><p>Is this page incomplete? Help by submitting info.</p></center>
-
 <script>
 document.getElementById("randomBandButton").addEventListener("click", function () {
     fetch("banddata.json")
@@ -609,7 +447,6 @@ document.getElementById("randomBandButton").addEventListener("click", function (
         .catch(error => console.error("Error loading band data:", error));
 });
 </script>
-
 
 </body>
 </html>
