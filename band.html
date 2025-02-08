@@ -470,13 +470,13 @@ function searchBands() {
 
                 // **Discography Section**
                 if (band.releases && band.releases.length > 0) {
-    bandHTML += `<hr><h2>Discography</h2>`;
-    band.releases.forEach((release, index) => {
-        bandHTML += `
-            <div style="margin-bottom: 10px;">
-                <u>
-                    <h3 class="release-title" data-image="${release.cover_image}" 
-                        style="margin-bottom: 5px; cursor: pointer; display: inline-block;">
+  			  bandHTML += `<hr><h2>Discography</h2>`;
+  			  band.releases.forEach((release, index) => {
+  			      bandHTML += `
+<div style="margin-bottom: 10px;">
+<u>
+<h3 class="release-title" data-image="${release.cover_image}" 
+style="margin-bottom: 5px; cursor: pointer; display: inline-block;">
                         ${release.title}
                     </h3>
                 </u>
@@ -489,7 +489,6 @@ function searchBands() {
     <tr><td style="border: 1px solid #660000;"><strong>Limitation:</strong></td><td style="border: 1px solid #660000;">${release.limitation || "N/A"}</td></tr>
     <tr><td style="border: 1px solid #660000;"><strong>Extra Info:</strong></td><td style="border: 1px solid #660000;">${release.extra_info || "N/A"}</td></tr>
 </table>
-
                 
                 <!-- Collapsible Tracklist -->
                 <button class="toggle-tracks" data-index="${index}" 

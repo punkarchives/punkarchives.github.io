@@ -3,7 +3,7 @@
     "band_name": "Insect Warfare",
     "genre": ["Grindcore", "Deathgrind"],
     "location": "Houston, Texas (TX), USA",
-    "years_active": "2004-2007, 2009, 2016-2017",
+    "years_active": "2004-2007, 2009, 2016-2017 (Inactive)",
     "description": "nxdx<br>Claimed Points: 190<br>Potential Points: ~12",
     "view_count": 0,
     "related_bands": [],
@@ -71,6 +71,7 @@
         "physical_format": "CD-R",
         "limitation": "",
         "extra_info": "",
+        "listen": "",
         "tracks": ["But Now You Die", "Hurricane Death", "Amphetamine Psychosis", "Negative Appeal", "Death to False Grind", "At War with Grindcore"]
       },
       {
@@ -381,7 +382,7 @@
     "band_name": "Black Flag",
     "genre": ["Hardcore Punk", "Jazz-Rock"],
     "location": "Hermosa Beach, California (CA), USA",
-    "years_active": "1976-1986, 2003, 2013-Present",
+    "years_active": "1976-1986, 2003, 2013-Present (Active)",
     "description": "nxdx<br>Claimed Points: 173<br>Potential Points: ~86",
     "view_count": 0,
     "related_bands": ["Rollins Band", "Minuteflag", "Gone"],
@@ -635,8 +636,8 @@
     "band_name": "The Great Redneck Hope",
     "genre": ["Mathcore, Mathgrind"],
     "location": "Colorado Springs, Colorado (CO), USA",
-    "years_active": "2000-2007",
-    "description": "nxdx<br>Claimed Points: 81<br>Potential Points: ~15",
+    "years_active": "2000-2007 (Inactive)",
+    "description": "nxdx<br>Claimed Points: 83<br>Potential Points: ~13",
     "view_count": 0,
     "related_bands": [],
 "official_links": {
@@ -746,7 +747,85 @@
         "physical_format": "Vinyl 12-inch",
         "limitation": "",
         "extra_info": "",
-        "tracks": ["(tracks from 'Cross The Line' demo)", "Live @ WIUW In Chicago, IL"]
+        "tracks": ["(Cross The Line Tracks): Putting The 'Gay' Back In Gangsta", "Constructing A Graboid Lure Out Of A Can Of Dr. Scholls And A Torn T-Shirt", "You're Not A Man 'Till You've Been With A Man", "Pass The Harpoon So I Can Stab Dad In The Neck", "Die Turkey, Die!", "Punching Cattle In The Middle Of Kansas On A Jackrabbit", "Die Turkey, Die! (Remixed)", "(Live Tracks): Girl, Are You Pregnant? It’s Not My Fault! You Seduced Me!", "A Rhetorical Question: What Do Christian Kids Talk About? (Ex: 'God Is Awesome' 'Totally')", "Never Mind The Amputees. Let's Have Sex", "It Sure Does Get Lonely Out Here In The Boondocks. Thank God For Cock", "Did You Ever Notice That 'Stat' Is 'Tats' Backward? Dude, That's So Tribal", "Pssst! Hey, The Lord Is Awesome. Pass It On", "They Say The People Elect The Government They Deserve, But I Don't Remember Knife-Raping Any Retarded Nuns"]
+      }
+    ],
+    "extra_images": [
+      ""
+    ]
+  },
+  
+     {
+    "band_name": "Terrible Virtue",
+    "genre": ["Hardcore Punk"],
+    "location": "Epping, New South Wales (NSW), Australia",
+    "years_active": "1987-???? (Inactive)",
+    "description": "nxdx<br>Claimed Points: 38<br>Potential Points: ~18",
+    "view_count": 0,
+    "related_bands": [],
+"official_links": {
+
+},
+    "members": [
+        {
+          "name": "Baggus Brady",
+          "instrument": "Bass",
+          "time_active": "1987-????",
+          "status": "Current"
+        },
+		        {
+          "name": "Peter Allen",
+          "instrument": "Drums",
+          "time_active": "1987-????",
+          "status": "Current"
+        },
+				        {
+          "name": "‎Dick Ford",
+          "instrument": "‎Guitar",
+          "time_active": "‎1987-????",
+          "status": "‎Current"
+        },
+				        {
+          "name": "‎Rod 'Snuffy' Hunt",
+          "instrument": "‎Vocals",
+          "time_active": "‎1987-????",
+          "status": "‎Current"
+        },
+		        {
+          "name": "‎ ",
+          "instrument": "‎ ",
+          "time_active": "‎ ",
+          "status": "‎ "
+        },
+		        {
+          "name": "Dick Needham",
+          "instrument": "Vocals",
+          "time_active": "1987-1988",
+          "status": "Former"
+        }
+      ],
+    "releases": [
+      {
+        "title": "Noise From An Average Suburban Garage",
+        "cover_image": "https://i.discogs.com/S6dXHARvLyY_I6mXxx_KjmrZCBl-05fmQzgqsiGp6W0/rs:fit/g:sm/q:90/h:600/w:374/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTEyNTgx/Nzg0LTE3Mzc5Nzcx/NzMtMTIzNy5qcGVn.jpeg",
+        "label": "R.O.A.R. Productions",
+        "year": "September 14, 1987",
+        "release_type": "Demo",
+        "physical_format": "Cassette",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["T.V.", "Neat Neat Neat", "Classroom Conversation", "Bodies", "Radiation Poisoning", "The Good The Bad The Ugly", "Neglected Duties", "Batman", "Summer Love", "Queen Mum"]
+      },
+	        {
+        "title": "I Only Laugh When It Hurts........",
+        "cover_image": "https://i.discogs.com/LTbtbF8dDTA-4CUWed0T3T_dZFAMrshIoM3obZHBp5A/rs:fit/g:sm/q:90/h:600/w:549/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NDUx/MzY1LTE2NTQxMTcz/NzQtNTk5OC5qcGVn.jpeg",
+        "label": "Even Clowns Cry",
+        "year": "(Between March 12-April 12) 1989",
+        "release_type": "EP",
+        "physical_format": "Cassette",
+        "limitation": "",
+        "extra_info": "Single-sided",
+        "tracks": ["Stuck In The Mud", "Social Failure", "(I Could Be So) Gnarly", "Radiation Poisoning", "Isolated", "Age Of Faith", "Sheep", "Lies.....", "Lonely, Lonely, Lonely"]
       }
     ],
     "extra_images": [
