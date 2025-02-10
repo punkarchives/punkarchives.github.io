@@ -4,7 +4,7 @@
     "genre": ["Grindcore", "Deathgrind"],
     "location": "Houston, Texas (TX), USA",
     "years_active": "2004-2007, 2009, 2016-2017 (Inactive)",
-    "description": "nxdx<br>Claimed Points: 190<br>Potential Points: ~12",
+    "description": "nxdx",
     "view_count": 0,
     "related_bands": [],
 "official_links": {
@@ -383,7 +383,7 @@
     "genre": ["Hardcore Punk", "Jazz-Rock"],
     "location": "Hermosa Beach, California (CA), USA",
     "years_active": "1976-1986, 2003, 2013-Present (Active)",
-    "description": "nxdx<br>Claimed Points: 173<br>Potential Points: ~86",
+    "description": "nxdx",
     "view_count": 0,
     "related_bands": ["Rollins Band", "Minuteflag", "Gone"],
 "official_links": {
@@ -637,7 +637,7 @@
     "genre": ["Mathcore, Mathgrind"],
     "location": "Colorado Springs, Colorado (CO), USA",
     "years_active": "2000-2007 (Inactive)",
-    "description": "nxdx<br>Claimed Points: 83<br>Potential Points: ~13",
+    "description": "nxdx",
     "view_count": 0,
     "related_bands": [],
 "official_links": {
@@ -760,7 +760,7 @@
     "genre": ["Hardcore Punk"],
     "location": "Epping, New South Wales (NSW), Australia",
     "years_active": "1987-???? (Inactive)",
-    "description": "nxdx<br>Claimed Points: 38<br>Potential Points: ~18",
+    "description": "nxdx",
     "view_count": 0,
     "related_bands": [],
 "official_links": {
@@ -830,6 +830,66 @@
     ],
     "extra_images": [
       ""
+    ]
+  },
+
+{
+    "band_name": "Otoboke Beaver (おとぼけビ～バ～)",
+    "genre": ["Garage Punk, Noise Rock, J-Punk"],
+    "location": "",
+    "years_active": "2009-Present",
+    "description": "",
+    "view_count": 0,
+    "related_bands": [],
+"official_links": {
+  "website": "https://www.otobokebeaver.com/"
+},
+    "members": [
+        {
+          "name": "Accorinrin",
+          "instrument": "Vocals",
+          "time_active": "2009-Present",
+          "status": "Current"
+        },
+		        {
+          "name": "Yoyoyoshie",
+          "instrument": "Guitar, Backing Vocals",
+          "time_active": "2009-Present",
+          "status": "Current"
+        },
+				        {
+          "name": "Hirochan",
+          "instrument": "‎Bass, Backing Vocals",
+          "time_active": "‎2013-Present",
+          "status": "‎Current"
+        },
+				        {
+          "name": "Kahokiss",
+          "instrument": "‎Drums, Backing Vocals",
+          "time_active": "‎2018-Present",
+          "status": "‎Current"
+        },
+		        {
+          "name": "‎ ",
+          "instrument": "‎ ",
+          "time_active": "‎ ",
+          "status": "‎ "
+        },
+		        {
+          "name": "Nishikawachi",
+          "instrument": "Bass, Backing Vocals",
+          "time_active": "2009-2013",
+          "status": "Former"
+        },
+		{
+          "name": "Pop",
+          "instrument": "Drums, Backing Vocals",
+          "time_active": "2009-2018",
+          "status": "Former"
+        }
+      ],
+    "releases": [
+      
     ]
   }
 
