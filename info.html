@@ -694,7 +694,6 @@ loadLeaderboard()
 
   // Function to save the band to Firebase
 window.saveBand = function () {
-
   console.log("🟢 saveBand() called");
 
   const getValue = (id) => {
@@ -707,16 +706,18 @@ window.saveBand = function () {
     return el.value.trim();
   };
 
-  const bandName = getValue("band-name");
-  if (!bandName) {
-    alert("Band name is required!");
-    return;
-  }
-
-  // Make sure the user is logged in
   const user = auth.currentUser;
   if (!user) {
     alert("You must be logged in to submit a band!");
+    return;
+  }
+
+  const username = user.email.replace("@punkarchives.com", "");
+const bandName = getValue("band-name");
+
+
+  if (!bandName.trim()) {
+    alert("Band name is required!");
     return;
   }
 
@@ -730,13 +731,14 @@ window.saveBand = function () {
     official_links: getValue("official-links"),
     members: getValue("band-members"),
     releases: getValue("band-releases"),
-    uploaded_by: user.email.replace("@punkarchives.com", "") // Extract username
+    uploaded_by: username
   };
 
   console.log("📤 Uploading Band Data:", bandData); // Debugging
 
   // Upload to Firebase
-  const bandRef = ref(db, "bands/" + bandName);
+const bandRef = ref(db, "bands/" + bandName + " " + username);
+
   set(bandRef, bandData)
     .then(() => {
       alert("✅ Band successfully uploaded!");
@@ -745,6 +747,7 @@ window.saveBand = function () {
       console.error("❌ Error saving band:", error);
     });
 };
+
 
 // Firebase config
 
