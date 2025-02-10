@@ -838,7 +838,7 @@
     "genre": ["Garage Punk, Noise Rock, J-Punk"],
     "location": "",
     "years_active": "2009-Present",
-    "description": "",
+    "description": "julianoncrack",
     "view_count": 0,
     "related_bands": [],
 "official_links": {
@@ -890,6 +890,84 @@
       ],
     "releases": [
       
+    ]
+  },
+  
+      {
+    "band_name": "Opposition Dolls",
+    "genre": ["Emo, Screamo"],
+    "location": "Miami, Florida (FL), USA",
+    "years_active": "2023-Present",
+    "description": "nxdx",
+    "view_count": 0,
+    "related_bands": [],
+"official_links": {
+  "linktree": "https://linktr.ee/oppositiondolls",
+  "bandcamp": "https://oppositiondolls.bandcamp.com/"
+},
+    "members": [
+        {
+          "name": "Dan",
+          "instrument": "",
+          "time_active": "",
+          "status": "Current"
+        },
+        {
+          "name": "Gian",
+          "instrument": "",
+          "time_active": "",
+          "status": "Current"
+        },
+        {
+          "name": "Orion",
+          "instrument": "",
+          "time_active": "",
+          "status": "Current"
+        },
+        {
+          "name": "Karina",
+          "instrument": "",
+          "time_active": "",
+          "status": "Current"
+        },
+      ],
+    "releases": [
+      {
+        "title": "don't stay here because you think it won't hold you back",
+        "cover_image": "https://f4.bcbits.com/img/a2326709486_16.jpg",
+        "label": "",
+        "year": "June 16, 2023",
+        "release_type": "Demo",
+        "physical_format": "",
+        "limitation": "",
+        "extra_info": "Practice Demo",
+        "tracks": ["don't stay here because you think it won't hold you back"]
+      },
+	        {
+        "title": "2024 Promo Split",
+        "cover_image": "https://i.discogs.com/qEaIp4mA0kY7evuZrraSFUgqob_SMhgoic1gUMPmBxU/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI5NDY3/MjU1LTE3MDUwNzc1/NTYtMTU4MC5qcGVn.jpeg",
+        "label": "",
+        "year": "2023",
+        "release_type": "Split",
+        "physical_format": "CD-R",
+        "limitation": "200",
+        "extra_info": "",
+        "tracks": ["Gravess: A Mother's Guilt And A Father's Pride Is The Child's Own To Bear", "Gravess: I Still Wonder Where We'll Go", "Opposition Dolls: Our Faces Mean Nothing", "Opposition Dolls: I Can Only Tell You What It Feels Like. Tape Demo"]
+      },
+	        {
+        "title": "A Burden I Beg To Keep",
+        "cover_image": "https://f4.bcbits.com/img/a2525296141_5.jpg",
+        "label": "Semi Collective Records",
+        "year": "2024",
+        "release_type": "EP",
+        "physical_format": "Cassette",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["I Can Only Tell You What It Feels Like", "Don't Stay Here", "Pans Dans Cette Vie", "Burden I Beg To Keep"]
+      }
+    ],
+    "extra_images": [
+      ""
     ]
   }
 
