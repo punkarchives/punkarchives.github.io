@@ -553,11 +553,6 @@ window.loadLeaderboard = function () {
 };
 
 // Run function when page loads
-window.onload = function () {
-  console.log("Window loaded, running loadLeaderboard()"); // Debugging message
-  loadLeaderboard();
-};
-
 // Global functions so they can be used in HTML
 window.signUp = function () {
   const username = document.getElementById("signup-username").value.trim();
