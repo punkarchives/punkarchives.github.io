@@ -92,14 +92,6 @@ window.signUp = function () {
     .then(data => {
       const userIP = data.ip; // Store user's IP address
 
-      // Check if IP is banned
-      const bannedIPsRef = ref(db, "banned_ips/" + userIP);
-      get(bannedIPsRef).then((snapshot) => {
-        if (snapshot.exists()) {
-          alert("Sign-up denied: This IP address has been banned.");
-          return;
-        }
-
         // Check if username already exists
         const userRef = ref(db, "users/" + username);
         get(userRef).then((snapshot) => {
@@ -128,7 +120,6 @@ window.signUp = function () {
                 alert("Sign-up error: " + error.message);
               });
           }
-        });
       });
     })
     .catch(error => {
