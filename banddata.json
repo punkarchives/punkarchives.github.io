@@ -969,6 +969,68 @@
     "extra_images": [
       ""
     ]
+  },
+
+      {
+    "band_name": "The Hives",
+    "genre": ["Garage Punk"],
+    "location": "Fagersta, Sweden",
+    "years_active": "2023-Present",
+    "description": "Afella",
+    "view_count": 0,
+    "related_bands": [The White Stripes, Misfits],
+"official_links": {
+  "website": "https://www.thehives.com/"
+},
+    "members": [
+        {
+          "name": "Howlin' Pelle Almqvist (Per Almqvist)",
+          "instrument": "Lead Vocals",
+          "time_active": "1993-Present",
+          "status": "Current"
+        },
+        {
+          "name": "Nicholaus Arson (Niklas Almqvist)",
+          "instrument": "Lead Guitar, Backing Vocals",
+          "time_active": "1993-Present",
+          "status": "Current"
+        },
+        {
+          "name": "Vigilante Carlstroem (Mikael Karlsson)",
+          "instrument": "Rhythm Guitar, Organ, Backing Vocals",
+          "time_active": "1993-Present",
+          "status": "Current"
+        },
+        {
+          "name": "Chris Dangerous (Christian Grahn)",
+          "instrument": "Drums, Percussion",
+          "time_active": "1993-Present (Hiatus in 2019)",
+          "status": "Current"
+        },
+        {
+          "name": "The Johan and Only (Johan Gustafsson)",
+          "instrument": "Bass Guitar",
+          "time_active": "2013-Present",
+          "status": "Current"
+        },
+        {
+          "name": "Dr. Matt Destruction (Mattias Bernvall)",
+          "instrument": "Bass Guitar",
+          "time_active": "1993-2013",
+          "status": "Former"
+        },
+        {
+          "name": "Joey Castillo",
+          "instrument": "Drums (Touring Musician)",
+          "time_active": "2019",
+          "status": "Former"
+        }
+      ],
+    "releases": [
+    ],
+    "extra_images": [
+      ""
+    ]
   }
 
 ]
