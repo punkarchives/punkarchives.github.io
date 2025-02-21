@@ -462,12 +462,6 @@ document.getElementById("randomBandButton").addEventListener("click", function (
         .catch(error => console.error('Error loading latest additions:', error));
 </script>
 
-<center>
-    <div class="latest-additions">
-        <h2>Latest Updates</h2>
-        <ul id="latest-updates-list"></ul>
-    </div>
-</center>
 
 <script>
     fetch('latest_updates.json')
