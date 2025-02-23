@@ -1037,6 +1037,61 @@
     "extra_images": [
       ""
     ]
+  },
+
+	    {
+    "band_name": "Smrt Mladého Sebevraha",
+    "genre": ["Hardcore Punk"],
+    "location": "Valašské Meziříčí, Czech Republic",
+    "years_active": "1987-1988",
+    "description": "Zlatovláska",
+    "view_count": 0,
+    "related_bands": [""],
+"official_links": {
+
+},
+    "members": [
+        {
+          "name": "Jindřich Špilka",
+          "instrument": "Vocals",
+          "time_active": "1987-1988",
+          "status": "Current"
+        },
+		        {
+          "name": "Roman Morocz",
+          "instrument": "Guitars",
+          "time_active": "1987-1988",
+          "status": "Current"
+        },
+				        {
+          "name": "Borek Fridrich",
+          "instrument": "‎Bass",
+          "time_active": "‎1987-1988",
+          "status": "‎Current"
+        },
+				        {
+          "name": "‎Jiří Čierňava",
+          "instrument": "‎Drums",
+          "time_active": "1987-1988",
+          "status": "‎Current"
+        }
+      ],
+    "releases": [
+      {
+        "title": "Smrt Mladého Sebevraha",
+        "cover_image": "https://i.discogs.com/ZZSil-WJs-tb6fIKRtiMtb_YhTJWrq_uwZsRJpOYx5A/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1MDA2/MTYzLTE1ODU0MTI3/NjgtNzA0Ni5qcGVn.jpeg",
+        "label": "Motherfucker Distribution Company",
+        "year": "1988",
+        "release_type": "LP",
+        "physical_format": "Cassette, Vinyl",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["Všechno", "Prázdniny", "Proč Nechci Žít", "Nic Nechci Vědět", "Rezavá Ojnice", "Pankáči", "Ještě To Nekončí", "Smrt Mladého Sebevraha", "Nejsou A Nebudou", "Všechno Je To", "Láska", "Spadla Na Mě Noc", "Nepoznávám", "Z Touhy Touha", "Snad Jsem To Věděl", "Kdo Jsi", "Je Tady Svět"]
+      }
+    ],
+    "extra_images": [
+      ""
+    ]
   }
 
 ]
