@@ -16,25 +16,25 @@
           "name": "Rahi Geramifar",
           "instrument": "Vocals",
           "time_active": "2004-2008, 2016-2017",
-          "status": "Current"
+          "status": "‎Last Known Lineup"
         },
         {
           "name": "Beau Beasley",
           "instrument": "Guitar, Studio Bass, Noise Pedals",
           "time_active": "2004-2009, 2016-2017",
-          "status": "Current"
+          "status": "‎Last Known Lineup"
         },
         {
           "name": "Alex Hughes",
           "instrument": "Touring Bass",
           "time_active": "2007-2008, 2016-2017",
-          "status": "Current"
+          "status": "‎Last Known Lineup"
         },
         {
           "name": "Dobber Beverly",
           "instrument": "Drums",
           "time_active": "2006-2009, 2016-2017",
-          "status": "Current"
+          "status": "‎Last Known Lineup"
         },
 		        {
           "name": "‎ ",
@@ -649,19 +649,19 @@
           "name": "Dan Harvey",
           "instrument": "Drums",
           "time_active": "2000-2007",
-          "status": "Current"
+          "status": "‎Last Known Lineup"
         },
 		        {
           "name": "Jeremy Grobsmith",
           "instrument": "Guitar",
           "time_active": "2000-2007",
-          "status": "Current"
+          "status": "‎Last Known Lineup"
         },
 				        {
           "name": "‎Bradley Roach",
           "instrument": "‎Vocals",
           "time_active": "‎(2004 or 2005?)-2007",
-          "status": "‎Current"
+          "status": "‎‎Last Known Lineup"
         },
 				        {
           "name": "‎ ",
@@ -771,25 +771,25 @@
           "name": "Baggus Brady",
           "instrument": "Bass",
           "time_active": "1987-????",
-          "status": "Current"
+          "status": "‎Last Known Lineup"
         },
 		        {
           "name": "Peter Allen",
           "instrument": "Drums",
           "time_active": "1987-????",
-          "status": "Current"
+          "status": "‎Last Known Lineup"
         },
 				        {
           "name": "‎Dick Ford",
           "instrument": "‎Guitar",
           "time_active": "‎1987-????",
-          "status": "‎Current"
+          "status": "‎‎Last Known Lineup"
         },
 				        {
           "name": "‎Rod 'Snuffy' Hunt",
           "instrument": "‎Vocals",
           "time_active": "‎1987-????",
-          "status": "‎Current"
+          "status": "‎‎Last Known Lineup"
         },
 		        {
           "name": "‎ ",
@@ -1055,25 +1055,25 @@
           "name": "Jindřich Špilka",
           "instrument": "Vocals",
           "time_active": "1987-1988",
-          "status": "Current"
+          "status": "‎Last Known Lineup"
         },
 		        {
           "name": "Roman Morocz",
           "instrument": "Guitars",
           "time_active": "1987-1988",
-          "status": "Current"
+          "status": "‎Last Known Lineup"
         },
 				        {
           "name": "Borek Fridrich",
           "instrument": "‎Bass",
           "time_active": "‎1987-1988",
-          "status": "‎Current"
+          "status": "‎‎Last Known Lineup"
         },
 				        {
           "name": "‎Jiří Čierňava",
           "instrument": "‎Drums",
           "time_active": "1987-1988",
-          "status": "‎Current"
+          "status": "‎‎Last Known Lineup"
         }
       ],
     "releases": [
@@ -1087,6 +1087,104 @@
         "limitation": "",
         "extra_info": "",
         "tracks": ["Všechno", "Prázdniny", "Proč Nechci Žít", "Nic Nechci Vědět", "Rezavá Ojnice", "Pankáči", "Ještě To Nekončí", "Smrt Mladého Sebevraha", "Nejsou A Nebudou", "Všechno Je To", "Láska", "Spadla Na Mě Noc", "Nepoznávám", "Z Touhy Touha", "Snad Jsem To Věděl", "Kdo Jsi", "Je Tady Svět"]
+      }
+    ],
+    "extra_images": [
+      ""
+    ]
+  },
+
+	    {
+    "band_name": "Left In Ruins",
+    "genre": ["Emo"],
+    "location": "Richmond, Virginia (VA), USA",
+    "years_active": "1997-???? (Inactive)",
+    "description": "nxdx",
+    "view_count": 0,
+    "related_bands": [""],
+"official_links": {
+
+},
+    "members": [
+        {
+          "name": "Ryan Parrish",
+          "instrument": "Drums",
+          "time_active": "1997-????",
+          "status": "‎Last Known Lineup"
+        },
+		        {
+          "name": "Adam Fischer",
+          "instrument": "Bass",
+          "time_active": "1997-????",
+          "status": "‎Last Known Lineup"
+        },
+				        {
+          "name": "Fred Ziomek",
+          "instrument": "‎Guitar",
+          "time_active": "‎1997-????",
+          "status": "‎Last Known Lineup"
+        },
+				        {
+          "name": "‎Jared Ferrara-Abel",
+          "instrument": "‎Vocals",
+          "time_active": "1997-????",
+          "status": "‎Last Known Lineup"
+        }
+      ],
+    "releases": [
+      {
+        "title": "Amalgamation / Left In Ruins",
+        "cover_image": "https://i.discogs.com/m7IHKWnKpOtWBR2dad0peWKcW76USsK2scuvsbCrnhg/rs:fit/g:sm/q:90/h:600/w:594/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI1NjIw/NzUtMTY2MDQyNzY2/MS0yNzQ0LmpwZWc.jpeg",
+        "label": "Rice Control",
+        "year": "1997",
+        "release_type": "Split",
+        "physical_format": "Vinyl, 12-inch",
+        "limitation": "",
+        "extra_info": "The sides are titled 'Side A' & 'Side L'",
+        "tracks": ["Amalgamation: Escape The Duality", "Amalgamation: Push", "Amalgamation: Pedestal", "Amalgamation: Moment", "Amalgamation: As I Slip Into Roles", "Amalgamation: Break The Chain", "Amalgamation: Why?", "Left In Ruins: Past Failure", "Left In Ruins: Yearning To Burn", "Left In Ruins: Act: Eternal", "Left In Ruins: Unanswered Question", "Left In Ruins: Number Justice"]
+      }
+    ],
+    "extra_images": [
+      ""
+    ]
+  },
+
+	    {
+    "band_name": "July",
+    "genre": ["Emo"],
+    "location": "Stillman Creek, North Carolina (NC), USA",
+    "years_active": "1999-???? (Inactive)",
+    "description": "nxdx",
+    "view_count": 0,
+    "related_bands": [""],
+"official_links": {
+
+},
+    "members": [
+        {
+          "name": "Gabe Johnson",
+          "instrument": "",
+          "time_active": "1999-????",
+          "status": "‎Last Known Lineup"
+        },
+		        {
+          "name": "Herb Harris",
+          "instrument": "",
+          "time_active": "1999-????",
+          "status": "‎Last Known Lineup"
+        }
+      ],
+    "releases": [
+      {
+        "title": "Jeromes Dream / July",
+        "cover_image": "https://i.discogs.com/mW8qYxstoYWa2zIuxWDzO3qGNanERRrTXwoAZdyp85o/rs:fit/g:sm/q:90/h:600/w:597/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4NTA1/NDMtMTU5OTQ1NTM2/My0xMjI1LmpwZWc.jpeg",
+        "label": "Hit The Ground Running",
+        "year": "1999",
+        "release_type": "Split",
+        "physical_format": "Vinyl, 7-inch",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["Jeromes Dream: Thirty Dollar Bill", "July: Untitled"]
       }
     ],
     "extra_images": [
