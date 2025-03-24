@@ -44,7 +44,7 @@ window.loadLeaderboard = function () {
             points: data.points || 0, // Default to 0 if missing
           }))
           .sort((a, b) => b.points - a.points) // Sort by points
-          .slice(0, 5); // Get top 5
+          .slice(0, 3); // Get top 5
 
         const leaderboardDiv = document.getElementById("leaderboard");
 
@@ -220,12 +220,12 @@ loadLeaderboard()
             top: 0;
             padding: 20px 5px;
             box-sizing: border-box;
-            border-right: 2px solid #660000;
+            border-right: 2px solid #aa0000;
         }
 
         .sidebar h1 {
             font-family: 'MyCustomFont2', sans-serif;
-            color: #660000;
+            color: #aa0000;
             font-size: 20px;
             text-transform: uppercase;
             margin-bottom: 20px;
@@ -240,7 +240,17 @@ loadLeaderboard()
         .sidebar ul li {
             margin: 15px 0;
         }
+a:link {
+  color: #ffaaaa;
+}
 
+a:visited {
+  color: #ffaaaa;
+}
+
+a:hover {
+  color: #aa0000;
+}
         .sidebar ul li a {
             color: #ffffff;
             text-decoration: none;
@@ -252,7 +262,7 @@ loadLeaderboard()
         }
 
         .sidebar ul li a:hover {
-            background-color: #660000;
+            background-color: #aa0000;
         }
 
         /* Right Sidebar */
@@ -266,12 +276,12 @@ loadLeaderboard()
             top: 0;
             padding: 20px 5px;
             box-sizing: border-box;
-            border-left: 2px solid #660000;
+            border-left: 2px solid #aa0000;
         }
 
         .sidebar2 h1 {
             font-family: 'MyCustomFont2', sans-serif;
-            color: #660000;
+            color: #aa0000;
             font-size: 20px;
             text-transform: uppercase;
             margin-bottom: 20px;
@@ -298,7 +308,7 @@ loadLeaderboard()
         }
 
         .sidebar2 ul li a:hover {
-            background-color: #660000;
+            background-color: #aa0000;
         }
 
         /* Main Content */
@@ -311,26 +321,26 @@ loadLeaderboard()
         /* Headings */
         .content h1 {
             font-family: 'MyCustomFont2', sans-serif;
-            color: #660000;
+            color: #aa0000;
             font-size: 22px;
             text-transform: uppercase;
-            border-bottom: 3px solid #660000;
+            border-bottom: 3px solid #aa0000;
             padding-bottom: 10px;
         }
-        button { background-color: #660000; color: white; padding: 10px; border: none; cursor: pointer; font-size: 18px; }
+        button { background-color: #aa0000; color: white; padding: 10px; border: none; cursor: pointer; font-size: 18px; }
         button:hover { background-color: darkred; }
 
         .content h2 {
             font-size: 20px;
             border-bottom: 2px solid #ffffff;
             padding-bottom: 10px;
-            color: #660000;
+            color: #aa0000;
         }
 
         /* News Items */
         .news-item h3 {
             font-size: 18px;
-            color: #660000;
+            color: #aa0000;
             margin: 10px 0;
         }
 
@@ -352,14 +362,14 @@ loadLeaderboard()
         /* Latest Additions Box */
         .latest-additions {
             background-color: #121212;
-            border: 2px solid #660000;
+            border: 2px solid #aa0000;
             width: 125px;
             color: #ffffff;
         }
 
         .latest-additions h2 {
             font-size: 18px;
-            color: #660000;
+            color: #aa0000;
         }
 
         .latest-additions ul {

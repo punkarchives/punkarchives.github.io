@@ -1,7 +1,7 @@
 {
     "latest_additions": [
+        { "name": "Descendents", "url": "band.html?band=Descendents" },
         { "name": "July", "url": "band.html?band=July" },
-        { "name": "Left In Ruins", "url": "band.html?band=Left%20In%20Ruins" },
-        { "name": "Smrt Mladého Sebevraha", "url": "band.html?band=Smrt%20Mladého%20Sebevraha" }
+        { "name": "Left In Ruins", "url": "band.html?band=Left%20In%20Ruins" }
     ]
 }

@@ -44,7 +44,7 @@ window.loadLeaderboard = function () {
             points: data.points || 0, // Default to 0 if missing
           }))
           .sort((a, b) => b.points - a.points) // Sort by points
-          .slice(0, 5); // Get top 5
+          .slice(0, 3); // Get top 5
 
         const leaderboardDiv = document.getElementById("leaderboard");
 
@@ -220,12 +220,12 @@ loadLeaderboard()
             top: 0;
             padding: 20px 5px;
             box-sizing: border-box;
-            border-right: 2px solid #660000;
+            border-right: 2px solid #aa0000;
         }
 
         .sidebar h1 {
             font-family: 'MyCustomFont2', sans-serif;
-            color: #660000;
+            color: #aa0000;
             font-size: 20px;
             text-transform: uppercase;
             margin-bottom: 20px;
@@ -252,7 +252,7 @@ loadLeaderboard()
         }
 
         .sidebar ul li a:hover {
-            background-color: #660000;
+            background-color: #aa0000;
         }
 
         /* Right Sidebar */
@@ -266,12 +266,12 @@ loadLeaderboard()
             top: 0;
             padding: 20px 5px;
             box-sizing: border-box;
-            border-left: 2px solid #660000;
+            border-left: 2px solid #aa0000;
         }
 
         .sidebar2 h1 {
             font-family: 'MyCustomFont2', sans-serif;
-            color: #660000;
+            color: #aa0000;
             font-size: 20px;
             text-transform: uppercase;
             margin-bottom: 20px;
@@ -298,10 +298,10 @@ loadLeaderboard()
         }
 
         .sidebar2 ul li a:hover {
-            background-color: #660000;
+            background-color: #aa0000;
         }
 
-        button { background-color: #660000; color: white; padding: 10px; border: none; cursor: pointer; font-size: 18px; }
+        button { background-color: #aa0000; color: white; padding: 10px; border: none; cursor: pointer; font-size: 18px; }
         button:hover { background-color: darkred; }
 
 
@@ -315,10 +315,10 @@ loadLeaderboard()
         /* Headings */
         .content h1 {
             font-family: 'MyCustomFont2', sans-serif;
-            color: #660000;
+            color: #aa0000;
             font-size: 22px;
             text-transform: uppercase;
-            border-bottom: 3px solid #660000;
+            border-bottom: 3px solid #aa0000;
             padding-bottom: 10px;
         }
 
@@ -326,13 +326,13 @@ loadLeaderboard()
             font-size: 20px;
             border-bottom: 2px solid #ffffff;
             padding-bottom: 10px;
-            color: #660000;
+            color: #aa0000;
         }
 
         /* News Items */
         .news-item h3 {
             font-size: 18px;
-            color: #660000;
+            color: #aa0000;
             margin: 10px 0;
         }
 
@@ -354,14 +354,14 @@ loadLeaderboard()
         /* Latest Additions Box */
         .latest-additions {
             background-color: #121212;
-            border: 2px solid #660000;
+            border: 2px solid #aa0000;
             width: 125px;
             color: #ffffff;
         }
 
         .latest-additions h2 {
             font-size: 18px;
-            color: #660000;
+            color: #aa0000;
         }
 
         .latest-additions ul {
@@ -376,7 +376,17 @@ loadLeaderboard()
 	.log {
 	font-size: 15px;
 	}
+a:link {
+  color: #ffaaaa;
+}
 
+a:visited {
+  color: #ffaaaa;
+}
+
+a:hover {
+  color: #aa0000;
+}
     </style>
 </head>
 <body>
@@ -458,10 +468,11 @@ document.getElementById("randomBandButton").addEventListener("click", function (
 
 
 <script>
-    fetch('latest_updates.json')
+    fetch('latest_updates.json?v=' + new Date().getTime()) // Append timestamp to URL
         .then(response => response.json())
         .then(data => {
             let list = document.getElementById("latest-updates-list");
+            list.innerHTML = ''; // Clear existing content to prevent duplicates
             data.latest_additions.forEach(band => {
                 let link = document.createElement("a");
                 link.href = band.url;
@@ -473,6 +484,7 @@ document.getElementById("randomBandButton").addEventListener("click", function (
         })
         .catch(error => console.error('Error loading latest updates:', error));
 </script>
+
 
 <br>
 <center>
@@ -493,13 +505,10 @@ document.getElementById("randomBandButton").addEventListener("click", function (
             <h1>Punk Archives</h1>
             <h2>News <span style="font-size: 12px;">(Month/Day/Year)</span></h2>
             <div class="news-item">
-                <h3>(03/01/25) My To Do List / What To Expect Eventually</h3>
-                <p>•Transfer accounts from firebase. (You will need to remake an account once this happens. I'll re-add your points though.)<br>
-		•Specific pages for each band + more customization for band pages<br>
-		•Editing without submission forms (maybe)<br>
-		•Reporting system for false edits<br>
-		•Pages for punk labels (maybe)<br>
-		•Links to listen to each release</p>
+                <h3>(03/24/25) Important Info</h3>
+                <p>•Refresh with ctrl+shift+r if changes aren't showing. This issue will be fixed on everything soon.<br>
+		•Hover your mouse over a release's name to see the image.<br>
+		•In <a href="bands.html">All Bands</a>, you can search by artist name, record label, genre, location, and release name.<br>
             </div>
 	    <div class="news-item">
                 <h3>(02/21/25) Small Changes + Screamo Reunions + AI Taking Over</h3>

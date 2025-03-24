@@ -1190,6 +1190,169 @@
     "extra_images": [
       ""
     ]
+  },
+
+	    {
+    "band_name": "Descendents",
+    "genre": ["Pop Punk"],
+    "location": "Manhattan Beach, California (CA), USA",
+    "years_active": "1977-Present",
+    "description": "Hermmitt",
+    "view_count": 0,
+    "related_bands": ["All"],
+"official_links": {
+  "store": "https://descendents.store/"
+},
+    "members": [
+{
+          "name": "Stephen Egerton",
+          "instrument": "Guitar",
+          "time_active": "1986-Present",
+          "status": "‎Last Known Lineup"
+        },
+		        {
+          "name": "Karl Alvarez",
+          "instrument": "Bass",
+          "time_active": "1986-Present",
+          "status": "‎Last Known Lineup"
+        },
+        {
+          "name": "Milo Aukerman",
+          "instrument": "Vocals",
+          "time_active": "1980-1982, 1985-Present",
+          "status": "‎Last Known Lineup"
+        },
+		        {
+          "name": "Bill Stevenson",
+          "instrument": "Drums, Percussion",
+          "time_active": "1978-Present",
+          "status": "‎Last Known Lineup"
+        },
+	{
+          "name": "‎ ",
+          "instrument": "‎ ",
+          "time_active": "‎ ",
+          "status": "‎ "
+        },
+	{
+          "name": "Doug Carrion",
+          "instrument": "Bass",
+          "time_active": "1985-1986",
+          "status": "‎Inactive"
+        },
+	{
+          "name": "Ray Cooper",
+          "instrument": "Guitar, Vocals",
+          "time_active": "1982-1986",
+          "status": "‎Inactive"
+        },
+	{
+          "name": "Cecilia Loera",
+          "instrument": "Vocals",
+          "time_active": "1980",
+          "status": "‎Inactive"
+        },
+        {
+          "name": "Tony Lombardo",
+          "instrument": "Bass, Vocals",
+          "time_active": "1978-1985",
+          "status": "‎Inactive"
+        },
+        {
+          "name": "Frank Navetta",
+          "instrument": "Guitar, Vocals",
+          "time_active": "1977-1983",
+          "status": "Inactive"
+        },
+		        {
+          "name": "David Nolte",
+          "instrument": "Vocals, Guitar",
+          "time_active": "1977-1979",
+          "status": "‎Inactive"
+        }
+      ],
+    "releases": [
+      {
+        "title": "Milo Goes To College",
+        "cover_image": "",
+        "label": "",
+        "year": "",
+        "release_type": "",
+        "physical_format": "",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": [""]
+      },
+      {
+        "title": "I Don't Want To Grow Up",
+        "cover_image": "",
+        "label": "",
+        "year": "",
+        "release_type": "",
+        "physical_format": "",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": [""]
+      },
+      {
+        "title": "All",
+        "cover_image": "",
+        "label": "",
+        "year": "",
+        "release_type": "",
+        "physical_format": "",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": [""]
+      },
+      {
+        "title": "Everything Sucks",
+        "cover_image": "",
+        "label": "",
+        "year": "",
+        "release_type": "",
+        "physical_format": "",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": [""]
+      },
+      {
+        "title": "Cool To Be You",
+        "cover_image": "",
+        "label": "",
+        "year": "",
+        "release_type": "",
+        "physical_format": "",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": [""]
+      },
+      {
+        "title": "Hypercaffium Spazzinate",
+        "cover_image": "",
+        "label": "",
+        "year": "",
+        "release_type": "",
+        "physical_format": "",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": [""]
+      },
+      {
+        "title": "9th & Walnut",
+        "cover_image": "",
+        "label": "",
+        "year": "",
+        "release_type": "",
+        "physical_format": "",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": [""]
+      }
+    ],
+    "extra_images": [
+      ""
+    ]
   }
 
 ]
