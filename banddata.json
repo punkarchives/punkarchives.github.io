@@ -92,8 +92,8 @@
         "year": "2006",
         "release_type": "Split",
         "physical_format": "Vinyl 7-inch 33 RPM",
-        "limitation": "N/A",
-        "extra_info": "N/A",
+        "limitation": "",
+        "extra_info": "",
         "tracks": ["Insect Warfare: Negative Appeal", "Insect Warfare: Obscene Creed", "Insect Warfare: Reanimated Horde", "Insect Warfare: But Now You Die", "Insect Warfare: Hurricane Death", "Hatred Surge: Rot", "Hatred Surge: Out of My Head", "Hatred Surge: Pile of Shit", "Hatred Surge: Funeral", "Hatred Surge: Old and Tired", "Hatred Surge: Farce"]
       },
       {
@@ -115,18 +115,18 @@
         "release_type": "Split",
         "physical_format": "Vinyl 7-inch 33 RPM",
         "limitation": "600 Copies",
-        "extra_info": "N/A",
+        "extra_info": "",
         "tracks": ["Bolt Stein: Future", "Bolt Stein: 1 Second", "Bolt Stein: An End Appetite", "Bolt Stein: Judas", "Bolt Stein: Words", "Bolt Stein: Important", "Insect Warfare: Fucked Up on PCP", "Insect Warfare: Engulfed in Fire", "Insect Warfare: In Grind There Is No Law"]
       },
       {
         "title": "Evolved Into Obliteration",
         "cover_image": "https://www.metal-archives.com/images/1/4/9/6/149668.jpg",
-        "label": "N/A",
+        "label": "",
         "year": "March 15th, 2007",
         "release_type": "Demo",
         "physical_format": "CD-R",
         "limitation": "150 Copies",
-        "extra_info": "N/A",
+        "extra_info": "",
         "tracks": ["Evolved into Obliteration", "Self Termination", "Paranoia", "Human Trafficking", "Street Sweeper", "Enslaved by Machinery", "Necessary Death", "Dead Inside", "Hydrophobia", "Caught in a Dream (Napalm Death cover)"]
       },
       {
@@ -147,8 +147,8 @@
         "year": "October, 2007",
         "release_type": "Album",
         "physical_format": "CD",
-        "limitation": "N/A",
-        "extra_info": "N/A",
+        "limitation": "",
+        "extra_info": "",
         "tracks": ["Oxygen Corrosion", "Self Termination", "Enslaved By Machinery", "Manipulator", "Zone Killer", "Decontamination", "Street Sweeper", "Dead Inside", "Human Trafficking", "Hydraphobia", "Mind Ripper", "Armored Virus", "Mass Communication Mindfuck", "Nuclear Deterrence", "Paranoia", "Necessary Death", "Protection Maze", "Lobotomized", "Internet Era Alienation", "Evolved into Obliteration"]
       },
       {
@@ -158,8 +158,8 @@
         "year": "2008",
         "release_type": "Split",
         "physical_format": "Vinyl 7-inch 33 RPM",
-        "limitation": "N/A",
-        "extra_info": "N/A",
+        "limitation": "",
+        "extra_info": "",
         "tracks": ["Flagitious Idiosyncrasy in the Dilapidation: Evacuation", "Flagitious Idiosyncrasy in the Dilapidation: Euthanasia", "Flagitious Idiosyncrasy in the Dilapidation: Elimination", "Insect Warfare: Hypothermia", "Insect Warfare: Blood Wind", "Insect Warfare: Burning Chrome", "Insect Warfare: Thermal Imaging", "Insect Warfare: Circuit Demon", "Insect Warfare: New Rotation (324 cover)"]
       },
       {
@@ -170,7 +170,7 @@
         "release_type": "Split",
         "physical_format": "Cassette",
         "limitation": "100 Copies",
-        "extra_info": "N/A",
+        "extra_info": "",
         "tracks": ["Insect Warfare: Untitled", "Insect Warfare: Untitled", "The Kill: Dead on the Floor 30 Seconds into the First Band", "The Kill: Dead on the Floor 30 Seconds into the First Band"]
       },
       {
@@ -181,7 +181,7 @@
         "release_type": "Live",
         "physical_format": "CD-R + DVD-R",
         "limitation": "13 Copies",
-        "extra_info": "N/A",
+        "extra_info": "",
         "tracks": ["Untitled", "Untitled"]
       },
       {
@@ -202,7 +202,7 @@
         "year": "April 13th, 2009",
         "release_type": "EP",
         "physical_format": "Vinyl 12-inch 45 RPM",
-        "limitation": "N/A",
+        "limitation": "",
         "extra_info": "Single-sided",
         "tracks": ["Untitled"]
       },
@@ -235,7 +235,7 @@
         "year": "July 2019",
         "release_type": "Compilation",
         "physical_format": "2xCD + DVD",
-        "limitation": "N/A",
+        "limitation": "",
         "extra_info": "Digipak",
         "tracks": [
     "But Now You Die",
@@ -1359,6 +1359,109 @@
         "limitation": "",
         "extra_info": "",
         "tracks": [""]
+      }
+    ],
+    "extra_images": [
+      ""
+    ]
+  },
+
+	    {
+    "band_name": "Pickletastemusic",
+    "genre": ["Pop Punk, Nu Metal, Noise Rock"],
+    "location": "Elkhart Lake, Wisconsin (WI), USA",
+    "years_active": "2023-Present",
+    "description": "julianoncrack",
+    "view_count": 0,
+    "related_bands": ["Necrotic Anus", "Blood's Point"],
+"official_links": {
+  "website": "https://wheredoihidethekids.com/"
+},
+    "members": [
+{
+          "name": "Julian",
+          "instrument": "Everything",
+          "time_active": "2023-Present",
+          "status": "‎Last Known Lineup"
+        }
+      ],
+    "releases": [
+      {
+        "title": "Sail Hatin'",
+        "cover_image": "https://i1.sndcdn.com/artworks-0sQVShu5GeMWzrTd-bpyoAg-t500x500.jpg",
+        "label": "",
+        "year": "March 18, 2024",
+        "release_type": "EP",
+        "physical_format": "",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["Avisna", "Sail Hatin'", "At The Crossroads", "Avisna Pt. 2"]
+      },
+      {
+        "title": "Screaming",
+        "cover_image": "https://i1.sndcdn.com/artworks-3Qvq9zlV1p98zoOy-wHyzkw-t500x500.jpg",
+        "label": "",
+        "year": "March 19, 2024",
+        "release_type": "EP",
+        "physical_format": "",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["Screaming", "Lil Dogs", "Oh Lord, Oh God!", "Quit Screaming"]
+      },
+      {
+        "title": "The Preppy EP",
+        "cover_image": "https://i1.sndcdn.com/artworks-lmn2m1JS7WVBXfTF-0FWPyQ-t500x500.jpg",
+        "label": "",
+        "year": "March 20, 2024",
+        "release_type": "EP",
+        "physical_format": "",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["The Preppy Song", "I Don't Wanna Make Sense", "The Preppy Interlude", "Quit Screaming (Acoustic)", "Rebirth In The Living Room"]
+      },
+      {
+        "title": "Diddy Raped Me",
+        "cover_image": "https://i1.sndcdn.com/artworks-VUcsPzPK12XYYXlF-LLjYIw-t500x500.jpg",
+        "label": "",
+        "year": "October 5, 2024",
+        "release_type": "Demo",
+        "physical_format": "",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["Bonkers (Demo)", "Diddy Raped Me (Demo)", "Touch When I Was Five (Demo)"]
+      },
+      {
+        "title": "Preach Wakko, Preach!",
+        "cover_image": "https://i1.sndcdn.com/artworks-S52c4hZoSyuzzXp3-uwrBbQ-t500x500.jpg",
+        "label": "",
+        "year": "October 13, 2024",
+        "release_type": "EP",
+        "physical_format": "CD-R",
+        "limitation": "1 Copy",
+        "extra_info": "",
+        "tracks": ["World Without A War", "Hello Sir I Mean Ma'am", "No!", "Sweetheart", "Preach Wakko, Preach!"]
+      },
+      {
+        "title": "African Goggles",
+        "cover_image": "https://i1.sndcdn.com/artworks-XN4uyCuYArWx9yF5-sZwuQw-t500x500.jpg",
+        "label": "",
+        "year": "October 13, 2024",
+        "release_type": "EP",
+        "physical_format": "",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["Bonkers!", "Diddy Raped Me", "Instrumental Piece No. 69 Fingered In A Minor", "Melon Seth", "Obama Bin Laden", "African Goggles"]
+      },
+      {
+        "title": "ファックユ！きさまトレ-ラ-パ-クのおしりクソビッチ！",
+        "cover_image": "https://f4.bcbits.com/img/a2608936832_16.jpg",
+        "label": "",
+        "year": "January 4, 2025",
+        "release_type": "EP",
+        "physical_format": "CD-R",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["Let's Party, It's Diddy Time!", "Back In Alabama", "Samuel Dogshit", "Scarry Barry Bass Solo (Live At Woodstock 1994)", "Nightcrawler", "\\m/etalignus", "Math Rock Merlin Guitar Solo (Live At Lollapalooza 2046)", "Summer's Goin' By", "Domeshots", "Killing Spree (I Was In The Shed)", "He's A Whore", "Touch When I Was Five", "This Town Ain't Big Enough For The Both Of Us", "R̶a̶p̶e̶ Rap Song", "Hood Shit", "Gasoline", "Junko Darling"]
       }
     ],
     "extra_images": [
