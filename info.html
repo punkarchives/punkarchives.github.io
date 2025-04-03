@@ -211,22 +211,18 @@ a:hover {
 
     <!-- Left Sidebar -->
     <div class="sidebar">
-        <h1>Punk Archives</h1>
-        <ul>
-            <li><a href="index.html#"><font face="MyCustomFont">Home</a></li>
+      <h1><a href="index.html#" style="text-decoration:none"><font face="MyCustomFont2" color="#aa0000">Punk Archives</font></a></h1>
+        <ul><font face="MyCustomFont">
+            <li></li>
             <li><a href="bands.html#">All Bands</a></li>
+            <li><a href="zines.html#">Zines</a></li>
+            <li><a href="labels.html#">Labels</a></li>
+      <h1><font face="MyCustomFont" color="#aa0000">──────────</font></h1>
             <li><a href="https://discordapp.com/users/767006494595350578">Contact</a></li>
-            <li><a href="info.html#">Add Info</a></li>
+            <li><a href="info.html#">Submit Info</a></li>
+      <h1><font face="MyCustomFont" color="#aa0000">──────────</font></h1>
         <ul>
             <li><a id="randomBandButton">Random Band</font></a></li>
-        </ul>
-        </ul>
-        <h1>Stupid Stuff:</h1>
-	<ul>
-            <li><a href="bandname.html#"><font face="MyCustomFont">Band Name Generator</a></li>
-            <li><a href="straightedge.html#">Straight edge-ifier</a></li>
-            <li><a href="madlibs.html#">Punk Mad-Libs</a></li>
-            <li><a href="speech.html#">Scott Vogel Speech Generator</a></font></li>
         </ul>
     </div>
 <script>
@@ -402,82 +398,141 @@ function searchBands() {
 <!-- Main Container -->
     <div class="main-container">
         <div class="content">
-<h1>Submit info on a Band</h1>
+<h1>Submit info</h1>
 
     
 <div id="bandForm">
 <center>
 <h3><font size="3"><b>Add any info for any band here, even if the band is already on the site and just needs one small correction.<br><br>Make sure to add as much info as possible. For example: if you leave the instrument of a member blank, I most likely won't go and find it myself.<br></b></font></h3>
-<h1></h1><p><font size="3"><u>Band Name</u><br>eg: Crass</font></p>
-<input type="text" id="band-name" placeholder="Band Name"><br>
+  <h1></h1>
+  <button onclick="toggleMiniPage()">Submit Band Info</button>
+<div id="miniPage" class="hidden">
+  <h3>(band name is required, other than that, you only have to write info you want to fix/add)</h3>
+  <h1>Submit Band Info</h1>
+  <p><font size="3"><u>Band Name</u><br>eg: Crass</font></p>
+<input type="text" id="bandband-name" placeholder="Band Name"><br>
 <h1></h1><p><font size="3"><u>Genre(s)</u><br>eg: Hardcore Punk, Anarcho-Punk</font></p>
-<input type="text" id="band-genres" placeholder="Genres"><br>
+<input type="text" id="bandband-genres" placeholder="Genres"><br>
 <h1></h1><p><font size="3"><u>Location Formed</u><br>eg: Epping, U.K.</font></p>
-<input type="text" id="band-location" placeholder="Location"><br>
+<input type="text" id="bandband-location" placeholder="Location"><br>
 <h1></h1><p><font size="3"><u>Years Active</u><br>eg: 1977-1984</font></p>
-<input type="text" id="band-years" placeholder="Years Active"><br>
+<input type="text" id="bandband-years" placeholder="Years Active"><br>
 <h1></h1><p><font size="3"><u>Related Bands</u><br>eg: Rollins Band Is Related To Black Flag</font></p>
-<input type="text" id="related-bands" placeholder="Related Bands"><br>
+<input type="text" id="bandrelated-bands" placeholder="Related Bands"><br>
 <h1></h1><p><font size="3"><u>Official Sites</u><br>eg: https://fakebandsite.com</font></p>
-<input type="text" id="official-links" placeholder="Official Site"><br>
+<input type="text" id="bandofficial-links" placeholder="Official Site"><br>
 <h1></h1><p><font size="3"><u>Members</u><br>eg: "John Doe, Guitar, 1999-2000, Former"</font></p>
-<textarea id="band-members" placeholder="Members"></textarea><br>
+<textarea id="bandband-members" placeholder="Members"></textarea><br>
 <h1></h1><p><font size="3"><u>Releases</u><br>eg: (for each release) Release Name, Image Link, Record Label, Date Released, Type (ep, lp, etc), Limitations, Extra Info, Tracklist</font></p>
-<textarea id="band-releases" placeholder="Releases:"></textarea><br><h1></h1>
-<button onclick="saveBand()">Submit Info</button><br></center>
-<center><br><br><br>
-  <div class="scoring-system">
-    <h1>Scoring System</h1>
-<p>Accuracy Gives Higher Scores</p>
-    <table border="1">
-      <thead>
-        <tr>
-          <th>Category</th>
-          <th>Points</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Band Name</td>
-          <td>1 Total</td>
-        </tr>
-        <tr>
-          <td>Years Active</td>
-          <td>1-2 Total</td>
-        </tr>
-        <tr>
-          <td>Genres</td>
-          <td>2 Total</td>
-        </tr>
-        <tr>
-          <td>Location</td>
-          <td>1-3 Total</td>
-        </tr>
-        <tr>
-          <td>Related Bands</td>
-          <td>1 Each (Max 3)</td>
-        </tr>
-        <tr>
-          <td>Official Links</td>
-          <td>1 Each (Max 5)</td>
-        </tr>
-        <tr>
-          <td>Members</td>
-          <td>1-4 Each</td>
-        </tr>
-        <tr>
-          <td>Releases</td>
-          <td>1-10 Each</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</center>
+<textarea id="bandband-releases" placeholder="Releases:"></textarea><br><h1></h1>
+<button onclick="saveBand()">Submit Info</button><br></center><br>
+</div>
+<script>
+  function toggleMiniPage() {
+    let miniPage = document.getElementById("miniPage");
+    if (miniPage.style.display === "none" || miniPage.style.display === "") {
+      miniPage.style.display = "block";
+    } else {
+      miniPage.style.display = "none";
+    }
+  }
+</script>
+  
+<style>
+  .hidden {
+    display: none;
+  }
+</style>
 
+  <center><button onclick="toggleMiniPage3()">Submit Zine Info</button>
+<div id="miniPage3" class="hidden">
+  <h3>(zine name is required, other than that, you only have to write info you want to fix/add)</h3>
+  <h1>Submit Zine Info</h1>
+  <p><font size="3"><u>Zine Name</u><br>eg: Sniffin' Glue</font></p>
+<input type="text" id="zinezine-name" placeholder="Zine Name"><br>
+<h1></h1><p><font size="3"><u>Author(s)</u><br>eg: John Doe</font></p>
+<input type="text" id="zinezine-authors" placeholder="Authors"><br>
+<h1></h1><p><font size="3"><u>Location Formed</u><br>eg: Epping, U.K.</font></p>
+<input type="text" id="zinezine-location" placeholder="Location"><br>
+<h1></h1><p><font size="3"><u>Years Active</u><br>eg: 1977-1984</font></p>
+<input type="text" id="zinezine-years" placeholder="Years Active"><br>
+<h1></h1><p><font size="3"><u>Issues</u><br>(take pictures and put the links here)</font></p>
+<textarea id="zinezine-issues" placeholder="Issues"></textarea><br><h1></h1>
+<button onclick="saveBand2()">Submit Info</button><br></center>
+<center><br>
+  
+<script>
+  function toggleMiniPage3() {
+    let miniPage = document.getElementById("miniPage3");
+    if (miniPage.style.display === "none" || miniPage.style.display === "") {
+      miniPage.style.display = "block";
+    } else {
+      miniPage.style.display = "none";
+    }
+  }
+</script>
+    
+  <center><button onclick="toggleMiniPage2()">Submit Compilation Info</button>
+<div id="miniPage2" class="hidden">
+  <h3>(label name is required, other than that, you only have to write info you want to fix/add)</h3>
+  <h1>Submit Compilation Info</h1>
+  <p><font size="3"><u>Label Name</u><br>eg: SST Records</font></p>
+<input type="text" id="complabel-name" placeholder="Label Name"><br>
+<h1></h1><p><font size="3"><u>Bands</u><br>eg: Crass, Black Flag</font></p>
+<input type="text" id="compbands" placeholder="Bands"><br>
+<h1></h1><p><font size="3"><u>Comp Title</u><br>eg: ABCs Of Punk</font></p>
+<input type="text" id="comptitle" placeholder="Title"><br>
+<h1></h1><p><font size="3"><u>Date Released</u><br>eg: January 1, 2025</font></p>
+<input type="text" id="compdate" placeholder="Date Released"><br>
+<h1></h1><p><font size="3"><u>Album Cover</u><br>(type a link to the image)</font></p>
+<input type="text" id="compalbumcover" placeholder="Album Cover"><br>
+<h1></h1><p><font size="3"><u>Tracklist</u><br>eg: 1. Title (Band Name), 2. Title (Band Name)</font></p>
+<textarea id="comptracklist" placeholder="Tracklist"></textarea><br><h1></h1>
+<button onclick="saveBand3()">Submit Info</button><br></center>
+<center><br>
+  
+<script>
+  function toggleMiniPage2() {
+    let miniPage = document.getElementById("miniPage2");
+    if (miniPage.style.display === "none" || miniPage.style.display === "") {
+      miniPage.style.display = "block";
+    } else {
+      miniPage.style.display = "none";
+    }
+  }
+</script>
+    
+    
+  <center><button onclick="toggleMiniPage4()">Submit Label Info</button>
+<div id="miniPage4" class="hidden">
+  <h3>(label name is required, other than that, you only have to write info you want to fix/add)</h3>
+  <h1>Submit Label Info</h1>
+  <p><font size="3"><u>Label Name</u><br>eg: SST Records</font></p>
+<input type="text" id="labellabel-name" placeholder="Label Name"><br>
+<h1></h1><p><font size="3"><u>Bands</u><br>eg: Black Flag, Minutemen</font></p>
+<input type="text" id="labelbands" placeholder="Bands"><br>
+<h1></h1><p><font size="3"><u>Location</u><br>eg: Los Angeles, California (CA), USA</font></p>
+<input type="text" id="labellocation" placeholder="Location"><br>
+<h1></h1><p><font size="3"><u>Years Active</u><br>eg: 2024-2025</font></p>
+<input type="text" id="labeldates" placeholder="Years Active"><br>
+<h1></h1><p><font size="3"><u>Logo</u><br>(type a link to the image)</font></p>
+<input type="text" id="labellogo" placeholder="Logo"><br><br>
+<button onclick="saveBand4()">Submit Info</button><br></center>
+<center><br>
+  
+<script>
+  function toggleMiniPage4() {
+    let miniPage = document.getElementById("miniPage4");
+    if (miniPage.style.display === "none" || miniPage.style.display === "") {
+      miniPage.style.display = "block";
+    } else {
+      miniPage.style.display = "none";
+    }
+  }
+</script>
+  
+  
     </div>
-
-
-
 <script>
 document.getElementById("randomBandButton").addEventListener("click", function () {
     fetch("banddata.json")
@@ -709,7 +764,7 @@ window.saveBand = function () {
   }
 
   const username = user.email.replace("@punkarchives.com", "");
-const bandName = getValue("band-name");
+const bandName = getValue("bandband-name");
 
 
   if (!bandName.trim()) {
@@ -719,21 +774,22 @@ const bandName = getValue("band-name");
 
   const bandData = {
     name: bandName,
-    genres: getValue("band-genres"),
-    location: getValue("band-location"),
-    years_active: getValue("band-years"),
-    description: getValue("band-description"),
-    related_bands: getValue("related-bands"),
-    official_links: getValue("official-links"),
-    members: getValue("band-members"),
-    releases: getValue("band-releases"),
+    genres: getValue("bandband-genres"),
+    location: getValue("bandband-location"),
+    years_active: getValue("bandband-years"),
+    description: getValue("bandband-description"),
+    related_bands: getValue("bandrelated-bands"),
+    official_links: getValue("bandofficial-links"),
+    members: getValue("bandband-members"),
+    releases: getValue("bandband-releases"),
     uploaded_by: username
   };
 
   console.log("📤 Uploading Band Data:", bandData); // Debugging
 
+const randomnum = Math.floor(Math.random() * 100)
   // Upload to Firebase
-const bandRef = ref(db, "bands/" + bandName + " " + username);
+const bandRef = ref(db, "bands/" + bandName + " " + username + randomnum);
 
   set(bandRef, bandData)
     .then(() => {
@@ -744,7 +800,164 @@ const bandRef = ref(db, "bands/" + bandName + " " + username);
     });
 };
 
+window.saveBand2 = function () {
+  console.log("🟢 saveBand() called");
 
+  const getValue = (id) => {
+    const el = document.getElementById(id);
+    if (!el) {
+      console.warn(`⚠️ Element with ID '${id}' not found!`);
+      return ""; // Default to empty string
+    }
+    console.log(`✅ ${id} =`, el.value); // Log what is being read
+    return el.value.trim();
+  };
+
+  const user = auth.currentUser;
+  if (!user) {
+    alert("You must be logged in to submit a band!");
+    return;
+  }
+
+  const username = user.email.replace("@punkarchives.com", "");
+const bandName = getValue("zinezine-name");
+
+
+  if (!bandName.trim()) {
+    alert("Zine name is required!");
+    return;
+  }
+
+  const bandData = {
+    name: bandName,
+    authors: getValue("zinezine-authors"),
+    location: getValue("zinezine-location"),
+    years_active: getValue("zinezine-years"),
+    issues: getValue("zinezine-issues"),
+    uploaded_by: username
+  };
+
+  console.log("📤 Uploading Band Data:", bandData); // Debugging
+
+const randomnum = Math.floor(Math.random() * 100)
+  // Upload to Firebase
+const bandRef = ref(db, "zines/" + bandName + " " + username + randomnum);
+
+  set(bandRef, bandData)
+    .then(() => {
+      alert("✅ Zine successfully uploaded!");
+    })
+    .catch((error) => {
+      console.error("❌ Error saving zine:", error);
+    });
+};
+
+window.saveBand3 = function () {
+  console.log("🟢 saveBand() called");
+
+  const getValue = (id) => {
+    const el = document.getElementById(id);
+    if (!el) {
+      console.warn(`⚠️ Element with ID '${id}' not found!`);
+      return ""; // Default to empty string
+    }
+    console.log(`✅ ${id} =`, el.value); // Log what is being read
+    return el.value.trim();
+  };
+
+  const user = auth.currentUser;
+  if (!user) {
+    alert("You must be logged in to submit a band!");
+    return;
+  }
+
+  const username = user.email.replace("@punkarchives.com", "");
+const bandName = getValue("complabel-name");
+
+
+  if (!bandName.trim()) {
+    alert("Compilation name is required!");
+    return;
+  }
+
+  const bandData = {
+    name: bandName,
+    bands: getValue("compbands"),
+    date: getValue("compdate"),
+    tracklist: getValue("comptracklist"),
+    title: getValue("comptitle"),
+    albumcover: getValue("compalbumcover"),
+    uploaded_by: username
+  };
+
+  console.log("📤 Uploading Band Data:", bandData); // Debugging
+
+const randomnum = Math.floor(Math.random() * 100)
+  // Upload to Firebase
+const bandRef = ref(db, "comp/" + bandName + " " + username + randomnum);
+
+  set(bandRef, bandData)
+    .then(() => {
+      alert("✅ Compilation successfully uploaded!");
+    })
+    .catch((error) => {
+      console.error("❌ Error saving compilation:", error);
+    });
+};
+  
+window.saveBand4 = function () {
+  console.log("🟢 saveBand() called");
+
+  const getValue = (id) => {
+    const el = document.getElementById(id);
+    if (!el) {
+      console.warn(`⚠️ Element with ID '${id}' not found!`);
+      return ""; // Default to empty string
+    }
+    console.log(`✅ ${id} =`, el.value); // Log what is being read
+    return el.value.trim();
+  };
+
+  const user = auth.currentUser;
+  if (!user) {
+    alert("You must be logged in to submit a band!");
+    return;
+  }
+
+  const username = user.email.replace("@punkarchives.com", "");
+const bandName = getValue("labellabel-name");
+
+
+  if (!bandName.trim()) {
+    alert("Label name is required!");
+    return;
+  }
+
+  const bandData = {
+    name: bandName,
+    bands: getValue("labelbands"),
+    date: getValue("labeldates"),
+    logo: getValue("labellogo"),
+    location: getValue("labellocation"),
+    uploaded_by: username
+  };
+
+  console.log("📤 Uploading Band Data:", bandData); // Debugging
+
+const randomnum = Math.floor(Math.random() * 100)
+  // Upload to Firebase
+const bandRef = ref(db, "label/" + bandName + " " + username + randomnum);
+
+  set(bandRef, bandData)
+    .then(() => {
+      alert("✅ Label successfully uploaded!");
+    })
+    .catch((error) => {
+      console.error("❌ Error saving label:", error);
+    });
+};
+  
+  
 // Firebase config
 
 

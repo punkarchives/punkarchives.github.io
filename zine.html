@@ -208,6 +208,7 @@ loadLeaderboard()
             padding-right: 150px; /* Matches sidebar width */
             padding: 20px;
         }
+
         /* Left Sidebar */
         .sidebar {
             width: 150px;
@@ -221,17 +222,7 @@ loadLeaderboard()
             box-sizing: border-box;
             border-right: 2px solid #aa0000;
         }
-a:link {
-  color: #ffaaaa;
-}
 
-a:visited {
-  color: #ffaaaa;
-}
-
-a:hover {
-  color: #aa0000;
-}
         .sidebar h1 {
             font-family: 'MyCustomFont2', sans-serif;
             color: #aa0000;
@@ -259,10 +250,24 @@ a:hover {
             padding: 5px;
             transition: background-color 0.2s ease-in-out;
         }
+a:link {
+  color: #ffaaaa;
+}
 
+a:visited {
+  color: #ffaaaa;
+}
+
+a:hover {
+  color: #aa0000;
+}
         .sidebar ul li a:hover {
             background-color: #aa0000;
         }
+
+        button { background-color: #aa0000; color: white; padding: 10px; border: none; cursor: pointer; font-size: 18px; }
+        button:hover { background-color: darkred; }
+
 
         /* Right Sidebar */
         .sidebar2 {
@@ -277,10 +282,6 @@ a:hover {
             box-sizing: border-box;
             border-left: 2px solid #aa0000;
         }
-
-        button { background-color: #aa0000; color: white; padding: 10px; border: none; cursor: pointer; font-size: 18px; }
-        button:hover { background-color: darkred; }
-
 
         .sidebar2 h1 {
             font-family: 'MyCustomFont2', sans-serif;
@@ -458,9 +459,7 @@ document.getElementById("randomBandButton").addEventListener("click", function (
             });
         })
         .catch(error => console.error('Error loading latest additions:', error));
-</script>
-
-
+</script> 
 
 <script>
     fetch('latest_updates.json')
@@ -504,7 +503,7 @@ function searchBands() {
         return;
     }
 
-    fetch("banddata.json")
+    fetch("zinedata.json")
         .then(response => response.json())
         .then(bands => {
             resultsList.innerHTML = "";
@@ -576,6 +575,14 @@ function searchBands() {
 }
 </script>
 
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Band Content will be updated here -->
+        <div id="band-content" class="content">
+            <h1>Loading...</h1>
+        </div>
+    </div>
+
 <style>
     /* Styling for the floating album cover */
     #album-cover {
@@ -604,75 +611,164 @@ function searchBands() {
         font-size: 14px;
     }
 </style>
-<div class="main-container">
-        <div class="content">
-<center><div class="search-container">
-    <input type="text" id="searchBar" placeholder="Search..." oninput="searchBands()" style="width: 400px; padding: 8px;">
-    <ul id="searchResults" style="list-style: none; padding: 0; display: none; background: #121212; border: 1px solid #aa0000; width: 400px; max-height: 200px; overflow-y: auto;"></ul>
-</div></center>
-            <h1>All Bands</h1>
-		
-<center><p>Note: "The" is put at the end of names to improve searching.</p></center>
-<div id="letterNav" style="text-align: center; margin-bottom: 20px;">
-    <!-- A-Z Navigation Buttons -->
-    <script>
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-        document.write('<div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 5px;">');
-        letters.forEach(letter => {
-            document.write(`<button onclick="scrollToLetter('${letter}')" style="background-color: #aa0000; color: white; border: none; padding: 5px 10px; cursor: pointer;">${letter}</button>`);
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const bandName = urlParams.get("zine");
+
+    if (!bandName) {
+        document.getElementById("band-content").innerHTML = "<h1>No zine selected.</h1>";
+        return;
+    }
+
+    fetch("zinedata.json")
+        .then(response => response.json())
+        .then(bands => {
+            const band = bands.find(b => b.band_name === bandName);
+            if (!band) {
+                document.getElementById("band-content").innerHTML = "<h1>Zine not found.</h1>";
+                return;
+            }
+
+            let bandHTML = `
+                <h1>${band.band_name}</h1>
+                <p><strong>Authors:</strong> ${band.authors.join(", ")}</p>
+                <p><strong>Location:</strong> ${band.location}</p>
+                <p><strong>Years Active:</strong> ${band.years_active}</p>
+                <p><strong>Added By:</strong> ${band.description}</p>
+                <h2>Issues:</h2>
+                <div id="issues-container"></div>
+            `;
+
+            document.getElementById("band-content").innerHTML = bandHTML;
+
+            // Display each issue with navigation
+            const issuesContainer = document.getElementById("issues-container");
+
+            if (Array.isArray(band.issues) && band.issues.length > 0) {
+                band.issues.forEach((issue, issueIndex) => {
+                    let issueDiv = document.createElement("div");
+                    issueDiv.style.marginBottom = "20px";
+                    issueDiv.style.textAlign = "center";
+
+                    let issueTitle = document.createElement("h3");
+                    issueTitle.textContent = issue.title;
+                    issueDiv.appendChild(issueTitle);
+
+                    let imageContainer = document.createElement("div");
+                    imageContainer.style.position = "relative";
+                    imageContainer.style.display = "inline-block";
+
+                    let img = document.createElement("img");
+                    img.style.width = "500px";  // Adjust size as needed
+                    img.style.borderRadius = "0px";
+                    img.style.display = "block";
+                    img.style.margin = "0 auto";
+
+                    if (Array.isArray(issue.images) && issue.images.length > 0) {
+                        img.src = issue.images[0]; // Start with the first image
+                        img.alt = `${issue.title} - Page 1`;
+                    } else {
+                        img.src = ""; // No images, set a placeholder
+                        img.alt = "No images available.";
+                    }
+
+                    let currentIndex = 0;
+
+                    // Left (Previous) button
+                    let leftButton = document.createElement("button");
+                    leftButton.innerHTML = "&#9665;";
+                    leftButton.style.position = "absolute";
+                    leftButton.style.left = "0";
+                    leftButton.style.top = "50%";
+                    leftButton.style.transform = "translateY(-50%)";
+                    leftButton.style.background = "rgba(0, 0, 0, 0.5)";
+                    leftButton.style.color = "white";
+                    leftButton.style.border = "none";
+                    leftButton.style.padding = "10px";
+                    leftButton.style.cursor = "pointer";
+                    leftButton.style.borderRadius = "5px";
+                    leftButton.style.display = issue.images.length > 1 ? "block" : "none";
+
+                    leftButton.onclick = function () {
+                        if (currentIndex > 0) {
+                            currentIndex--;
+                            img.src = issue.images[currentIndex];
+                            img.alt = `${issue.title} - Page ${currentIndex + 1}`;
+                        }
+                        updateButtons();
+                    };
+
+                    // Right (Next) button
+                    let rightButton = document.createElement("button");
+                    rightButton.innerHTML = "&#9655;";
+                    rightButton.style.position = "absolute";
+                    rightButton.style.right = "0";
+                    rightButton.style.top = "50%";
+                    rightButton.style.transform = "translateY(-50%)";
+                    rightButton.style.background = "rgba(0, 0, 0, 0.5)";
+                    rightButton.style.color = "white";
+                    rightButton.style.border = "none";
+                    rightButton.style.padding = "10px";
+                    rightButton.style.cursor = "pointer";
+                    rightButton.style.borderRadius = "5px";
+                    rightButton.style.display = issue.images.length > 1 ? "block" : "none";
+
+                    rightButton.onclick = function () {
+                        if (currentIndex < issue.images.length - 1) {
+                            currentIndex++;
+                            img.src = issue.images[currentIndex];
+                            img.alt = `${issue.title} - Page ${currentIndex + 1}`;
+                        }
+                        updateButtons();
+                    };
+
+                    // Function to update button visibility
+                    function updateButtons() {
+                        leftButton.style.display = currentIndex > 0 ? "block" : "none";
+                        rightButton.style.display = currentIndex < issue.images.length - 1 ? "block" : "none";
+                    }
+
+                    // Add elements to the container
+                    imageContainer.appendChild(leftButton);
+                    imageContainer.appendChild(img);
+                    imageContainer.appendChild(rightButton);
+                    issueDiv.appendChild(imageContainer);
+                    issuesContainer.appendChild(issueDiv);
+                });
+            } else {
+                issuesContainer.innerHTML = "<p>No issues available.</p>";
+            }
+        })
+        .catch(error => {
+            console.error("Error loading zine data:", error);
+            document.getElementById("band-content").innerHTML = "<h1>Error loading zine data.</h1>";
         });
-        document.write('</div>');
-    </script>
-</div>
-            <font color="#ffffff"><ul id="artistList" class="artist-list"></ul></font>
-        </div>
-    </div>
+});
+</script>
+
+
 
 
 <center><p>Is this page incomplete? Help by submitting info.</p></center>
 
 <script>
+document.getElementById("randomBandButton").addEventListener("click", function () {
     fetch("banddata.json")
         .then(response => response.json())
         .then(bands => {
-            const artistList = document.getElementById("artistList");
-
-            // Sort bands alphabetically by name
-            bands.sort((a, b) => a.band_name.localeCompare(b.band_name));
-
-            let currentLetter = "";
-            
-            bands.forEach(band => {
-                let firstLetter = band.band_name.charAt(0).toUpperCase();
-                
-                // Add a letter heading if it's a new letter
-                if (firstLetter !== currentLetter) {
-                    currentLetter = firstLetter;
-                    let letterHeader = document.createElement("h2");
-                    letterHeader.id = `letter-${currentLetter}`; // Add ID for scrolling
-                    letterHeader.textContent = currentLetter;
-                    artistList.appendChild(letterHeader);
-                }
-
-                // Create band list item
-                let li = document.createElement("li");
-                let a = document.createElement("a");
-                a.textContent = band.band_name;
-                a.href = `band.html?band=${encodeURIComponent(band.band_name)}`;
-                li.appendChild(a);
-                artistList.appendChild(li);
-            });
+            if (bands.length === 0) {
+                alert("No bands available.");
+                return;
+            }
+            const randomBand = bands[Math.floor(Math.random() * bands.length)];
+            window.location.href = `zine.html?zine=${encodeURIComponent(randomBand.band_name)}`;
         })
         .catch(error => console.error("Error loading band data:", error));
-
-    // Function to scroll to letter section
-    function scrollToLetter(letter) {
-        let section = document.getElementById(`letter-${letter}`);
-        if (section) {
-            section.scrollIntoView({ behavior: "smooth" });
-        }
-    }
+});
 </script>
+
 
 </body>
 </html>

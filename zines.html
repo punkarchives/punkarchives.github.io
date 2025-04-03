@@ -504,7 +504,7 @@ function searchBands() {
         return;
     }
 
-    fetch("banddata.json")
+    fetch("zinedata.json")
         .then(response => response.json())
         .then(bands => {
             resultsList.innerHTML = "";
@@ -512,41 +512,28 @@ function searchBands() {
 
             bands.forEach(band => {
                 let matchText = "";
-                let priority = Infinity; // Lower is better
+                let matchFound = false;
 
-                function updatePriority(field, text) {
-                    if (typeof field === "string") {
-                        let pos = field.toLowerCase().indexOf(query);
-                        if (pos !== -1 && pos < priority) {
-                            priority = pos;
-                            matchText = text;
-                        }
+                function checkMatch(field, text) {
+                    if (typeof field === "string" && field.toLowerCase().includes(query)) {
+                        matchText = text;
+                        matchFound = true;
                     }
                 }
 
-                updatePriority(band.band_name, `Band Name: ${band.band_name}`);
-                updatePriority(band.location, `Location: ${band.location}`);
+                checkMatch(band.band_name, `Zine Name: ${band.band_name}`);
+                checkMatch(band.location, `Location: ${band.location}`);
 
-                if (Array.isArray(band.genre)) {
-                    for (let g of band.genre) {
-                        updatePriority(g, `Genre: ${band.genre.join(", ")}`);
-                    }
+                if (Array.isArray(band.authors)) {
+                    band.authors.forEach(author => {
+                        checkMatch(author, `Author: ${band.authors.join(", ")}`);
+                    });
                 }
 
-                if (Array.isArray(band.releases)) {
-    for (let release of band.releases) {
-        if (release.title) updatePriority(release.title, `Release: ${release.title}`);
-        if (release.label) updatePriority(release.label, `Label: ${release.label}`);
-    }
-}
-
-                if (priority !== Infinity) {
-                    matches.push({ band, matchText, priority });
+                if (matchFound) {
+                    matches.push({ band, matchText });
                 }
             });
-
-            // **Sort by priority (lower index appears first)**
-            matches.sort((a, b) => a.priority - b.priority);
 
             if (matches.length === 0) {
                 resultsList.innerHTML = "<li style='color: #888; padding: 5px;'>No results</li>";
@@ -557,13 +544,13 @@ function searchBands() {
                     li.style.cursor = "pointer";
                     li.style.color = "#ffffff";
 
-                    li.innerHTML = `<strong>Band:</strong> ${band.band_name}`;
+                    li.innerHTML = `<strong>Zine:</strong> ${band.band_name}`;
                     if (matchText) {
                         li.innerHTML += `<br><span style="color: #888; font-size: 14px;">${matchText}</span>`;
                     }
 
                     li.onclick = function() {
-                        window.location.href = `band.html?band=${encodeURIComponent(band.band_name)}`;
+                        window.location.href = `zine.html?zine=${encodeURIComponent(band.band_name)}`;
                     };
 
                     resultsList.appendChild(li);
@@ -572,8 +559,9 @@ function searchBands() {
 
             resultsList.style.display = "block";
         })
-        .catch(error => console.error("Error loading band data:", error));
+        .catch(error => console.error("Error loading zine data:", error));
 }
+
 </script>
 
 <style>
@@ -610,7 +598,7 @@ function searchBands() {
     <input type="text" id="searchBar" placeholder="Search..." oninput="searchBands()" style="width: 400px; padding: 8px;">
     <ul id="searchResults" style="list-style: none; padding: 0; display: none; background: #121212; border: 1px solid #aa0000; width: 400px; max-height: 200px; overflow-y: auto;"></ul>
 </div></center>
-            <h1>All Bands</h1>
+            <h1>All Zines</h1>
 		
 <center><p>Note: "The" is put at the end of names to improve searching.</p></center>
 <div id="letterNav" style="text-align: center; margin-bottom: 20px;">
@@ -632,7 +620,7 @@ function searchBands() {
 <center><p>Is this page incomplete? Help by submitting info.</p></center>
 
 <script>
-    fetch("banddata.json")
+    fetch("zinedata.json")
         .then(response => response.json())
         .then(bands => {
             const artistList = document.getElementById("artistList");
@@ -658,12 +646,12 @@ function searchBands() {
                 let li = document.createElement("li");
                 let a = document.createElement("a");
                 a.textContent = band.band_name;
-                a.href = `band.html?band=${encodeURIComponent(band.band_name)}`;
+                a.href = `zine.html?zine=${encodeURIComponent(band.band_name)}`;
                 li.appendChild(a);
                 artistList.appendChild(li);
             });
         })
-        .catch(error => console.error("Error loading band data:", error));
+        .catch(error => console.error("Error loading zine data:", error));
 
     // Function to scroll to letter section
     function scrollToLetter(letter) {

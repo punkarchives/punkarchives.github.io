@@ -1,0 +1,54 @@
+[
+{
+  "band_name": "Concurrent",
+  "location": "Atlanta, Georgia (GA), USA",
+  "years_active": "1995-1998 (Inactive)",
+  "description": "nxdx",
+  "view_count": 0,
+  "bands": ["Serotonin", "Prevail", "Order Of Importance", "Reversal Of Man", "Inkwell"],
+  "official_links": {
+  },
+  "compilations": [
+    {
+      "title": "Placebo Compilation",
+      "cover_image": "https://i.discogs.com/GKEdyiL_ztwh0L5YGYlMBchOd_s0AiqGuN3raLOeaaU/rs:fit/g:sm/q:90/h:600/w:591/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTEzNzc1/NTItMTY2MDM1MzQy/My00NjUwLmpwZWc.jpeg",
+      "label": "Concurrent",
+      "year": "1995",
+      "artists": "Prevail, Order Of Importance, Reversal Of Man, Inkwell",
+      "physical_format": "Vinyl 7-inch 33 RPM",
+      "limitation": "",
+      "extra_info": "",
+      "tracks": ["Prevail: Nine", "Order Of Importance: Silicon Valley", "Reversal Of Man: Assembley", "Inkwell: Wash"]
+    }
+  ]
+},
+  
+{
+  "band_name": "SST Records",
+  "location": "Los Angeles, California (CA), USA",
+  "years_active": "1978-Present",
+  "description": "nxdx",
+  "view_count": 0,
+  "bands": ["Black Flag", "Minutemen", "Saint Vitus"],
+  "official_links": {
+    "website": "https://sstsuperstore.com/"
+  },
+  "logo": "https://sstsuperstore.com/cdn/shop/products/SSTS20.jpg?v=1632148058",
+  "compilations": [
+  ]
+},
+  
+ {
+  "band_name": "625 Thrashcore",
+  "location": "",
+  "years_active": "",
+  "description": "nxdx",
+  "view_count": 0,
+  "bands": ["Insect Warfare"],
+  "official_links": {
+  },
+  "logo": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da847051c7d9baadf6357e5c3e8f",
+  "compilations": [
+  ]
+}
+]

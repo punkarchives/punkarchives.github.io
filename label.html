@@ -208,6 +208,7 @@ loadLeaderboard()
             padding-right: 150px; /* Matches sidebar width */
             padding: 20px;
         }
+
         /* Left Sidebar */
         .sidebar {
             width: 150px;
@@ -221,17 +222,7 @@ loadLeaderboard()
             box-sizing: border-box;
             border-right: 2px solid #aa0000;
         }
-a:link {
-  color: #ffaaaa;
-}
 
-a:visited {
-  color: #ffaaaa;
-}
-
-a:hover {
-  color: #aa0000;
-}
         .sidebar h1 {
             font-family: 'MyCustomFont2', sans-serif;
             color: #aa0000;
@@ -259,10 +250,24 @@ a:hover {
             padding: 5px;
             transition: background-color 0.2s ease-in-out;
         }
+a:link {
+  color: #ffaaaa;
+}
 
+a:visited {
+  color: #ffaaaa;
+}
+
+a:hover {
+  color: #aa0000;
+}
         .sidebar ul li a:hover {
             background-color: #aa0000;
         }
+
+        button { background-color: #aa0000; color: white; padding: 10px; border: none; cursor: pointer; font-size: 18px; }
+        button:hover { background-color: darkred; }
+
 
         /* Right Sidebar */
         .sidebar2 {
@@ -277,10 +282,6 @@ a:hover {
             box-sizing: border-box;
             border-left: 2px solid #aa0000;
         }
-
-        button { background-color: #aa0000; color: white; padding: 10px; border: none; cursor: pointer; font-size: 18px; }
-        button:hover { background-color: darkred; }
-
 
         .sidebar2 h1 {
             font-family: 'MyCustomFont2', sans-serif;
@@ -458,9 +459,7 @@ document.getElementById("randomBandButton").addEventListener("click", function (
             });
         })
         .catch(error => console.error('Error loading latest additions:', error));
-</script>
-
-
+</script> 
 
 <script>
     fetch('latest_updates.json')
@@ -492,89 +491,13 @@ document.getElementById("randomBandButton").addEventListener("click", function (
 <button onclick="logout()">Log Out</button><br><br>
 </div>
 
-<script>
-const DEBUG = true; // Set to true for debugging
-
-function searchBands() {
-    const query = document.getElementById("searchBar").value.toLowerCase();
-    const resultsList = document.getElementById("searchResults");
-
-    if (query.length === 0) {
-        resultsList.style.display = "none";
-        return;
-    }
-
-    fetch("banddata.json")
-        .then(response => response.json())
-        .then(bands => {
-            resultsList.innerHTML = "";
-            let matches = [];
-
-            bands.forEach(band => {
-                let matchText = "";
-                let priority = Infinity; // Lower is better
-
-                function updatePriority(field, text) {
-                    if (typeof field === "string") {
-                        let pos = field.toLowerCase().indexOf(query);
-                        if (pos !== -1 && pos < priority) {
-                            priority = pos;
-                            matchText = text;
-                        }
-                    }
-                }
-
-                updatePriority(band.band_name, `Band Name: ${band.band_name}`);
-                updatePriority(band.location, `Location: ${band.location}`);
-
-                if (Array.isArray(band.genre)) {
-                    for (let g of band.genre) {
-                        updatePriority(g, `Genre: ${band.genre.join(", ")}`);
-                    }
-                }
-
-                if (Array.isArray(band.releases)) {
-    for (let release of band.releases) {
-        if (release.title) updatePriority(release.title, `Release: ${release.title}`);
-        if (release.label) updatePriority(release.label, `Label: ${release.label}`);
-    }
-}
-
-                if (priority !== Infinity) {
-                    matches.push({ band, matchText, priority });
-                }
-            });
-
-            // **Sort by priority (lower index appears first)**
-            matches.sort((a, b) => a.priority - b.priority);
-
-            if (matches.length === 0) {
-                resultsList.innerHTML = "<li style='color: #888; padding: 5px;'>No results</li>";
-            } else {
-                matches.forEach(({ band, matchText }) => {
-                    let li = document.createElement("li");
-                    li.style.padding = "5px";
-                    li.style.cursor = "pointer";
-                    li.style.color = "#ffffff";
-
-                    li.innerHTML = `<strong>Band:</strong> ${band.band_name}`;
-                    if (matchText) {
-                        li.innerHTML += `<br><span style="color: #888; font-size: 14px;">${matchText}</span>`;
-                    }
-
-                    li.onclick = function() {
-                        window.location.href = `band.html?band=${encodeURIComponent(band.band_name)}`;
-                    };
-
-                    resultsList.appendChild(li);
-                });
-            }
-
-            resultsList.style.display = "block";
-        })
-        .catch(error => console.error("Error loading band data:", error));
-}
-</script>
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Band Content will be updated here -->
+        <div id="label-content" class="content">
+            <h1>Loading...</h1>
+        </div>
+    </div>
 
 <style>
     /* Styling for the floating album cover */
@@ -604,75 +527,211 @@ function searchBands() {
         font-size: 14px;
     }
 </style>
-<div class="main-container">
-        <div class="content">
-<center><div class="search-container">
-    <input type="text" id="searchBar" placeholder="Search..." oninput="searchBands()" style="width: 400px; padding: 8px;">
-    <ul id="searchResults" style="list-style: none; padding: 0; display: none; background: #121212; border: 1px solid #aa0000; width: 400px; max-height: 200px; overflow-y: auto;"></ul>
-</div></center>
-            <h1>All Bands</h1>
-		
-<center><p>Note: "The" is put at the end of names to improve searching.</p></center>
-<div id="letterNav" style="text-align: center; margin-bottom: 20px;">
-    <!-- A-Z Navigation Buttons -->
-    <script>
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-        document.write('<div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 5px;">');
-        letters.forEach(letter => {
-            document.write(`<button onclick="scrollToLetter('${letter}')" style="background-color: #aa0000; color: white; border: none; padding: 5px 10px; cursor: pointer;">${letter}</button>`);
-        });
-        document.write('</div>');
-    </script>
-</div>
-            <font color="#ffffff"><ul id="artistList" class="artist-list"></ul></font>
-        </div>
-    </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const labelName = urlParams.get("label");
+
+    if (!labelName) {
+        document.getElementById("label-content").innerHTML = "<h1>No label selected.</h1>";
+        return;
+    }
+
+    fetch("labeldata.json")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(labels => {
+            const label = labels.find(l => l.band_name === labelName);
+            if (!label) {
+                document.getElementById("label-content").innerHTML = "<h1>Label not found.</h1>";
+                return;
+            }
+
+            // Add label info with logo
+            let labelHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h1>${label.band_name}</h1>
+                        <p><strong>Location:</strong> ${label.location}</p>
+                        <p><strong>Years Active:</strong> ${label.years_active}</p>
+                        <p><strong>Added By:</strong> ${label.description}</p>
+                        ${label.official_links && label.official_links.website ? `<p><strong>Official Website:</strong> <a href="${label.official_links.website}" target="_blank">${label.official_links.website}</a></p>` : ""}
+                    </div>
+                    <div>
+                        ${label.logo ? `<img src="${label.logo}" alt="${label.band_name} Logo" style="max-width: 200px; height: auto;" />` : ""}
+                    </div>
+                </div>
+
+                <h2>Artists:</h2>
+                <ul>
+                    ${label.bands.map(band => `<li><a href="band.html?band=${encodeURIComponent(band)}">${band}</a></li>`).join('')}
+                </ul>
+            `;
+            document.getElementById("label-content").innerHTML = labelHTML;
+
+            return fetch("banddata.json");
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(bands => {
+            let releases = [];
+
+            // Add band releases
+            bands.forEach(band => {
+                band.releases.forEach(release => {
+                    if (release.label === labelName) {
+                        releases.push({
+                            ...release,
+                            artist: band.band_name // Attach the band name
+                        });
+                    }
+                });
+            });
+
+            // Add compilations from labeldata.json
+            fetch("labeldata.json")
+                .then(response => response.json())
+                .then(labels => {
+                    const label = labels.find(l => l.band_name === labelName);
+                    if (label.compilations) {
+                        label.compilations.forEach(compilation => {
+                            releases.push({
+                                ...compilation,
+                                artist: compilation.artists, // Artists field from compilation
+                                release_type: "Compilation" // Explicitly mark as Compilation
+                            });
+                        });
+                    }
+
+                    // Sort releases and compilations by year (ascending order)
+                    releases.sort((a, b) => {
+                        const yearA = parseInt((a.year.match(/\b\d{4}\b/) || [0])[0], 10);
+                        const yearB = parseInt((b.year.match(/\b\d{4}\b/) || [0])[0], 10);
+                        return yearA - yearB;
+                    });
+
+                    let releasesHTML = "<h2>Releases:</h2>";
+
+                    releases.forEach((release, index) => {
+                        releasesHTML += `
+                            <div style="margin-bottom: 10px;">
+                                <u>
+                                    <h3 class="release-title" data-image="${release.cover_image}" 
+                                        style="margin-bottom: 5px; cursor: pointer; display: inline-block;">
+                                        ${release.title}
+                                    </h3>
+                                </u>
+                                <button class="download-image" data-image="${release.cover_image}" style="margin-left: 10px;">Download Image</button>
+                                <table class="release-details" style="border-collapse: collapse; border: 2px solid #aa0000;">
+                                    <tr><td style="border: 1px solid #aa0000;"><strong>Artist(s):</strong></td><td style="border: 1px solid #aa0000;">${release.artist}</td></tr>
+                                    <tr><td style="border: 1px solid #aa0000;"><strong>Label:</strong></td><td style="border: 1px solid #aa0000;">${release.label || "N/A"}</td></tr>
+                                    <tr><td style="border: 1px solid #aa0000;"><strong>Release Date:</strong></td><td style="border: 1px solid #aa0000;">${release.year || "Unknown"}</td></tr>
+                                    <tr><td style="border: 1px solid #aa0000;"><strong>Type:</strong></td><td style="border: 1px solid #aa0000;">${release.release_type || "N/A"}</td></tr>
+                                    <tr><td style="border: 1px solid #aa0000;"><strong>Format:</strong></td><td style="border: 1px solid #aa0000;">${release.physical_format || "N/A"}</td></tr>
+                                    <tr><td style="border: 1px solid #aa0000;"><strong>Limitation:</strong></td><td style="border: 1px solid #aa0000;">${release.limitation || "N/A"}</td></tr>
+                                    <tr><td style="border: 1px solid #aa0000;"><strong>Extra Info:</strong></td><td style="border: 1px solid #aa0000;">${release.extra_info || "N/A"}</td></tr>
+                                </table>
+
+                                <button class="toggle-tracks" data-index="${index}" 
+                                    style="display: block; margin-top: 5px; background: black; color: white; border: 1px solid red; padding: 5px;">
+                                    Show Tracklist
+                                </button>
+                                <ol class="tracklist" id="tracklist-${index}" 
+                                    style="display: none; margin-top: 5px; padding-left: 20px;">
+                                    ${release.tracks.map(track => `<li>${track}</li>`).join("")}
+                                </ol>
+                            </div>
+                        `;
+                    });
+
+                    if (releases.length === 0) {
+                        releasesHTML += "<p>No releases found for this label.</p>";
+                    }
+
+                    document.getElementById("label-content").innerHTML += releasesHTML;
+
+                    // Add interactivity
+                    setTimeout(() => {
+                        document.querySelectorAll(".toggle-tracks").forEach(button => {
+                            button.addEventListener("click", function () {
+                                const index = this.getAttribute("data-index");
+                                const tracklist = document.getElementById(`tracklist-${index}`);
+                                tracklist.style.display = tracklist.style.display === "none" ? "block" : "none";
+                                this.textContent = tracklist.style.display === "none" ? "Show Tracklist" : "Hide Tracklist";
+                            });
+                        });
+
+                        // Album Cover Hover Feature
+                        const albumCover = document.createElement("img");
+                        albumCover.id = "album-cover";
+                        albumCover.style.position = "absolute";
+                        albumCover.style.width = "200px";
+                        albumCover.style.border = "2px solid white";
+                        albumCover.style.display = "none";
+                        albumCover.style.background = "black";
+                        albumCover.style.padding = "5px";
+                        albumCover.style.zIndex = "1000";
+                        albumCover.style.pointerEvents = "none";
+                        document.body.appendChild(albumCover);
+
+                        document.querySelectorAll(".release-title").forEach(title => {
+                            title.addEventListener("mouseover", function () {
+                                albumCover.src = this.getAttribute("data-image");
+                                albumCover.style.display = "block";
+                            });
+                            title.addEventListener("mousemove", event => {
+                                albumCover.style.top = `${event.pageY + 10}px`;
+                                albumCover.style.left = `${event.pageX + 10}px`;
+                            });
+                            title.addEventListener("mouseleave", () => albumCover.style.display = "none");
+                        });
+
+                        document.querySelectorAll(".download-image").forEach(button => {
+                            button.addEventListener("click", function () {
+                                const link = document.createElement("a");
+                                link.href = this.getAttribute("data-image");
+                                link.download = link.href.split("/").pop();
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                            });
+                        });
+
+                    }, 100);
+                });
+        })
+        .catch(error => console.error("Error:", error));
+});
+</script>
 
 
 <center><p>Is this page incomplete? Help by submitting info.</p></center>
 
 <script>
+document.getElementById("randomBandButton").addEventListener("click", function () {
     fetch("banddata.json")
         .then(response => response.json())
         .then(bands => {
-            const artistList = document.getElementById("artistList");
-
-            // Sort bands alphabetically by name
-            bands.sort((a, b) => a.band_name.localeCompare(b.band_name));
-
-            let currentLetter = "";
-            
-            bands.forEach(band => {
-                let firstLetter = band.band_name.charAt(0).toUpperCase();
-                
-                // Add a letter heading if it's a new letter
-                if (firstLetter !== currentLetter) {
-                    currentLetter = firstLetter;
-                    let letterHeader = document.createElement("h2");
-                    letterHeader.id = `letter-${currentLetter}`; // Add ID for scrolling
-                    letterHeader.textContent = currentLetter;
-                    artistList.appendChild(letterHeader);
-                }
-
-                // Create band list item
-                let li = document.createElement("li");
-                let a = document.createElement("a");
-                a.textContent = band.band_name;
-                a.href = `band.html?band=${encodeURIComponent(band.band_name)}`;
-                li.appendChild(a);
-                artistList.appendChild(li);
-            });
+            if (bands.length === 0) {
+                alert("No bands available.");
+                return;
+            }
+            const randomBand = bands[Math.floor(Math.random() * bands.length)];
+            window.location.href = `band.html?band=${encodeURIComponent(randomBand.band_name)}`;
         })
         .catch(error => console.error("Error loading band data:", error));
-
-    // Function to scroll to letter section
-    function scrollToLetter(letter) {
-        let section = document.getElementById(`letter-${letter}`);
-        if (section) {
-            section.scrollIntoView({ behavior: "smooth" });
-        }
-    }
+});
 </script>
+
 
 </body>
 </html>
