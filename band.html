@@ -631,20 +631,27 @@ function searchBands() {
                     return;
                 }
 
-                let bandHTML = 
-                    `<h1>${band.band_name}</h1>
-                    <p><strong>Genres:</strong> ${band.genre.join(", ")}</p>
-                    <p><strong>Location:</strong> ${band.location}</p>
-                    <p><strong>Years Active:</strong> ${band.years_active}</p><p><strong>Related Bands: </strong>
-  ${band.related_bands.map(b => `<a href="band.html?band=${encodeURIComponent(b)}">${b}</a>`).join(", ")}
-</p>
-
-                    <p><strong>Links:</strong></p>
-                    <ul>
-                        ${Object.entries(band.official_links).map(([key, url]) => `<li><a href="${url}" target="_blank">${key}</a></li>`).join("")}
-                    </ul>
-					
-                    <p><strong>Added By:<strong> ${band.description}</p>`;
+                // Build band information HTML
+                let bandHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h1>${band.band_name}</h1>
+                            <p><strong>Genres:</strong> ${band.genre.join(", ")}</p>
+                            <p><strong>Location:</strong> ${band.location}</p>
+                            <p><strong>Years Active:</strong> ${band.years_active}</p>
+                            <p><strong>Added By:</strong> ${band.description}</p>
+                            <p><strong>Related Bands:</strong> ${band.related_bands.map(b => `<a href="band.html?band=${encodeURIComponent(b)}">${b}</a>`).join(", ")}</p>
+                            <p><strong>Links:</strong></p>
+                            <ul>
+                                ${Object.entries(band.official_links).map(([key, url]) => `<li><a href="${url}" target="_blank">${key}</a></li>`).join("")}
+                            </ul>
+                        </div>
+                        <div>
+                        ${band.bandpic ? `<img src="${band.bandpic}" alt="${band.band_name} Logo" style="max-width: 200px; height: auto;" />` : ""}
+                            ${band.logo ? `<img src="${band.logo}" alt="${band.band_name} Logo" style="max-width: 200px; height: auto;" />` : ""}
+                        </div>
+                    </div>
+                `;
 
                 // **Band Members Table**
                 if (band.members && band.members.length > 0) {
@@ -670,54 +677,49 @@ function searchBands() {
 
                 // **Discography Section**
                 if (band.releases && band.releases.length > 0) {
-  			  bandHTML += `<hr><h2>Discography</h2>`;
-  			  band.releases.forEach((release, index) => {
-  			      bandHTML += `
-<div style="margin-bottom: 10px;">
-<u>
-<h3 class="release-title" data-image="${release.cover_image}" 
-style="margin-bottom: 5px; cursor: pointer; display: inline-block;">
-                        ${release.title}
-                    </h3>
-                </u>
-                <button class="download-image" data-image="${release.cover_image}" style="margin-left: 10px;">Download Image</button>
-<table class="release-details" style="border-collapse: collapse; border: 2px solid #aa0000;">
-    <tr><td style="border: 1px solid #aa0000;"><strong>Label:</strong></td><td style="border: 1px solid #aa0000;">${release.label || "N/A"}</td></tr>
-    <tr><td style="border: 1px solid #aa0000;"><strong>Release Date:</strong></td><td style="border: 1px solid #aa0000;">${release.year || "Unknown"}</td></tr>
-    <tr><td style="border: 1px solid #aa0000;"><strong>Type:</strong></td><td style="border: 1px solid #aa0000;">${release.release_type || "N/A"}</td></tr>
-    <tr><td style="border: 1px solid #aa0000;"><strong>Format:</strong></td><td style="border: 1px solid #aa0000;">${release.physical_format || "N/A"}</td></tr>
-    <tr><td style="border: 1px solid #aa0000;"><strong>Limitation:</strong></td><td style="border: 1px solid #aa0000;">${release.limitation || "N/A"}</td></tr>
-    <tr><td style="border: 1px solid #aa0000;"><strong>Extra Info:</strong></td><td style="border: 1px solid #aa0000;">${release.extra_info || "N/A"}</td></tr>
-</table>
-                
-                <!-- Collapsible Tracklist -->
-                <button class="toggle-tracks" data-index="${index}" 
-                    style="display: block; margin-top: 5px; background: black; color: white; border: 1px solid red; padding: 5px;">
-                    Show Tracklist
-                </button>
-                <ol class="tracklist" id="tracklist-${index}" 
-                    style="display: none; margin-top: 5px; padding-left: 20px;">
-                    ${release.tracks.map(track => `<li>${track}</li>`).join("")}
-                </ol>
-            </div>`;
-    });
-}
+                    bandHTML += `<hr><h2>Discography</h2><p>Note: Hover your mouse over an album title to see the album art.`;
+                    band.releases.forEach((release, index) => {
+                        bandHTML += `
+                            <div style="margin-bottom: 10px;">
+                                <u>
+                                    <h3 class="release-title" data-image="${release.cover_image}" 
+                                        style="margin-bottom: 5px; cursor: pointer; display: inline-block;">
+                                        ${release.title}
+                                    </h3>
+                                </u>
+                                <button class="download-image" data-image="${release.cover_image}" style="margin-left: 10px;">Download Image</button>
+                                ${release.listen ? `<button class="listen" style="margin-left: 10px;" onclick="window.open('${release.listen}', '_blank')">Listen</button>` : ""}
+                                <table class="release-details" style="border-collapse: collapse; border: 2px solid #aa0000;">
+                                    <tr><td style="border: 1px solid #aa0000;"><strong>Label:</strong></td><td style="border: 1px solid #aa0000;">${release.label || "N/A"}</td></tr>
+                                    <tr><td style="border: 1px solid #aa0000;"><strong>Release Date:</strong></td><td style="border: 1px solid #aa0000;">${release.year || "Unknown"}</td></tr>
+                                    <tr><td style="border: 1px solid #aa0000;"><strong>Type:</strong></td><td style="border: 1px solid #aa0000;">${release.release_type || "N/A"}</td></tr>
+                                    <tr><td style="border: 1px solid #aa0000;"><strong>Format:</strong></td><td style="border: 1px solid #aa0000;">${release.physical_format || "N/A"}</td></tr>
+                                    <tr><td style="border: 1px solid #aa0000;"><strong>Limitation:</strong></td><td style="border: 1px solid #aa0000;">${release.limitation || "N/A"}</td></tr>
+                                    <tr><td style="border: 1px solid #aa0000;"><strong>Extra Info:</strong></td><td style="border: 1px solid #aa0000;">${release.extra_info || "N/A"}</td></tr>
+                                </table>
+                                <!-- Collapsible Tracklist -->
+                                <button class="toggle-tracks" data-index="${index}" 
+                                    style="display: block; margin-top: 5px; background: black; color: white; border: 1px solid red; padding: 5px;">
+                                    Show Tracklist
+                                </button>
+                                <ol class="tracklist" id="tracklist-${index}" 
+                                    style="display: none; margin-top: 5px; padding-left: 20px;">
+                                    ${release.tracks.map(track => `<li>${track}</li>`).join("")}
+                                </ol>
+                            </div>`;
+                    });
+                }
 
-setTimeout(() => {
-    document.querySelectorAll(".toggle-tracks").forEach(button => {
-        button.addEventListener("click", function () {
-            const index = this.getAttribute("data-index");
-            const tracklist = document.getElementById(`tracklist-${index}`);
-            if (tracklist.style.display === "none") {
-                tracklist.style.display = "block";
-                this.textContent = "Hide Tracklist";
-            } else {
-                tracklist.style.display = "none";
-                this.textContent = "Show Tracklist";
-            }
-        });
-    });
-}, 100);
+                setTimeout(() => {
+                    document.querySelectorAll(".toggle-tracks").forEach(button => {
+                        button.addEventListener("click", function () {
+                            const index = this.getAttribute("data-index");
+                            const tracklist = document.getElementById(`tracklist-${index}`);
+                            tracklist.style.display = tracklist.style.display === "none" ? "block" : "none";
+                            this.textContent = tracklist.style.display === "none" ? "Show Tracklist" : "Hide Tracklist";
+                        });
+                    });
+                }, 100);
 
                 document.getElementById("band-content").innerHTML = bandHTML;
 
@@ -789,6 +791,7 @@ setTimeout(() => {
             .catch(error => console.error("Error loading band data:", error));
     });
 </script>
+
 
 
 <center><p>Is this page incomplete? Help by submitting info.</p></center>

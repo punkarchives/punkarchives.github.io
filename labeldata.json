@@ -50,5 +50,34 @@
   "logo": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da847051c7d9baadf6357e5c3e8f",
   "compilations": [
   ]
+},
+  
+ {
+  "band_name": "The Opposite Of Have A Taste Of Your Own Medicine Is Don't Get High Off Your Own Supply Records",
+  "location": "Onaway, Michigan (MI), USA",
+  "years_active": "2025-Present",
+  "description": "nxdx",
+  "view_count": 0,
+  "bands": ["Necrotic Desires", "Weather Underground"],
+  "official_links": {
+    "website": "https://oppositeofmedicine.github.io"
+  },
+  "logo": "oppositeofmedicine.png",
+  "compilations": [
+  ]
+},
+  
+ {
+  "band_name": "Circle Of Sound Records",
+  "location": "Onaway, Michigan (MI), USA",
+  "years_active": "2023-2024",
+  "description": "nxdx",
+  "view_count": 0,
+  "bands": ["Heat From Fire", "Defying Fall", "Weather Underground"],
+  "official_links": {
+  },
+  "logo": "cos.png",
+  "compilations": [
+  ]
 }
 ]
