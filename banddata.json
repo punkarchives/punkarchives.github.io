@@ -1649,6 +1649,331 @@
     "extra_images": [
       ""
     ]
+  },
+
+	    {
+    "band_name": "Rare Americans",
+    "genre": ["Pop Punk"],
+    "location": "Vancouver, Canada (CA)",
+    "years_active": "2018-Present",
+    "description": "theterryman",
+    "logo": "",
+    "view_count": 0,
+    "related_bands": [],
+"official_links": {
+  "website": "https://www.rareamericans.com"
+},
+    "members": [
+{
+          "name": "James Priestner",
+          "instrument": "Vocals, Guitar",
+          "time_active": "2018-Present",
+          "status": "‎Last Known Lineup"
+        },
+	{
+          "name": "Jared Priestner",
+          "instrument": "Songwriting",
+          "time_active": "2018-Present",
+          "status": "‎Last Known Lineup"
+        },
+	{
+          "name": "Jan 'Jongo' Cajaka",
+          "instrument": "Bass, Guitar, Keyboards, Trumpet",
+          "time_active": "2018-Present",
+          "status": "‎Last Known Lineup"
+        },
+	{
+          "name": "Duran Ritz",
+          "instrument": "Drums, Percussion",
+          "time_active": "2018-Present",
+          "status": "‎Last Known Lineup"
+        },
+	{
+          "name": "‎ ",
+          "instrument": "‎ ",
+          "time_active": "‎‎ ",
+          "status": "‎‎ "
+        },
+	{
+          "name": "Lubo Ivan",
+          "instrument": "Guitar",
+          "time_active": "2018-2022",
+          "status": "Former"
+        },
+	{
+          "name": "Ginger Chen",
+          "instrument": "Bass",
+          "time_active": "2018-????",
+          "status": "‎Former"
+        },
+	{
+          "name": "Jeff Quinn",
+          "instrument": "Bass",
+          "time_active": "2018-????",
+          "status": "‎Former"
+        }
+      ],
+    "releases": [
+      {
+        "title": "Rare Americans 1",
+        "cover_image": "https://merch.rareamericans.com/cdn/shop/products/raalbumcover_1200x.jpg?v=1683207242",
+        "label": "",
+        "year": "August 13, 2018",
+        "release_type": "Album",
+        "physical_format": "CD / Vinyl LP",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["Cats, Dogs, & Rats", "Balmoral Hotel", "I vs I", "Pay Me Back", "Night After Night", "Moss Park", "Same Boat We Row", "Garbage Day", "I Had It Coming", "It Was You", "Fuck You World", "Debut Record", "Hands Free", "Wake Up"]
+      },
+      {
+        "title": "Rare Americans 2",
+        "cover_image": "https://f4.bcbits.com/img/a0867486473_16.jpg",
+        "label": "",
+        "year": "March 5, 2021",
+        "release_type": "Album",
+        "physical_format": "CD / Vinyl LP",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["Brittle Bones Nicky", "Milk Man", "Falling Down", "No Easy Roads", "Hullabaloo", "Knives, Guns, & Bed", "Gas Mask", "Berlin", "Up, Up And Away", "9 Times Out Of 10", "Adults Or Kids?", "Without You Around", "Ryan & Dave", "Missing Targets", "Brittle Bones Nicky 2"]
+      },
+      {
+        "title": "RA3: Jamesy Boy & The Screw Loose Zoo",
+        "cover_image": "https://merch.rareamericans.com/cdn/shop/products/RA3FrontCover_c20597cc-f820-42dc-9e4e-14b265c04e23_1200x.jpg?v=1683207595",
+        "label": "Crooked City Records",
+        "year": "",
+        "release_type": "Album",
+        "physical_format": "CD / Vinyl LP",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["Baggage", "Walkin' N' Talkin'", "Black Sheep", "Rhythm Kitchen (feat. D Smoke)", "Shay", "PHD", "Wayne's World 2", "Hey Sunshine", "Something Else Entirely (Demo)", "Good Guy", "Fuck U Pal", "Steam To Blow", "Baby Boy", "Pandora's Box", "Mama Bear", "Full Moon", "Rhythm Kitchen (Original Version) (Bonus Track)"]
+      },
+      {
+        "title": "You’re Not a Bad Person, It’s Just a Bad World",
+        "cover_image": "https://m.media-amazon.com/images/I/71VA-6HLKyL._UF1000,1000_QL80_.jpg",
+        "label": "Crooked City Records",
+        "year": "July 21, 2022",
+        "release_type": "Album",
+        "physical_format": "CD / Vinyl LP",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["Run The World", "Love Is All I Bring", "Moving On", "Better Man", "Lose My Cool", "Carson", "Starting Over", "White T-Shirt Nights", "Green Eye'd Monsta"]
+      },
+      {
+        "title": "The Story Of Jongo Bongo",
+        "cover_image": "https://i.discogs.com/7KL6HNcak0QdybkTH3bz-sXmOmc2GihwQQ9xqIuprsQ/rs:fit/g:sm/q:90/h:225/w:225/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI3OTk3/ODcyLTE2OTIyNjg2/NzAtNDAwMS5qcGVn.jpeg",
+        "label": "Crooked City Records",
+        "year": "July 7, 2023",
+        "release_type": "Album",
+        "physical_format": "CD / Vinyl LP",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["Money!", "Milk And Honey", "Stay Curious", "2 U's", "Northern Lights", "Good Eats", "Brothers", "No Troubles", "Sunday Morning", "F*$# You Elmo", "Moving Beyond", "Odd Ducks"]
+      },
+      {
+        "title": "Rare Americans 4: The Human Animal",
+        "cover_image": "https://i.discogs.com/M3ZgiVvPOhmj7r-Rcb_8dXYX7BiOT5zRQdbEj2y8PwE/rs:fit/g:sm/q:90/h:316/w:316/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTMyMzgx/NDY2LTE3MzI0MTIy/MzYtMjE5OC5qcGVn.jpeg",
+        "label": "Crooked City Records",
+        "year": "August 16, 2024",
+        "release_type": "Album",
+        "physical_format": "CD / Vinyl LP",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["The Human Animal", "Stupid Heart", "Mr Please", "Song For The People", "Dead Of The Night", "Young Minds", "101", "Rat Race", "Sway", "Lovers For A Night (feat. Vox Rea)", "The Painful Part", "Flip The Switch (feat. Omar Khan)", "Inconsequential", "Placebo", "The Machine", "Can Anybody Even See Me", "Drift Away", "X On You (feat. Lil Meesha)", "Take It Right On", "Wednesday Night", "Sadie Jane", "Fortune Cookies", "Got U", "A Brand New Tune", "My Year"]
+      }
+    ],
+    "extra_images": [
+      ""
+    ]
+  },
+
+	    {
+    "band_name": "COMBATWOUNDEDVETERAN",
+    "genre": ["Emoviolence"],
+    "location": "Tampa, Florida (FL), USA",
+    "years_active": "1996-2003",
+    "description": "morpheus",
+    "logo": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/198a4bd5-ad63-4d33-b79b-7ccafb4a92ca/dgquezm-fc1b6500-f47d-444f-ae63-8649a11bd268.png/v1/fill/w_894,h_894,q_70,strp/combat_wounded_veteran_by_anarchostencilism_dgquezm-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI4MCIsInBhdGgiOiJcL2ZcLzE5OGE0YmQ1LWFkNjMtNGQzMy1iNzliLTdjY2FmYjRhOTJjYVwvZGdxdWV6bS1mYzFiNjUwMC1mNDdkLTQ0NGYtYWU2My04NjQ5YTExYmQyNjgucG5nIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.-WaPrOHjewpyw_jlLexAdMkr7asttDeh97ymXe4UO4Y",
+    "view_count": 0,
+    "related_bands": ["Reversal Of Man"],
+"official_links": {
+},
+    "members": [
+{
+          "name": "Christopher Norris",
+          "instrument": "Guitar, Vocals",
+          "time_active": "1996-2003",
+          "status": "‎Last Known Lineup"
+        },
+	{
+          "name": "Dan Ponch",
+          "instrument": "Bass, Vocals",
+          "time_active": "1996-2003",
+          "status": "‎Last Known Lineup"
+        },
+	{
+          "name": "Jason Hamacher",
+          "instrument": "Drums",
+          "time_active": "2000-2003",
+          "status": "Last Known Lineup"
+        },
+	{
+          "name": "Dan Radde",
+          "instrument": "Guitar",
+          "time_active": "1999-2003",
+          "status": "Last Known Lineup"
+        },
+	{
+          "name": "‎ ",
+          "instrument": "‎ ",
+          "time_active": "‎‎ ",
+          "status": "‎‎ "
+        },
+	{
+          "name": "Mark Muenchinger",
+          "instrument": "Drums",
+          "time_active": "1996-????",
+          "status": "Former"
+        },
+	{
+          "name": "Davy Bartlett",
+          "instrument": "Guitar, Vocals",
+          "time_active": "1996, 1997-1998",
+          "status": "‎Former"
+        },
+	{
+          "name": "Gavin St. Denis",
+          "instrument": "Guitar, Vocals",
+          "time_active": "1996",
+          "status": "Former"
+        },
+	{
+          "name": "Billy Frank",
+          "instrument": "Guitar",
+          "time_active": "1998-????",
+          "status": "Former"
+        },
+	{
+          "name": "Jeff Howe",
+          "instrument": "Bass",
+          "time_active": "2000-2001",
+          "status": "Former"
+        }
+      ],
+    "releases": [
+      {
+        "title": "Demo (Criminal)'",
+        "cover_image": "https://i.discogs.com/8oZ4_N3paPLbj0fBJMfUa3GODZzEwlKSLjewf7Z3VNQ/rs:fit/g:sm/q:90/h:600/w:452/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI0MTM1/NzA3LTE3MjIwMTY3/ODItMTcyMi5qcGVn.jpeg",
+        "label": "",
+        "year": "1996",
+        "release_type": "EP",
+        "physical_format": "Cassette / Vinyl 7-inch (2024 Reissue)",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["Why Fools Fall...", "Useful Tips For High Maintenence", "Http://stupidshit.com", "The Last Song", "God, Guns, & Guts"]
+      },
+      {
+        "title": "11 Song 7''",
+        "cover_image": "https://i.discogs.com/NYTwyQMtZvVhdXNpe_c_eB5Td6wykz5j6smHb_B7fm4/rs:fit/g:sm/q:90/h:497/w:490/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTEyOTUz/NzktMTIwNzMxMzIx/Mi5qcGVn.jpeg",
+        "label": "Suppose I Break Your Neck Records",
+        "year": "1997",
+        "release_type": "EP",
+        "physical_format": "Vinyl 7-inch 33RPM",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["10. Eat More Blood Money", "9. With Love, Your Mother", "8. I Gotta' Slingshot, Wanna Get Hurt?", "7. Completed In Three Easy Steps....", "6. Six! Two! Two! Mayhem!", "5. Put 'Em In A Bodybag Johnny (The Saga Continues)", "4. The Brown Tie Is A Clip On", "3. The Song About Killing Your Parents In The Toilet", "2. Kill L.I.N.C.O.L.N!", "1. Some People Ask Too Many Questions", "0. The Tri-Lamb Shadow-Kick Meltdown (The Fuck John Wayne Mix)"]
+      },
+      {
+        "title": "What Flavor Is Your Death Squad Leader?",
+        "cover_image": "https://i.discogs.com/d2cp5UGQ05e1W0QTUSP9d9YIZ5vlkQJTVWDdx_7EuB0/rs:fit/g:sm/q:90/h:498/w:500/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTEyNzc4/NTctMTIwNTg0NDAz/Mi5qcGVn.jpeg",
+        "label": "Schematics Records",
+        "year": "1998",
+        "release_type": "EP",
+        "physical_format": "Vinyl 7-inch 45RPM",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["29. Plastic Bullets Are So '84", "30. I Hope You Get Cancelled", "31. I've Got A Slingshot, Wanna Get Hurt?", "32. The Rise Of A Thousand Prosthetic Limbs", "33. What The Hell", "34. Shit 3:16", "35. Also Comes In Red, Orange & Fuck You", "36. Disembowelment At Room Temperature", "37. Black Hair Dye, Aisle 6", "38. 'Jane, You Ignorant Slut' / Power Failure In The Suburbs"]
+      },
+      {
+        "title": "Combatwoundedveteran / Scrotum Grinder",
+        "cover_image": "https://i.discogs.com/6YbrRYbsLQpqrHKfW1VBVRR1PE6fcxD28bhMBZ8pn6U/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTY5NzQz/MS0xNTg5OTA3Mzgz/LTY1NjYuanBlZw.jpeg",
+        "label": "Burrito Records",
+        "year": "1999",
+        "release_type": "Split",
+        "physical_format": "Vinyl 7-inch 45RPM",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["Scrotum Grinder: 507 Years And A Heap Of Flesh", "Combatwoundedveteran: Operation Super-Imposed Head", "Scrotum Grinder: The Fight Song", "Combatwoundedveteran: And When I Swing Around I Will Destroy You", "Combatwoundedveteran: Q: What Kind Of A Name Is Scrotum Grinder? A: A Terrible One", "Scrotum Grinder: Anathema: Anthem Of The Aimless", "Combatwoundedveteran: We Are Geniuses", "Scrotum Grinder: CWV: Shutting Up is Your Best Finishing Move", "Combatwoundedveteran: Asshole Means I'm Better Than You"]
+      },
+      {
+        "title": "Split 6''",
+        "cover_image": "https://i.discogs.com/T_Ot_djGPEUUQf3zp7No4G5-K9oWCitglzZWhWuEviY/rs:fit/g:sm/q:90/h:442/w:444/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTEyNTA3/OTQtMTIwMzk0NjQ1/MS5qcGVn.jpeg",
+        "label": "Clean Plate Records",
+        "year": "1999",
+        "release_type": "Split",
+        "physical_format": "Vinyl 6-inch 33RPM",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["Combatwoundedveteran: 22. Economic Downturn With The Kung-Fu Grip", "Combatwoundedveteran: 23. Hank Cut His Bowels Again", "Combatwoundedveteran: 24. I Talk, You Listen", "Combatwoundedveteran: 25. Rocks In A Blender", "26. Kill The Translator", "Orchid: Eye Gouger", "Orchid: Panopticism"]
+      },
+      {
+        "title": "I Know A Girl Who Develops Crime Scene Photos",
+        "cover_image": "https://i.discogs.com/QoxjDD7Nh3sTLtA6lzC2ZFNnCpL2QsQTGLZICi9_2AM/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTExNzA5/NjEtMTU4OTg0MjIz/MC01MDQ0LmpwZWc.jpeg",
+        "label": "No Idea Records",
+        "year": "1999",
+        "release_type": "Album",
+        "physical_format": "CD / Vinyl 12-inch 45RPM",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["My Spine! My Spine! My Spine!", "Watching Stock Car Racing On My Wedding Night", "Propaganda Films Shot With A Sitcom Script", "Assassination Attempt Part Two", "I Talk, You Listen", "You'll Never Be Where I Am, Ever In Your Life", "Fuck The Ghouls", "Mercury Streams, The Proliferation Of Foreign Matter", "One Arm Left", "Folded Space: Lead Poisoning And Distortion", "You Win, I'm Stupid", "Appendix: Proportion Zero", "Operation: Head Superimposed", "You Make Statements Concerning Things That You Know Nothing About", "Christ, My Leg Is Sore", "Let The Surgical Strike Begin", "One Third Of A Perfect Man", "The Seven-Ten Split", "The Party Asteroid Apocalypse"]
+      },
+      {
+        "title": "Duck Down For The Torso",
+        "cover_image": "https://i.discogs.com/eOYBjxZ5MvZWowOfatMGOoaTb2P8tY4V1FCtTf20Nq0/rs:fit/g:sm/q:90/h:360/w:360/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTExNzA5/NTEtMTE5Nzk5ODAy/MC5naWY.jpeg",
+        "label": "No Idea Records",
+        "year": "2002",
+        "release_type": "EP",
+        "physical_format": "CD / Vinyl 10-inch 45RPM",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["Activate The Corpses", "The Very First Pterodactyl!", "15 Minutes On A Forklift", "Folded Space: Mapping Unexploded Ordinance"]
+      },
+      {
+        "title": "Electric Youth Crew",
+        "cover_image": "https://f4.bcbits.com/img/a3032759331_10.jpg",
+        "label": "",
+        "year": "2002",
+        "release_type": "Split",
+        "physical_format": "Vinyl 12-inch 45RPM",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["Reversal Of Man: Game Of Chess", "Reversal Of Man: Fire Sermon", "Reversal Of Man: What The Thunder Said", "Reversal Of Man: Burial Of The Dead", "Reversal Of Man: Death By Water", "Combatwoundedveteran: Pieces Of Judith", "Combatwoundedveteran: Plagiarizing The Father", "Combatwoundedveteran: ...And Now That I'm Cornered By Vermin", "Combatwoundedveteran: F That We're Not Here To Have Fun"]
+      },
+      {
+        "title": "I Know A Girl Who Develops Crime Scene Photos (The Instrumentals)",
+        "cover_image": "https://f4.bcbits.com/img/a3622644763_10.jpg",
+        "label": "",
+        "year": "January 4, 2025",
+        "release_type": "Album",
+        "physical_format": "",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["My Spine! My Spine! My Spine!", "Watching Stock Car Racing On My Wedding Night", "Propaganda Films Shot With A Sitcom Script", "Assassination Attempt Part Two", "I Talk, You Listen", "You'll Never Be Where I Am, Ever In Your Life", "Fuck The Ghouls", "Mercury Streams, The Proliferation Of Foreign Matter", "One Arm Left", "Folded Space: Lead Poisoning And Distortion", "You Win, I'm Stupid", "Appendix: Proportion Zero", "Operation: Head Superimposed", "You Make Statements Concerning Things That You Know Nothing About", "Christ, My Leg Is Sore", "Let The Surgical Strike Begin", "One Third Of A Perfect Man", "The Seven-Ten Split", "The Party Asteroid Apocalypse"]
+      },
+      {
+        "title": "This Is Not An Erect, All-Red Neon Body",
+        "cover_image": "https://i.discogs.com/Y48xQNtw6Fo6TVg9BP8zpNz8elItUZhCfo1Q67GibGo/rs:fit/g:sm/q:90/h:200/w:200/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTIyMzgz/MDAtMTM5MTMzNzY4/NC05ODYwLmpwZWc.jpeg",
+        "label": "No Idea Records",
+        "year": "December 31, 2004",
+        "release_type": "Compilation",
+        "physical_format": "Vinyl 12-inch 45RPM x2",
+        "limitation": "",
+        "extra_info": "",
+        "tracks": ["Eat More Blood Money", "With Love, Your Mother", "I Gotta' Slingshot, Wanna' Get Hurt", "Completed In Three Easy Steps", "Six! Two! Two! Mayhem", "Put 'Em In A Body Bag, Johnny", "The Brown Tie Is A Clip On", "Dead Parents, Yeah!", "Kill L.I.N.C.O.L.N.", "Some People Ask Too Many Questions", "The Tri-Lamb Shadkick Meltdown", "God, Guns, & Guts", "Put Your Weight On T.", "Ted, Me, & Al Green", "Dance, Asshole", "Say Yes, To Cathode Ray Rock", "Cumbersome Ant People", "We Sticks Butter", "My Food, The Catheter", "....And Other Sinister Motives", "Economic Downturn", "Hank Cut Out His Bowles Again", "I Talk, You Listen (Version: Low-Fi)", "Rocks In A Blender", "Kill The Translator", "Shit x1000", "I'm Sweet, I'm Sexy & I'm Oh So Chocalate", "Plastic Bullets Are So '84", "I Hope You Get Cancelled", "I've Gotta' Slingshot Wanna' Get Hurt? (Again, Faster)", "The Rise Of A Thousand Prosthetic Limbs", "What The Hell?", "Shit 3:16", "Also Comes In Red, Orange & Fuck You", "Disembowlment At Romm Temperature", "Black Hair Dye, Isle 6", ""Jane, You Ignorant Slut" / Power Failure In The Suburbs", "Operation: Super Imposed Head (prelude)", "And When I Swing Around, I Will Destroy You", "Q: What Kind Of (A Band) Name Is Scrotum Grinder A: A Terrible One", "We Are Geniuses", "Asshole Means I Am Better Than You"]
+      }
+    ],
+    "extra_images": [
+      ""
+    ]
   }
 
 ]
