@@ -1974,6 +1974,34 @@
     "extra_images": [
       ""
     ]
+  },
+	
+      	    {
+    "band_name": "SMES",
+    "genre": ["Cybergore, Goregrind"],
+    "location": "Eindhoven, Netherlands",
+    "years_active": "1998-Present",
+    "description": "rockettothemoon",
+    "view_count": 0,
+    "related_bands": ["Lymphatic Phlegm", "Purulent Wormjizz"],
+"official_links": {
+  "website": "http://www.myspace.com/sxmxexsx"
+},
+    "members": [
+        {
+          "name": "Erwin de Groot",
+          "instrument": "Everything",
+          "time_active": "1998-Present",
+          "status": "‎Current"
+        }
+      ],
+    "releases": [
+      
+    ],
+    "extra_images": [
+      ""
+    ]
   }
+	
 
 ]
