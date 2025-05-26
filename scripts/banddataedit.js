@@ -152,13 +152,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         "Current": [],
         "Former": [],
         "Last Known Lineup": [],
-        "Unknown": [] // For members with unrecognized or missing status
+        "Unknown": []
     };
 
     band.members.forEach((m, i) => {
         const status = m.status || "Unknown";
         if (!categorizedMembers[status]) {
-            categorizedMembers[status] = []; // Optionally collect other unknown status labels
+            categorizedMembers[status] = []; 
         }
         categorizedMembers[status].push({
             ...m,
@@ -166,7 +166,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
 
-    bandHTML += `<hr><h2>Band Members</h2>
+    bandHTML += `<hr><h2>Band Members</h2><p>note: members will not display unless theyre given a status of "Current", "Former", or "Last Known Lineup"
     <table border="1"><tr><th>Name</th><th>Instrument</th><th>Time Active</th><th>Status</th></tr>`;
 
     const knownCategories = ["Current", "Former", "Last Known Lineup"];
@@ -228,7 +228,7 @@ if (band.releases?.length) {
 
     bandHTML += `
       <div style="margin-bottom:20px">
-        <h3 ${titleStyle}><strong>Title:</strong> <span class="editable-value" data-path="releases/${r.originalIndex}/title" data-band="${band.key}">${r?.title ?? "N/A"}${lockEmoji}</span>
+        <h3><strong>Title:</strong> <span class="editable-value" data-path="releases/${r.originalIndex}/title" data-band="${band.key}">${r?.title ?? "N/A"}</span>
         ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</h3>
         <p><strong>Image Link:</strong> <span class="editable-value" data-path="releases/${r.originalIndex}/cover_image" data-band="${band.key}">${r?.cover_image ?? "N/A"}</span>
         ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
@@ -274,10 +274,8 @@ document.addEventListener("click", async (event) => {
   if (event.target.id === "addReleaseButton") {
     if (!band.releases) band.releases = [];
 
-    // Find the next available release index
     const nextIndex = band.releases.length;
 
-    // Create a new blank release object
     const newRelease = {
       title: "undefined",
       cover_image: "undefined",
