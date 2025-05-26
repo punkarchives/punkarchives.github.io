@@ -3,9 +3,9 @@
    <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=1000, user-scalable=yes">
-      <link rel="stylesheet" href="styles.css">
       <script type="module" src="scripts/main.js"></script>
       <title>Punk Archives</title>
+      <link rel="stylesheet" href="styles.css">
    </head>
    <body>
       <div class="sidebar">
@@ -60,29 +60,13 @@
          <button onclick="logout()">Log Out</button><br><br>
       </div>
       <div class="main-container">
-         <!-- Band Content will be updated here -->
-         <div id="label-content" class="content">
+         <div id="band-content" class="content">
             <h1>Loading...</h1>
          </div>
       </div>
-      <script src="scripts/labeldata.js" type="module"></script>
+      <script src="scripts/banddataedit.js" type="module"></script>
       <center>
          <p>Is this page incomplete? Help by submitting info.</p>
       </center>
-      <script>
-         document.getElementById("randomBandButton").addEventListener("click", function () {
-             fetch("banddata.json")
-                 .then(response => response.json())
-                 .then(bands => {
-                     if (bands.length === 0) {
-                         alert("No bands available.");
-                         return;
-                     }
-                     const randomBand = bands[Math.floor(Math.random() * bands.length)];
-                     window.location.href = `band.html?band=${encodeURIComponent(randomBand.band_name)}`;
-                 })
-                 .catch(error => console.error("Error loading band data:", error));
-         });
-      </script>
    </body>
 </html>

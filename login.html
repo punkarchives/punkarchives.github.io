@@ -9,7 +9,7 @@
    </head>
    <body>
       <div class="sidebar">
-	 <a href="index.html#" style="text-decoration:none"><img src="assets/logo.png" width="140px"></a>
+         <a href="index.html#" style="text-decoration:none"><img src="assets/logo.png" width="140px"></a>
          <ul>
          <font face="MyCustomFont">
             <li></li>
@@ -26,8 +26,7 @@
          </a></li>
          </ul>
       </div>
-      <script src="scripts/randomband.js"></script>
-      </font>
+      <script src="scripts/randomband.js"></script></font>
       <div class="sidebar2">
          <center>
          <input type="text" id="signup-username" placeholder="Username" required><br>
@@ -60,29 +59,9 @@
          <button onclick="logout()">Log Out</button><br><br>
       </div>
       <div class="main-container">
-         <!-- Band Content will be updated here -->
-         <div id="label-content" class="content">
-            <h1>Loading...</h1>
-         </div>
+      <div class="content">
+         <h1><img src="assets/logo.png" width="100px"></h1>
+         <h2>You're forbidden from accessing that page until you log in.</h2>
       </div>
-      <script src="scripts/labeldata.js" type="module"></script>
-      <center>
-         <p>Is this page incomplete? Help by submitting info.</p>
-      </center>
-      <script>
-         document.getElementById("randomBandButton").addEventListener("click", function () {
-             fetch("banddata.json")
-                 .then(response => response.json())
-                 .then(bands => {
-                     if (bands.length === 0) {
-                         alert("No bands available.");
-                         return;
-                     }
-                     const randomBand = bands[Math.floor(Math.random() * bands.length)];
-                     window.location.href = `band.html?band=${encodeURIComponent(randomBand.band_name)}`;
-                 })
-                 .catch(error => console.error("Error loading band data:", error));
-         });
-      </script>
    </body>
 </html>

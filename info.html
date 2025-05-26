@@ -3,572 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1000, user-scalable=yes">
-
+<link rel="stylesheet" href="styles.css">
     <title>Punk Archives</title>
-    <style>
-        /* Global Styles */
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #000000;
-            color: #ffffff;
-        }
-
-        /* Main flex container */
-        .main-container {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding-left: 150px; /* Matches sidebar width */
-            padding-right: 150px; /* Matches sidebar width */
-            padding: 20px;
-        }
-
-        /* Left Sidebar */
-        .sidebar {
-            width: 150px;
-            background-color: #121212;
-            color: #fff;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            padding: 20px 5px;
-            box-sizing: border-box;
-            border-right: 2px solid #aa0000;
-        }
-
-        .sidebar h1 {
-            font-family: 'MyCustomFont2', sans-serif;
-            color: #aa0000;
-            font-size: 20px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            text-align: right;
-        }
-
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .sidebar ul li {
-            margin: 15px 0;
-        }
-a:link {
-  color: #ffaaaa;
-}
-
-a:visited {
-  color: #ffaaaa;
-}
-
-a:hover {
-  color: #aa0000;
-}
-        .sidebar ul li a {
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 20px;
-            display: block;
-            text-align: right;
-            padding: 5px;
-            transition: background-color 0.2s ease-in-out;
-        }
-
-        .sidebar ul li a:hover {
-            background-color: #aa0000;
-        }
-
-        /* Right Sidebar */
-        .sidebar2 {
-            width: 150px;
-            background-color: #121212;
-            color: #fff;
-            height: 100vh;
-            position: fixed;
-            right: 0;
-            top: 0;
-            padding: 20px 5px;
-            box-sizing: border-box;
-            border-left: 2px solid #aa0000;
-        }
-
-        .sidebar2 h1 {
-            font-family: 'MyCustomFont2', sans-serif;
-            color: #aa0000;
-            font-size: 20px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .sidebar2 ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .sidebar2 ul li {
-            margin: 15px 0;
-        }
-
-        .sidebar2 ul li a {
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 20px;
-            display: block;
-            text-align: left;
-            padding: 5px;
-            transition: background-color 0.2s ease-in-out;
-        }
-
-        .sidebar2 ul li a:hover {
-            background-color: #aa0000;
-        }
-
-        /* Main Content */
-        .content {
-            width: 100%;
-            max-width: 70%; /* Prevents extreme width */
-            padding: 20px;
-        }
-
-        /* Headings */
-        .content h1 {
-            font-family: 'MyCustomFont2', sans-serif;
-            color: #aa0000;
-            font-size: 22px;
-            text-transform: uppercase;
-            border-bottom: 3px solid #aa0000;
-            padding-bottom: 10px;
-        }
-
-        .content h2 {
-            font-size: 20px;
-            border-bottom: 2px solid #ffffff;
-            padding-bottom: 10px;
-            color: #aa0000;
-        }
-
-        /* News Items */
-        .news-item h3 {
-            font-size: 18px;
-            color: #aa0000;
-            margin: 10px 0;
-        }
-
-        .news-item p {
-            line-height: 1.6;
-            font-size: 16px;
-        }
-
-        /* Custom Fonts */
-        @font-face {
-            font-family: 'MyCustomFont';
-            src: url('Modest.woff') format('woff');
-        }
-        @font-face {
-            font-family: 'MyCustomFont2';
-            src: url('Crass.ttf') format('truetype');
-        }
-
-        /* Latest Additions Box */
-        .latest-additions {
-            background-color: #121212;
-            border: 2px solid #aa0000;
-            width: 125px;
-            color: #ffffff;
-        }
-
-        .latest-additions h2 {
-            font-size: 18px;
-            color: #aa0000;
-        }
-
-        .latest-additions ul {
-            list-style: none;
-            padding: 0;
-            font-size: 14px;
-        }
-
-        .latest-additions ul li {
-        }
-
-	.log {
-	font-size: 15px;
-	}
-        button { background-color: #aa0000; color: white; padding: 10px; border: none; cursor: pointer; font-size: 18px; }
-        button:hover { background-color: darkred; }
-
-    </style>
-</head>
-<body>
-
-    <!-- Left Sidebar -->
-    <div class="sidebar">
-      <h1><a href="index.html#" style="text-decoration:none"><font face="MyCustomFont2" color="#aa0000">Punk Archives</font></a></h1>
-        <ul><font face="MyCustomFont">
-            <li></li>
-            <li><a href="bands.html#">All Bands</a></li>
-            <li><a href="zines.html#">Zines</a></li>
-            <li><a href="labels.html#">Labels</a></li>
-      <h1><font face="MyCustomFont" color="#aa0000">──────────</font></h1>
-            <li><a href="https://discordapp.com/users/767006494595350578">Contact</a></li>
-            <li><a href="info.html#">Submit Info</a></li>
-      <h1><font face="MyCustomFont" color="#aa0000">──────────</font></h1>
-        <ul>
-            <li><a id="randomBandButton">Random Band</font></a></li>
-        </ul>
-    </div>
-<script>
-document.getElementById("randomBandButton").addEventListener("click", function () {
-    fetch("banddata.json")
-        .then(response => response.json())
-        .then(bands => {
-            if (bands.length === 0) {
-                alert("No bands available.");
-                return;
-            }
-            const randomBand = bands[Math.floor(Math.random() * bands.length)];
-            window.location.href = `band.html?band=${encodeURIComponent(randomBand.band_name)}`;
-        })
-        .catch(error => console.error("Error loading band data:", error));
-});
-</script>
-</font>
-<!-- Right Sidebar -->
-<div class="sidebar2">
-
-<center><!-- Sign Up -->
-<input type="text" id="signup-username" placeholder="Username" required><br>
-<input type="password" id="signup-password" placeholder="Password" required><br>
-<button onclick="signUp()">Sign Up</button><br><br>
-
-<!-- Log In -->
-<input type="text" id="login-username" placeholder="Username" required><br>
-<input type="password" id="login-password" placeholder="Password" required><br>
-<button onclick="login()">Log In</button><br><br>
-
-
-<center>
-    <div class="latest-additions">
-        <h2>Latest Additions</h2>
-        <ul id="latest-additions-list"></ul>
-    </div>
-</center>
-
-<script>
-    fetch('latest_additions.json')
-        .then(response => response.json())
-        .then(data => {
-            let list = document.getElementById("latest-additions-list");
-            data.latest_additions.forEach(band => {
-                let link = document.createElement("a");
-                link.href = band.url;
-                link.innerHTML = `<u><font color="#ffffff">${band.name}</font></u>`;
-                list.appendChild(link);
-                list.appendChild(document.createElement("br"));
-                list.appendChild(document.createElement("br"));
-            });
-        })
-        .catch(error => console.error('Error loading latest additions:', error));
-</script>
-
-
-<script>
-    fetch('latest_updates.json')
-        .then(response => response.json())
-        .then(data => {
-            let list = document.getElementById("latest-updates-list");
-            data.latest_additions.forEach(band => {
-                let link = document.createElement("a");
-                link.href = band.url;
-                link.innerHTML = `<u><font color="#ffffff">${band.name}</font></u>`;
-                list.appendChild(link);
-                list.appendChild(document.createElement("br"));
-                list.appendChild(document.createElement("br"));
-            });
-        })
-        .catch(error => console.error('Error loading latest updates:', error));
-</script>
-
-<br>
-<center>
-  <div class="latest-additions">
-    <h2>Top Users</h2>
-<div id="leaderboard"></div>
-  </div>
-</center>
-
-<center><p><font size="3">Logged In As: </p><p class="log" id="logged-in-user">Not logged in.</font></p></center>
-<!-- Log Out -->
-<button onclick="logout()">Log Out</button><br><br>
-</div>
-
-<script>
-const DEBUG = true; // Set to true for debugging
-
-function searchBands() {
-    const query = document.getElementById("searchBar").value.toLowerCase();
-    const resultsList = document.getElementById("searchResults");
-
-    if (query.length === 0) {
-        resultsList.style.display = "none";
-        return;
-    }
-
-    fetch("banddata.json")
-        .then(response => response.json())
-        .then(bands => {
-            resultsList.innerHTML = "";
-            let matches = [];
-
-            bands.forEach(band => {
-                let matchText = "";
-                let priority = Infinity; // Lower is better
-
-                function updatePriority(field, text) {
-                    if (typeof field === "string") {
-                        let pos = field.toLowerCase().indexOf(query);
-                        if (pos !== -1 && pos < priority) {
-                            priority = pos;
-                            matchText = text;
-                        }
-                    }
-                }
-
-                updatePriority(band.band_name, `Band Name: ${band.band_name}`);
-                updatePriority(band.location, `Location: ${band.location}`);
-
-                if (Array.isArray(band.genre)) {
-                    for (let g of band.genre) {
-                        updatePriority(g, `Genre: ${band.genre.join(", ")}`);
-                    }
-                }
-
-                if (Array.isArray(band.releases)) {
-    for (let release of band.releases) {
-        if (release.title) updatePriority(release.title, `Release: ${release.title}`);
-        if (release.label) updatePriority(release.label, `Label: ${release.label}`);
-    }
-}
-
-                if (priority !== Infinity) {
-                    matches.push({ band, matchText, priority });
-                }
-            });
-
-            // **Sort by priority (lower index appears first)**
-            matches.sort((a, b) => a.priority - b.priority);
-
-            if (matches.length === 0) {
-                resultsList.innerHTML = "<li style='color: #888; padding: 5px;'>No results</li>";
-            } else {
-                matches.forEach(({ band, matchText }) => {
-                    let li = document.createElement("li");
-                    li.style.padding = "5px";
-                    li.style.cursor = "pointer";
-                    li.style.color = "#ffffff";
-
-                    li.innerHTML = `<strong>Band:</strong> ${band.band_name}`;
-                    if (matchText) {
-                        li.innerHTML += `<br><span style="color: #888; font-size: 14px;">${matchText}</span>`;
-                    }
-
-                    li.onclick = function() {
-                        window.location.href = `band.html?band=${encodeURIComponent(band.band_name)}`;
-                    };
-
-                    resultsList.appendChild(li);
-                });
-            }
-
-            resultsList.style.display = "block";
-        })
-        .catch(error => console.error("Error loading band data:", error));
-}
-</script>
-
-
-<!-- Main Container -->
-    <div class="main-container">
-        <div class="content">
-<h1>Submit info</h1>
-
-    
-<div id="bandForm">
-<center>
-<h3><font size="3"><b>Add any info for any band here, even if the band is already on the site and just needs one small correction.<br><br>Make sure to add as much info as possible. For example: if you leave the instrument of a member blank, I most likely won't go and find it myself.<br></b></font></h3>
-  <h1></h1>
-  <button onclick="toggleMiniPage()">Submit Band Info</button>
-<div id="miniPage" class="hidden">
-  <h3>(band name is required, other than that, you only have to write info you want to fix/add)</h3>
-  <h1>Submit Band Info</h1>
-  <p><font size="3"><u>Band Name</u><br>eg: Crass</font></p>
-<input type="text" id="bandband-name" placeholder="Band Name"><br>
-<h1></h1><p><font size="3"><u>Genre(s)</u><br>eg: Hardcore Punk, Anarcho-Punk</font></p>
-<input type="text" id="bandband-genres" placeholder="Genres"><br>
-<h1></h1><p><font size="3"><u>Location Formed</u><br>eg: Epping, U.K.</font></p>
-<input type="text" id="bandband-location" placeholder="Location"><br>
-<h1></h1><p><font size="3"><u>Years Active</u><br>eg: 1977-1984</font></p>
-<input type="text" id="bandband-years" placeholder="Years Active"><br>
-<h1></h1><p><font size="3"><u>Related Bands</u><br>eg: Rollins Band Is Related To Black Flag</font></p>
-<input type="text" id="bandrelated-bands" placeholder="Related Bands"><br>
-<h1></h1><p><font size="3"><u>Official Sites</u><br>eg: https://fakebandsite.com</font></p>
-<input type="text" id="bandofficial-links" placeholder="Official Site"><br>
-<h1></h1><p><font size="3"><u>Members</u><br>eg: "John Doe, Guitar, 1999-2000, Former"</font></p>
-<textarea id="bandband-members" placeholder="Members"></textarea><br>
-<h1></h1><p><font size="3"><u>Releases</u><br>eg: (for each release) Release Name, Image Link, Record Label, Physical Format, Type (ep, lp, etc), Limitations, Extra Info, Tracklist, Link To Listen</font></p>
-<img src="goodformat.png" width="600px"><br>
-<textarea id="bandband-releases" placeholder="Releases:"></textarea><br><h1></h1>
-<button onclick="saveBand()">Submit Info</button><br></center><br>
-</div>
-<script>
-  function toggleMiniPage() {
-    let miniPage = document.getElementById("miniPage");
-    if (miniPage.style.display === "none" || miniPage.style.display === "") {
-      miniPage.style.display = "block";
-    } else {
-      miniPage.style.display = "none";
-    }
-  }
-</script>
-  
-<style>
-  .hidden {
-    display: none;
-  }
-</style>
-
-  <center><button onclick="toggleMiniPage3()">Submit Zine Info</button>
-<div id="miniPage3" class="hidden">
-  <h3>(zine name is required, other than that, you only have to write info you want to fix/add)</h3>
-  <h1>Submit Zine Info</h1>
-  <p><font size="3"><u>Zine Name</u><br>eg: Sniffin' Glue</font></p>
-<input type="text" id="zinezine-name" placeholder="Zine Name"><br>
-<h1></h1><p><font size="3"><u>Author(s)</u><br>eg: John Doe</font></p>
-<input type="text" id="zinezine-authors" placeholder="Authors"><br>
-<h1></h1><p><font size="3"><u>Location Formed</u><br>eg: Epping, U.K.</font></p>
-<input type="text" id="zinezine-location" placeholder="Location"><br>
-<h1></h1><p><font size="3"><u>Years Active</u><br>eg: 1977-1984</font></p>
-<input type="text" id="zinezine-years" placeholder="Years Active"><br>
-<h1></h1><p><font size="3"><u>Issues</u><br>(take pictures and put the links here)</font></p>
-<textarea id="zinezine-issues" placeholder="Issues"></textarea><br><h1></h1>
-<button onclick="saveBand2()">Submit Info</button><br></center>
-<center><br>
-  
-<script>
-  function toggleMiniPage3() {
-    let miniPage = document.getElementById("miniPage3");
-    if (miniPage.style.display === "none" || miniPage.style.display === "") {
-      miniPage.style.display = "block";
-    } else {
-      miniPage.style.display = "none";
-    }
-  }
-</script>
-    
-  <center><button onclick="toggleMiniPage2()">Submit Compilation Info</button>
-<div id="miniPage2" class="hidden">
-  <h3>(label name is required, other than that, you only have to write info you want to fix/add)</h3>
-  <h1>Submit Compilation Info</h1>
-  <p><font size="3"><u>Label Name</u><br>eg: SST Records</font></p>
-<input type="text" id="complabel-name" placeholder="Label Name"><br>
-<h1></h1><p><font size="3"><u>Bands</u><br>eg: Crass, Black Flag</font></p>
-<input type="text" id="compbands" placeholder="Bands"><br>
-<h1></h1><p><font size="3"><u>Comp Title</u><br>eg: ABCs Of Punk</font></p>
-<input type="text" id="comptitle" placeholder="Title"><br>
-<h1></h1><p><font size="3"><u>Date Released</u><br>eg: January 1, 2025</font></p>
-<input type="text" id="compdate" placeholder="Date Released"><br>
-<h1></h1><p><font size="3"><u>Album Cover</u><br>(type a link to the image)</font></p>
-<input type="text" id="compalbumcover" placeholder="Album Cover"><br>
-<h1></h1><p><font size="3"><u>Tracklist</u><br>eg: 1. Title (Band Name), 2. Title (Band Name)</font></p>
-<textarea id="comptracklist" placeholder="Tracklist"></textarea><br><h1></h1>
-<button onclick="saveBand3()">Submit Info</button><br></center>
-<center><br>
-  
-<script>
-  function toggleMiniPage2() {
-    let miniPage = document.getElementById("miniPage2");
-    if (miniPage.style.display === "none" || miniPage.style.display === "") {
-      miniPage.style.display = "block";
-    } else {
-      miniPage.style.display = "none";
-    }
-  }
-</script>
-    
-    
-  <center><button onclick="toggleMiniPage4()">Submit Label Info</button>
-<div id="miniPage4" class="hidden">
-  <h3>(label name is required, other than that, you only have to write info you want to fix/add)</h3>
-  <h1>Submit Label Info</h1>
-  <p><font size="3"><u>Label Name</u><br>eg: SST Records</font></p>
-<input type="text" id="labellabel-name" placeholder="Label Name"><br>
-<h1></h1><p><font size="3"><u>Bands</u><br>eg: Black Flag, Minutemen</font></p>
-<input type="text" id="labelbands" placeholder="Bands"><br>
-<h1></h1><p><font size="3"><u>Location</u><br>eg: Los Angeles, California (CA), USA</font></p>
-<input type="text" id="labellocation" placeholder="Location"><br>
-<h1></h1><p><font size="3"><u>Years Active</u><br>eg: 2024-2025</font></p>
-<input type="text" id="labeldates" placeholder="Years Active"><br>
-<h1></h1><p><font size="3"><u>Logo</u><br>(type a link to the image)</font></p>
-<input type="text" id="labellogo" placeholder="Logo"><br><br>
-<button onclick="saveBand4()">Submit Info</button><br></center>
-<center><br>
-  
-<script>
-  function toggleMiniPage4() {
-    let miniPage = document.getElementById("miniPage4");
-    if (miniPage.style.display === "none" || miniPage.style.display === "") {
-      miniPage.style.display = "block";
-    } else {
-      miniPage.style.display = "none";
-    }
-  }
-</script>
-  
-  
-    </div>
-<script>
-document.getElementById("randomBandButton").addEventListener("click", function () {
-    fetch("banddata.json")
-        .then(response => response.json())
-        .then(bands => {
-            if (bands.length === 0) {
-                alert("No bands available.");
-                return;
-            }
-            const randomBand = bands[Math.floor(Math.random() * bands.length)];
-            window.location.href = `band.html?band=${encodeURIComponent(randomBand.band_name)}`;
-        })
-        .catch(error => console.error("Error loading band data:", error));
-});
-</script>
-<script type="module">
-import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
-import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js";
+      <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged} from "https://www.gstatic.com/firebasejs/11.3.0/firebase-auth.js";
+import { get, update, child } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js";
 
-let app;
-try {
-  app = getApp(); // Try to get an already initialized Firebase app
-} catch (error) {
-  app = initializeApp({
-    apiKey: "AIzaSyAoKv4PLrk4xvZF_IeUhfViwOLBYBv0czQ",
-    authDomain: "punkarchivesdata.firebaseapp.com",
-    projectId: "punkarchivesdata",
-    storageBucket: "punkarchivesdata.firebasestorage.app",
-    messagingSenderId: "272312472875",
-    appId: "1:272312472875:web:048288b995db157dc8216e",
-    measurementId: "G-24V1CEFHYP"
-  });
-}
 
-const db = getDatabase(app);
+    const firebaseConfig = {
+      apiKey: "AIzaSyAoKv4PLrk4xvZF_IeUhfViwOLBYBv0czQ",
+      authDomain: "punkarchivesdata.firebaseapp.com",
+      projectId: "punkarchivesdata",
+      storageBucket: "punkarchivesdata.firebasestorage.app",
+      messagingSenderId: "272312472875",
+      appId: "1:272312472875:web:048288b995db157dc8216e",
+      measurementId: "G-24V1CEFHYP",
+      databaseURL: "https://punkarchivesdata-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
 const auth = getAuth(app);
-
-
-
+auth.onAuthStateChanged((user) => {
+  if (!user) {
+    // User not logged in, redirect to login page or homepage
+    window.location.href = '/login.html';
+  }
+});
 window.loadLeaderboard = function () {
   console.log("loadLeaderboard function is running!"); // Debugging message
 
@@ -580,7 +44,6 @@ window.loadLeaderboard = function () {
 
       if (snapshot.exists()) {
         const users = snapshot.val();
-        console.log("Retrieved Users:", users); // Debugging Log
 
         const sortedUsers = Object.entries(users)
           .map(([username, data]) => ({
@@ -608,480 +71,182 @@ window.loadLeaderboard = function () {
 };
 
 // Run function when page loads
-// Global functions so they can be used in HTML
-window.signUp = function () {
-  const username = document.getElementById("signup-username").value.trim();
-  const password = document.getElementById("signup-password").value;
-
-  if (!username || !password) {
-    alert("Username and password are required!");
-    return;
-  }
-
-  if (username.length > 15) {
-    alert("Username cannot be longer than 15 characters!");
-    return;
-  }
-
-  const fakeEmail = `${username}@punkarchives.com`;
-
-  // Fetch user's IP address
-  fetch("https://api64.ipify.org?format=json")
-    .then(response => response.json())
-    .then(data => {
-      const userIP = data.ip; // Store user's IP address
-
-      // Check if IP is banned
-      const bannedIPsRef = ref(db, "banned_ips/" + userIP);
-      get(bannedIPsRef).then((snapshot) => {
-        if (snapshot.exists()) {
-          alert("Sign-up denied: This IP address has been banned.");
-          return;
-        }
-
-        // Check if username already exists
-        const userRef = ref(db, "users/" + username);
-        get(userRef).then((snapshot) => {
-          if (snapshot.exists()) {
-            alert("Username already taken!");
-          } else {
-            // Create account with Firebase
-            createUserWithEmailAndPassword(auth, fakeEmail, password)
-              .then((userCredential) => {
-                const userId = userCredential.user.uid;
-
-                // Store the username, userId, initial points, and IP in the database
-                set(ref(db, "users/" + username), { 
-                  userId: userId,
-                  points: 0, // Initial points set to 0
-                  ip: userIP // Store IP address
-                })
-                .then(() => {
-                  alert("Sign-up successful! You can now log in.");
-                })
-                .catch((error) => {
-                  console.error("Database error:", error);
-                });
-              })
-              .catch((error) => {
-                alert("Sign-up error: " + error.message);
-              });
-          }
-        });
-      });
-    })
-    .catch(error => {
-      console.error("IP fetch error:", error);
-      alert("Error: Check your internet connection.");
-    });
-};
-
-// Function to display logged-in username
-window.displayUsername = function () {
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      const email = user.email;
-      const username = email.replace("@punkarchives.com", ""); // Extract username from email
-      document.getElementById("logged-in-user").innerText = username;
-    } else {
-      document.getElementById("logged-in-user").innerText = "Not logged in.";
-    }
-  });
-};
-
-// Call displayUsername() on page load
-window.onload = function () {
-  displayUsername();
-};
-
-window.login = function () {
-  const username = document.getElementById("login-username").value;
-  const password = document.getElementById("login-password").value;
-
-  if (!username || !password) {
-    alert("Username and password are required!");
-    return;
-  }
-
-  // Look up the username in the database to find the fake email
-  const userRef = ref(db, "users/" + username);
-  get(userRef).then((snapshot) => {
-    if (snapshot.exists()) {
-      const fakeEmail = `${username}@punkarchives.com`;
-
-      // Log in using the fake email
-      signInWithEmailAndPassword(auth, fakeEmail, password)
-        .then((userCredential) => {
-          alert("Login successful!");
-        })
-        .catch((error) => {
-          alert("Login error: " + error.message);
-        });
-    } else {
-      alert("Username not found.");
-    }
-  });
-};
-
-window.logout = function () {
-  signOut(auth)
-    .then(() => {
-      alert("You have logged out.");
-    })
-    .catch((error) => {
-      console.error("Logout error:", error);
-    });
-};
-
-
-  // Function to show the form after entering the band name
-  window.showForm = function() {
-    document.getElementById("bandForm").style.display = "block";
-  };
-
-  // Function to save the band to Firebase
-window.saveBand = function () {
-  console.log("🟢 saveBand() called");
-
-  const getValue = (id) => {
-    const el = document.getElementById(id);
-    if (!el) {
-      console.warn(`⚠️ Element with ID '${id}' not found!`);
-      return ""; // Default to empty string
-    }
-    console.log(`✅ ${id} =`, el.value); // Log what is being read
-    return el.value.trim();
-  };
-
-  const user = auth.currentUser;
-  if (!user) {
-    alert("You must be logged in to submit a band!");
-    return;
-  }
-
-  const username = user.email.replace("@punkarchives.com", "");
-const bandName = getValue("bandband-name");
-
-
-  if (!bandName.trim()) {
-    alert("Band name is required!");
-    return;
-  }
-
-  const bandData = {
-    name: bandName,
-    genres: getValue("bandband-genres"),
-    location: getValue("bandband-location"),
-    years_active: getValue("bandband-years"),
-    description: getValue("bandband-description"),
-    related_bands: getValue("bandrelated-bands"),
-    official_links: getValue("bandofficial-links"),
-    members: getValue("bandband-members"),
-    releases: getValue("bandband-releases"),
-    uploaded_by: username
-  };
-
-  console.log("📤 Uploading Band Data:", bandData); // Debugging
-
-const randomnum = Math.floor(Math.random() * 100)
-  // Upload to Firebase
-const bandRef = ref(db, "bands/" + bandName + " " + username + randomnum);
-
-  set(bandRef, bandData)
-    .then(() => {
-      alert("✅ Band successfully uploaded!");
-    })
-    .catch((error) => {
-      console.error("❌ Error saving band:", error);
-    });
-};
-
-window.saveBand2 = function () {
-  console.log("🟢 saveBand() called");
-
-  const getValue = (id) => {
-    const el = document.getElementById(id);
-    if (!el) {
-      console.warn(`⚠️ Element with ID '${id}' not found!`);
-      return ""; // Default to empty string
-    }
-    console.log(`✅ ${id} =`, el.value); // Log what is being read
-    return el.value.trim();
-  };
-
-  const user = auth.currentUser;
-  if (!user) {
-    alert("You must be logged in to submit a band!");
-    return;
-  }
-
-  const username = user.email.replace("@punkarchives.com", "");
-const bandName = getValue("zinezine-name");
-
-
-  if (!bandName.trim()) {
-    alert("Zine name is required!");
-    return;
-  }
-
-  const bandData = {
-    name: bandName,
-    authors: getValue("zinezine-authors"),
-    location: getValue("zinezine-location"),
-    years_active: getValue("zinezine-years"),
-    issues: getValue("zinezine-issues"),
-    uploaded_by: username
-  };
-
-  console.log("📤 Uploading Band Data:", bandData); // Debugging
-
-const randomnum = Math.floor(Math.random() * 100)
-  // Upload to Firebase
-const bandRef = ref(db, "zines/" + bandName + " " + username + randomnum);
-
-  set(bandRef, bandData)
-    .then(() => {
-      alert("✅ Zine successfully uploaded!");
-    })
-    .catch((error) => {
-      console.error("❌ Error saving zine:", error);
-    });
-};
-
-window.saveBand3 = function () {
-  console.log("🟢 saveBand() called");
-
-  const getValue = (id) => {
-    const el = document.getElementById(id);
-    if (!el) {
-      console.warn(`⚠️ Element with ID '${id}' not found!`);
-      return ""; // Default to empty string
-    }
-    console.log(`✅ ${id} =`, el.value); // Log what is being read
-    return el.value.trim();
-  };
-
-  const user = auth.currentUser;
-  if (!user) {
-    alert("You must be logged in to submit a band!");
-    return;
-  }
-
-  const username = user.email.replace("@punkarchives.com", "");
-const bandName = getValue("complabel-name");
-
-
-  if (!bandName.trim()) {
-    alert("Compilation name is required!");
-    return;
-  }
-
-  const bandData = {
-    name: bandName,
-    bands: getValue("compbands"),
-    date: getValue("compdate"),
-    tracklist: getValue("comptracklist"),
-    title: getValue("comptitle"),
-    albumcover: getValue("compalbumcover"),
-    uploaded_by: username
-  };
-
-  console.log("📤 Uploading Band Data:", bandData); // Debugging
-
-const randomnum = Math.floor(Math.random() * 100)
-  // Upload to Firebase
-const bandRef = ref(db, "comp/" + bandName + " " + username + randomnum);
-
-  set(bandRef, bandData)
-    .then(() => {
-      alert("✅ Compilation successfully uploaded!");
-    })
-    .catch((error) => {
-      console.error("❌ Error saving compilation:", error);
-    });
-};
-  
-window.saveBand4 = function () {
-  console.log("🟢 saveBand() called");
-
-  const getValue = (id) => {
-    const el = document.getElementById(id);
-    if (!el) {
-      console.warn(`⚠️ Element with ID '${id}' not found!`);
-      return ""; // Default to empty string
-    }
-    console.log(`✅ ${id} =`, el.value); // Log what is being read
-    return el.value.trim();
-  };
-
-  const user = auth.currentUser;
-  if (!user) {
-    alert("You must be logged in to submit a band!");
-    return;
-  }
-
-  const username = user.email.replace("@punkarchives.com", "");
-const bandName = getValue("labellabel-name");
-
-
-  if (!bandName.trim()) {
-    alert("Label name is required!");
-    return;
-  }
-
-  const bandData = {
-    name: bandName,
-    bands: getValue("labelbands"),
-    date: getValue("labeldates"),
-    logo: getValue("labellogo"),
-    location: getValue("labellocation"),
-    uploaded_by: username
-  };
-
-  console.log("📤 Uploading Band Data:", bandData); // Debugging
-
-const randomnum = Math.floor(Math.random() * 100)
-  // Upload to Firebase
-const bandRef = ref(db, "label/" + bandName + " " + username + randomnum);
-
-  set(bandRef, bandData)
-    .then(() => {
-      alert("✅ Label successfully uploaded!");
-    })
-    .catch((error) => {
-      console.error("❌ Error saving label:", error);
-    });
-};
-  
-  
-// Firebase config
-
-
-
-// Run function when page loads
 window.onload = function () {
   console.log("Window loaded, running loadLeaderboard()"); // Debugging message
+  loadLeaderboard();
 };
+    function slugify(name) {
+      return name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+    }
 
-// Global functions so they can be used in HTML
-window.signUp = function () {
-  const username = document.getElementById("signup-username").value.trim();
-  const password = document.getElementById("signup-password").value;
+    function getDefaultData(type, name) {
+  if (type === "band") {
+    return {
+      band_name: name,
+      description: "",
+      genres: "",
+      location: "",
+      years_active: "",
+      related_bands: "",
+      members: [
+        {
+          name: "",
+          instrument: ""
+        }
+      ],
+      releases: [
+        {
+          title: "",
+          year: "",
+          format: ""
+        }
+      ]
+    };
+  } else if (type === "label") {
+    return {
+      label_name: name,
+      location: "",
+      years_active: "",
+      description: "",
+      bands: "",
+      logo: "",
+      compilations: []
+    };
+  } else if (type === "zine") {
+    return {
+      zine_name: name,
+      authors: [],
+      description: "",
+      location: "",
+      years_active: "",
+      issues: []
+    };
+  }
+  return {};
+}
 
-  if (!username || !password) {
-    alert("Username and password are required!");
+
+function addEntry(type) {
+  const input = document.getElementById(`${type}-name`);
+  const name = input.value.trim();
+  if (!name) {
+    alert("Please enter a name.");
     return;
   }
 
-  if (username.length > 15) {
-    alert("Username cannot be longer than 15 characters!");
-    return;
-  }
+  const key = `${type}_${slugify(name)}`;
+  const path = `${type}s/${key}`;
+  const data = getDefaultData(type, name);
 
-  const fakeEmail = `${username}@punkarchives.com`;
+  set(ref(db, path), data)
+    .then(() => {
+      alert(`${type.charAt(0).toUpperCase() + type.slice(1)} added.`);
+      input.value = "";
 
-  // Fetch user's IP address
-  fetch("https://api64.ipify.org?format=json")
-    .then(response => response.json())
-    .then(data => {
-      const userIP = data.ip; // Store user's IP address
+      // Only update points if a band is added
+      if (type === "band") {
+        const user = auth.currentUser;
+        if (user) {
+          const username = user.email.split('@')[0]; // or however your usernames are stored
+          const userRef = ref(db, `users/${username}/points`);
 
-        // Check if username already exists
-        const userRef = ref(db, "users/" + username);
-        get(userRef).then((snapshot) => {
-          if (snapshot.exists()) {
-            alert("Username already taken!");
-          } else {
-            // Create account with Firebase
-            createUserWithEmailAndPassword(auth, fakeEmail, password)
-              .then((userCredential) => {
-                const userId = userCredential.user.uid;
+          get(userRef).then((snapshot) => {
+            let currentPoints = 0;
+            if (snapshot.exists()) {
+              currentPoints = snapshot.val();
+            }
 
-                // Store the username, userId, initial points, and IP in the database
-                set(ref(db, "users/" + username), { 
-                  userId: userId,
-                  points: 0, // Initial points set to 0
-                  ip: userIP // Store IP address
-                })
-                .then(() => {
-                  alert("Sign-up successful! You can now log in.");
-                })
-                .catch((error) => {
-                  console.error("Database error:", error);
-                });
-              })
-              .catch((error) => {
-                alert("Sign-up error: " + error.message);
-              });
-          }
-      });
+            set(userRef, currentPoints + 1);
+          }).catch((error) => {
+            console.error("Error updating points:", error);
+          });
+        }
+      }
+
     })
     .catch(error => {
-      console.error("IP fetch error:", error);
-      alert("Error: Check your internet connection.");
+      console.error("Error adding entry:", error);
+      alert("Failed to add entry.");
     });
-};
+}
 
-// Function to display logged-in username
-window.displayUsername = function () {
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      const email = user.email;
-      const username = email.replace("@punkarchives.com", ""); // Extract username from email
-      document.getElementById("logged-in-user").innerText = username;
-    } else {
-      document.getElementById("logged-in-user").innerText = "Not logged in.";
-    }
-  });
-};
+    window.addEntry = addEntry;
 
-// Call displayUsername() on page load
-window.onload = function () {
-  displayUsername();
-};
+  </script>
+</head>
+<body>
 
-window.login = function () {
-  const username = document.getElementById("login-username").value;
-  const password = document.getElementById("login-password").value;
+    <div class="sidebar">
+	 <a href="index.html#" style="text-decoration:none"><img src="assets/logo.png" width="140px"></a>
+        <ul><font face="MyCustomFont">
+            <li></li>
+            <li><a href="bands.html#">All Bands</a></li>
+            <li><a href="zines.html#">Zines</a></li>
+            <li><a href="labels.html#">Labels</a></li>
+      <h1><font face="MyCustomFont" color="#aa0000">──────────</font></h1>
+            <li><a href="https://discordapp.com/users/767006494595350578">Contact</a></li>
+            <li><a href="info.html#">Add New</a></li>
+      <h1><font face="MyCustomFont" color="#aa0000">──────────</font></h1>
+        <ul>
+            <li><a id="randomBandButton">Random Band</font></a></li>
+        </ul>
+    </div>
+<script src="scripts/randomband.js"></script>
+</font>
+<div class="sidebar2">
 
-  if (!username || !password) {
-    alert("Username and password are required!");
-    return;
-  }
+<center>
+<input type="text" id="signup-username" placeholder="Username" required><br>
+<input type="password" id="signup-password" placeholder="Password" required><br>
+<button onclick="signUp()">Sign Up</button><br><br>
 
-  // Look up the username in the database to find the fake email
-  const userRef = ref(db, "users/" + username);
-  get(userRef).then((snapshot) => {
-    if (snapshot.exists()) {
-      const fakeEmail = `${username}@punkarchives.com`;
+<input type="text" id="login-username" placeholder="Username" required><br>
+<input type="password" id="login-password" placeholder="Password" required><br>
+<button onclick="login()">Log In</button><br><br>
 
-      // Log in using the fake email
-      signInWithEmailAndPassword(auth, fakeEmail, password)
-        .then((userCredential) => {
-          alert("Login successful!");
-        })
-        .catch((error) => {
-          alert("Login error: " + error.message);
-        });
-    } else {
-      alert("Username not found.");
-    }
-  });
-};
 
-window.logout = function () {
-  signOut(auth)
-    .then(() => {
-      alert("You have logged out.");
-    })
-    .catch((error) => {
-      console.error("Logout error:", error);
-    });
-};
+<center>
+    <div class="latest-additions">
+        <h2>Latest Additions</h2>
+        <ul id="latest-additions-list"></ul>
+    </div>
+</center>
 
-{
-loadLeaderboard()
-};
-</script>
+<script src="scripts/additions.js"></script>
+
+<br>
+<center>
+  <div class="latest-additions">
+    <h2>Bands Added</h2>
+<div id="leaderboard"></div>
+  </div>
+</center>
+
+<center><p><font size="3">Logged In As: </p><p class="log" id="logged-in-user">Not logged in.</font></p></center>
+
+<button onclick="logout()">Log Out</button><br><br>
+</div>
+
+
+<div class="main-container">
+    <div class="content">
+      <h1>Add New Band / Label / Zine</h1>
+      <div>
+        <h2>Band</h2>
+        <input type="text" id="band-name" placeholder="Band Name">
+        <button onclick="addEntry('band')">Add Band</button>
+      </div>
+      <div>
+        <h2>Label</h2>
+        <input type="text" id="label-name" placeholder="Label Name">
+        <button onclick="addEntry('label')">Add Label</button>
+      </div>
+      <div>
+        <h2>Zine</h2>
+        <input type="text" id="zine-name" placeholder="Zine Name">
+        <button onclick="addEntry('zine')">Add Zine</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

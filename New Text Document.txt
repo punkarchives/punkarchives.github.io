@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload Band/Label/Zine Data</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+</head>
+<body style="font-family: sans-serif; padding: 2rem; background: #111; color: white;">
+
+  <h2>Upload JSON to Firebase</h2>
+
+  <label>Firebase Config:</label><br>
+  <textarea id="config" rows="6" cols="80" placeholder="Paste your firebaseConfig object here"></textarea><br><br>
+
+  <label>Select Type:</label>
+  <select id="type">
+    <option value="bands">Band</option>
+    <option value="labels">Label</option>
+    <option value="zines">Zine</option>
+  </select><br><br>
+
+  <label>Paste JSON:</label><br>
+  <textarea id="json" rows="20" cols="80" placeholder="Paste your band/label/zine JSON here..."></textarea><br><br>
+
+  <button onclick="upload()">Upload to Firebase</button>
+
+  <pre id="output"></pre>
+
+  <script>
+    let app, db;
+
+    function initFirebase(configStr) {
+      const config = eval("(" + configStr + ")");
+      app = firebase.initializeApp(config);
+      db = firebase.database();
+    }
+
+    function sanitizeId(name) {
+      return name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+    }
+
+    function normalize(type, raw) {
+      if (type === "bands") {
+        return {
+          id: "band_" + sanitizeId(raw.band_name),
+          data: {
+            band_name: raw.band_name,
+            genre: raw.genre,
+            location: raw.location,
+            years_active: raw.years_active,
+            description: raw.description,
+            related_bands: raw.related_bands,
+            official_links: raw.official_links || {},
+            members: raw.members || [],
+            releases: raw.releases || [],
+            extra_images: raw.extra_images || []
+          }
+        };
+      }
+
+      if (type === "labels") {
+        return {
+          id: "label_" + sanitizeId(raw.band_name),
+          data: {
+            label_name: raw.band_name,
+            location: raw.location,
+            years_active: raw.years_active,
+            description: raw.description,
+            bands: raw.bands || [],
+            official_links: raw.official_links || {},
+            compilations: raw.compilations || []
+          }
+        };
+      }
+
+      if (type === "zines") {
+        return {
+          id: "zine_" + sanitizeId(raw.band_name),
+          data: {
+            zine_name: raw.band_name,
+            authors: raw.authors || [],
+            location: raw.location,
+            years_active: raw.years_active,
+            description: raw.description,
+            issues: raw.issues || []
+          }
+        };
+      }
+
+      return null;
+    }
+
+    function upload() {
+      try {
+        const configText = document.getElementById("config").value;
+        if (!app) initFirebase(configText);
+
+        const jsonText = document.getElementById("json").value;
+        const type = document.getElementById("type").value;
+        const parsed = JSON.parse(jsonText);
+
+        let items = Array.isArray(parsed) ? parsed : [parsed];
+
+        let promises = items.map(item => {
+          const { id, data } = normalize(type, item);
+          return db.ref(`${type}/${id}`).set(data)
+            .then(() => `✅ Uploaded: ${id}`)
+            .catch(err => `❌ Error: ${id} - ${err}`);
+        });
+
+        Promise.all(promises).then(results => {
+          document.getElementById("output").textContent = results.join("\n");
+        });
+      } catch (e) {
+        document.getElementById("output").textContent = "❌ Failed: " + e.message;
+      }
+    }
+  </script>
+</body>
+</html>
