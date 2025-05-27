@@ -1,7 +1,7 @@
 {
-    "latest_additions": [
-        { "name": "SMES", "url": "band.html?band=SMES" },
-        { "name": "COMBAT WOUNDED VETERAN", "url": "band.html?band=COMBATWOUNDEDVETERAN" },
-        { "name": "Rare Americans", "url": "band.html?band=Rare%20Americans" }
-    ]
+"latest_additions": [
+{ "name": "Forks In The Microwave", "url": "band.html?band=Forks%20In%20The%20Microwave" },
+{ "name": "Hřbitovní Květy", "url": "band.html?band=Hřbitovní%20Květy" },
+{ "name": "SMES", "url": "band.html?band=SMES" }
+]
 }

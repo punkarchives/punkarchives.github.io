@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=1000, user-scalable=yes">
+      <link rel="stylesheet" href="styles.css">
+      <script type="module" src="scripts/main.js"></script>
+      <title>Punk Archives</title>
+   </head>
+   <body>
+      <div class="sidebar">
+         <a href="index.html#" style="text-decoration:none"><img src="assets/logo.png" width="140px"></a>
+         <ul>
+         <font face="MyCustomFont">
+            <li></li>
+            <li><a href="bands.html#">All Bands</a></li>
+            <li><a href="zines.html#">Zines</a></li>
+            <li><a href="labels.html#">Labels</a></li>
+            <h1><font face="MyCustomFont" color="#aa0000">──────────</font></h1>
+            <li><a href="https://discordapp.com/users/767006494595350578">Contact</a></li>
+            <li><a href="info.html#">Add New</a></li>
+            <h1><font face="MyCustomFont" color="#aa0000">──────────</font></h1>
+            <ul>
+               <li><a id="randomBandButton">Random Band
+         </font>
+         </a></li>
+         </ul>
+      </div>
+      <script src="scripts/randomband.js"></script></font>
+      <div class="sidebar2">
+         <center>
+         <input type="text" id="signup-username" placeholder="Username" required><br>
+         <input type="password" id="signup-password" placeholder="Password" required><br>
+         <button onclick="signUp()">Sign Up</button><br><br>
+         <input type="text" id="login-username" placeholder="Username" required><br>
+         <input type="password" id="login-password" placeholder="Password" required><br>
+         <button onclick="login()">Log In</button><br><br>
+         <center>
+            <div class="latest-additions">
+               <h2>Latest Additions</h2>
+               <ul id="latest-additions-list"></ul>
+            </div>
+         </center>
+         <script src="scripts/additions.js"></script>
+         <br>
+         <center>
+            <div class="latest-additions">
+               <h2>Bands Added</h2>
+               <div id="leaderboard"></div>
+            </div>
+         </center>
+         <center>
+            <p>
+               <font size="3">
+                  Logged In As: 
+            </p>
+            <p class="log" id="logged-in-user">Not logged in.</font></p>
+         </center>
+         <button onclick="logout()">Log Out</button><br><br>
+      </div>
+      <div class="main-container">
+      <div class="content">
+         <h1><img src="assets/logo.png" width="100px"></h1>
+         <h2>Editor Help<span style="font-size: 12px;"></span></h2>
+
+         <div class="news-item">
+            <h3><font color="#f00">How do I edit something?</font></h3>
+            <p>Make sure you're logged into your account. Then, go to the band, label, or zine page and look for the Edit button next to the title. Click it to open the edit page.</p>
+         </div>
+
+         <div class="news-item">
+            <h3><font color="#f00">What is flagging a band?</font></h3>
+            <p>On the editor page, you can flag releases as Delete or Restore.<br>
+• Delete: A moderator will review and remove the release.<br>
+• Restore: A moderator will revert the release to an earlier version.<br>
+Anyone with the right info can also restore it manually. To remove a flag, just change the value to anything other than "Delete" or "Restore."</p>
+         </div>
+
+         <div class="news-item">
+            <h3><font color="#f00">What is flagging a release?</font></h3>
+            <p>In the editor page, you can flag releases as Delete or Restore. When a release is flagged as Delete, a moderator will review and delete it. When a release is flagged as Restore, a moderator will restore the info on this release to an older version. Anybody can do the restoration though if they have the right info. To remove a flag just edit the value and change it to something that isn't "Delete" or "Restore".</p>
+         </div>
+
+         <div class="news-item">
+            <h3><font color="#f00">How do I delete something?</font></h3>
+            <p>Users can't delete anything directly. To delete a release, see "What is flagging a release?". To delete anything else, just rename it to something like "delete" or "please delete this" and a moderator will deal with it.</p>
+         </div>
+
+         <div class="news-item">
+            <h3><font color="#f00">How do I add a new band, label, or zine?</font></h3>
+            <p>Go to the <a href="info.html">Add New</a> page. Choose what you're adding, enter the name, and click the button to submit. It will be automatically added and you can edit it from its page.</p>
+         </div>
+
+         <div class="news-item">
+            <h3><font color="#f00">How do I add an image to something?</font></h3>
+            <p>First, you need the image URL. If you're not sure how to get that:<br>
+• Find the image online<br>
+• Right-click it<br>
+• Choose "Copy image address"<br>
+Then paste that link where it's required.</p>
+         </div>
+
+         <div class="news-item">
+            <h3><font color="#f00">Why isn't the image I added displaying?</font></h3>
+            <p>If it’s an album cover, it won’t automatically show. To see it, hover over the album title or click "Download Image". If it still doesn’t appear, it's probably an issue with the link (most common) or your internet.</p>
+         </div>
+
+         <div class="news-item">
+            <h3><font color="#f00">Why isn't a member I added showing? / How do I properly set the status of a member?</font></h3>
+            <p>Band members won’t show unless their status is set to one of these:<br>
+• Current: member is still in the band and the band is active<br>
+• Former: member is no longer in the band and wasn’t part of the last lineup<br>
+• Last Known Lineup: member was in the last known lineup before the band went inactive</p>
+         </div>
+
+         <div class="news-item">
+            <h3><font color="#f00">Why aren't a band's releases sorting by date?</font></h3>
+            <p>Currently the sorting feature only supports years. If the release date is anything other than a 4-digit year, then it won't get sorted.</p>
+         </div>
+
+         <h2></h2>
+      </div>
+   </body>
+</html>
