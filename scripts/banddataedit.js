@@ -228,7 +228,7 @@ if (band.releases?.length) {
 
     bandHTML += `
       <div style="margin-bottom:20px">
-        <h3><strong>Title:</strong> <span class="editable-value" data-path="releases/${r.originalIndex}/title" data-band="${band.key}">${r?.title ?? "N/A"}</span>
+        <h3 ${titleStyle}><strong>Title:</strong> <span class="editable-value" data-path="releases/${r.originalIndex}/title" data-band="${band.key}">${r?.title ?? "N/A"}${lockEmoji}</span>
         ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</h3>
         <p><strong>Image Link:</strong> <span class="editable-value" data-path="releases/${r.originalIndex}/cover_image" data-band="${band.key}">${r?.cover_image ?? "N/A"}</span>
         ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
@@ -359,9 +359,9 @@ document.getElementById("add-member-button").addEventListener("click", async () 
         const members = snapshot.exists() ? snapshot.val() : [];
 
         members.push(newMember); // Add new member to the array
-        await set(membersRef, members); // Save updated array
+        await set(membersRef, members);
 
-        location.reload(); // Reload to reflect changes (or re-render your band view)
+        location.reload();
     } catch (err) {
         alert("Failed to add member: " + err.message);
     }
