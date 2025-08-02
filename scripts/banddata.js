@@ -48,6 +48,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const bandName = urlParams.get("band");
   const bandName2 = urlParams.get("band");
 
+
+
+
   if (!bandName) {
     document.getElementById("band-content").innerHTML = "<h1>No band selected.</h1>";
     return;
@@ -110,7 +113,31 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>
       </div>
     `;
+if (band.notes) {
+  const allowedStatuses = ["Firsthand", "Secondhand", "Rumor"];
 
+  const validNotes = Object.values(band.notes).filter(note =>
+    allowedStatuses.includes(note.status)
+  );
+
+  if (validNotes.length > 0) {
+    bandHTML += `<hr><h2>Community Notes</h2><div id="community-notes">`;
+
+    validNotes.forEach((note, idx) => {
+      bandHTML += `
+        <div class="note-item">
+          <button class="note-toggle" data-index="${idx}">${note.title}</button>
+          <div class="note-content" id="note-content-${idx}" style="display: none; border: 1px solid #ccc; padding: 5px; margin-top: 5px;">
+            <p><strong>Submitted by:</strong> ${note.user || "Unknown"}</p>
+            <p><strong>Status:</strong> ${note.status}</p>
+            <p><strong>Note:</strong><br>${note.text}</p>
+          </div>
+        </div>`;
+    });
+
+    bandHTML += `</div>`;
+  }
+}
 const membersArray = band.members ? Object.values(band.members) : [];
 
 if (membersArray.length) {
@@ -205,6 +232,16 @@ if (band.releases?.length) {
     document.getElementById("band-content").innerHTML = bandHTML;
 const flagBtn = document.getElementById("flag-incomplete-btn");
 const flagStatus = document.getElementById("flag-status");
+
+document.querySelectorAll(".note-toggle").forEach(button => {
+  button.addEventListener("click", () => {
+    const index = button.getAttribute("data-index");
+    const contentDiv = document.getElementById(`note-content-${index}`);
+    const isVisible = contentDiv.style.display === "block";
+    contentDiv.style.display = isVisible ? "none" : "block";
+  });
+});
+
 
 flagBtn.addEventListener("click", async () => {
   const user = auth.currentUser;

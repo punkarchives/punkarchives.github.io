@@ -199,7 +199,7 @@ function addEntry(type) {
             <li><a id="randomBandButton">Random Band</font></a></li>
         </ul>
     </div>
-<script src="scripts/randomband.js"></script>
+<script src="scripts/randomband.js" type="module"></script>
 </font>
 <div class="sidebar2">
 
@@ -210,16 +210,7 @@ function addEntry(type) {
 
 <input type="text" id="login-username" placeholder="Username" required><br>
 <input type="password" id="login-password" placeholder="Password" required><br>
-<button onclick="login()">Log In</button><br><br>
-
-
-<center>
-    <div class="latest-additions">
-        <h2>Latest Additions</h2>
-        <ul id="latest-additions-list"></ul>
-    </div>
-</center>
-
+<button onclick="login()">Log In</button><br>
 <script src="scripts/additions.js"></script>
 
 <br>
@@ -240,7 +231,7 @@ function addEntry(type) {
     <div class="content">
       <h1>Add New Band / Label / Zine</h1>
       <div>
-        <h2>Band</h2>
+        <h2>Band <font color="#fff" size="2">put "the" at the end of band names (eg: Hives, The)</font></h2>
         <input type="text" id="band-name" placeholder="Band Name">
         <button onclick="addEntry('band')">Add Band</button>
       </div>

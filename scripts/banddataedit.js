@@ -30,10 +30,10 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 
 auth.onAuthStateChanged((user) => {
-  if (!user) {
-    // User not logged in, redirect to login page or homepage
-    window.location.href = '/login.html';
-  }
+    if (!user) {
+        // User not logged in, redirect to login page or homepage
+        window.location.href = '/login.html';
+    }
 });
 
 async function logChange(db, bandKey, field, oldValue, newValue) {
@@ -61,7 +61,7 @@ function capitalize(text) {
 
 function attachEditListeners() {
     document.querySelectorAll(".edit-button").forEach(button => {
-        button.addEventListener("click", function () {
+        button.addEventListener("click", function() {
             const span = this.previousElementSibling;
             const fieldPath = span.getAttribute("data-path");
             const bandKey = span.getAttribute("data-band");
@@ -81,7 +81,7 @@ function attachEditListeners() {
                     await set(ref(db, `bands/${bandKey}/${fieldPath}`), newValue);
                     await logChange(db, bandKey, fieldPath, currentValue, newValue);
                     const isMemberField = fieldPath.startsWith("members/");
-		    const isTrackField = fieldPath.includes("/tracks/");
+                    const isTrackField = fieldPath.includes("/tracks/");
                     container.innerHTML = `
                         ${!isMemberField && !isTrackField ? `<strong>${capitalize(fieldName)}:</strong>` : ""}
                         <span class="editable-value" data-path="${fieldPath}" data-band="${bandKey}">${newValue}</span>
@@ -96,7 +96,7 @@ function attachEditListeners() {
             container.querySelector(".cancel-button").addEventListener("click", () => {
                 const fieldName = fieldPath.split("/").pop().replace(/_/g, " ");
                 const isMemberField = fieldPath.startsWith("members/");
-	        const isTrackField = fieldPath.includes("/tracks/");
+                const isTrackField = fieldPath.includes("/tracks/");
                 container.innerHTML = `
                     ${!isMemberField && !isTrackField ? `<strong>${capitalize(fieldName)}:</strong>` : ""}
                     <span class="editable-value" data-path="${fieldPath}" data-band="${bandKey}">${currentValue}</span>
@@ -147,86 +147,220 @@ document.addEventListener("DOMContentLoaded", async () => {
             .map(field => editableField(field, band[field], band.key)).join("");
 
         if (band.members?.length) {
-    // Categorize members by status, including unknowns
-    const categorizedMembers = {
-        "Current": [],
-        "Former": [],
-        "Last Known Lineup": [],
-        "Unknown": []
-    };
+            // Categorize members by status, including unknowns
+            const categorizedMembers = {
+                "Current": [],
+                "Former": [],
+                "Last Known Lineup": [],
+                "Unknown": []
+            };
 
-    band.members.forEach((m, i) => {
-        const status = m.status || "Unknown";
-        if (!categorizedMembers[status]) {
-            categorizedMembers[status] = []; 
-        }
-        categorizedMembers[status].push({
-            ...m,
-            index: i
-        });
-    });
+            band.members.forEach((m, i) => {
+                const status = m.status || "Unknown";
+                if (!categorizedMembers[status]) {
+                    categorizedMembers[status] = [];
+                }
+                categorizedMembers[status].push({
+                    ...m,
+                    index: i
+                });
+            });
 
-    bandHTML += `<hr><h2>Band Members</h2><p>note: members will not display unless theyre given a status of "Current", "Former", or "Last Known Lineup"
+            bandHTML += `<hr><h2>Band Members</h2><p>note: members will not display unless theyre given a status of "Current", "Former", or "Last Known Lineup"
     <table border="1"><tr><th>Name</th><th>Instrument</th><th>Time Active</th><th>Status</th></tr>`;
 
-    const knownCategories = ["Current", "Former", "Last Known Lineup"];
+            const knownCategories = ["Current", "Former", "Last Known Lineup"];
 
-    // First, list known categories
-    knownCategories.forEach(status => {
-        categorizedMembers[status].forEach(member => {
-            bandHTML += `<tr>`;
-            ["name", "instrument", "time_active", "status"].forEach(attr => {
-                const safeValue = member?.[attr] ?? "N/A";
-                bandHTML += `<td>
+            // First, list known categories
+            knownCategories.forEach(status => {
+                categorizedMembers[status].forEach(member => {
+                    bandHTML += `<tr>`;
+                    ["name", "instrument", "time_active", "status"].forEach(attr => {
+                        const safeValue = member?.[attr] ?? "N/A";
+                        bandHTML += `<td>
                     <span class="editable-value" data-path="members/${member.index}/${attr}" data-band="${band.key}">${safeValue}</span>
                     <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
                 </td>`;
+                    });
+                    bandHTML += `</tr>`;
+                });
             });
-            bandHTML += `</tr>`;
-        });
-    });
 
-    // Then list unknown/other categories (excluding known ones)
-    Object.keys(categorizedMembers).forEach(category => {
-        if (!knownCategories.includes(category)) {
-            categorizedMembers[category].forEach(member => {
-                bandHTML += `<tr>`;
-                ["name", "instrument", "time_active", "status"].forEach(attr => {
-                    const safeValue = member?.[attr] ?? "N/A";
-                    bandHTML += `<td>
+            // Then list unknown/other categories (excluding known ones)
+            Object.keys(categorizedMembers).forEach(category => {
+                if (!knownCategories.includes(category)) {
+                    categorizedMembers[category].forEach(member => {
+                        bandHTML += `<tr>`;
+                        ["name", "instrument", "time_active", "status"].forEach(attr => {
+                            const safeValue = member?.[attr] ?? "N/A";
+                            bandHTML += `<td>
                         <span class="editable-value" data-path="members/${member.index}/${attr}" data-band="${band.key}">${safeValue}</span>
                         <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
                     </td>`;
-                });
-                bandHTML += `</tr>`;
+                        });
+                        bandHTML += `</tr>`;
+                    });
+                }
             });
-        }
-    });
 
-    bandHTML += `</table>`;
-    bandHTML += `
+            bandHTML += `</table>`;
+            bandHTML += `
         <button id="add-member-button">
             Add Member
         </button>`;
+// --- Community Notes Section ---
+const currentUser = auth.currentUser;
+if (!band.notes) band.notes = {};
 
+let notesHTML = "<hr><h2>Community Notes</h2>";
+Object.entries(band.notes).forEach(([noteKey, noteObj]) => {
+  const canEdit = currentUser && noteObj.user === currentUser.email.replace("@punkarchives.com", "");
+  notesHTML += `
+    <div style="border:1px solid #ccc; margin-bottom:10px; padding:5px;">
+      <p><strong>Title:</strong> ${noteObj.title}</p>
+      <p><strong>Submitted by:</strong> ${noteObj.user || "Unknown"}</p>
+      <p><strong>Status:</strong> ${noteObj.status}</p>
+      <p><strong>Note:</strong><br>${noteObj.text}</p>
+      ${canEdit ? `<button class="edit-note-button" data-note-key="${noteKey}">✏️ Edit Note</button>` : ""}
+    </div>
+  `;
+});
 
-if (band.releases?.length) {
-  bandHTML += `<hr><h2>Releases</h2>`;
+notesHTML += `<button id="add-note-button" style="margin-top:10px;">➕ Add New Note</button>`;
+document.getElementById("band-content").insertAdjacentHTML("beforeend", notesHTML);
 
-  const sortedReleases = band.releases
-    .map((release, originalIndex) => ({ ...release, originalIndex }))
-    .sort((a, b) => {
-      const yearA = parseInt(a?.year) || 0;
-      const yearB = parseInt(b?.year) || 0;
-      return yearA - yearB;
+// --- Add Note Button Listener ---
+document.getElementById("add-note-button").addEventListener("click", () => {
+  const formContainer = document.createElement("div");
+  formContainer.style.background = "#f0f0f0";
+  formContainer.style.border = "1px solid #aaa";
+  formContainer.style.padding = "10px";
+  formContainer.style.marginTop = "10px";
+
+  formContainer.innerHTML = `
+    <h3>Add New Note</h3>
+    <label>Title: <input type="text" id="new-note-title" style="width: 100%;" /></label><br><br>
+    <label>Status:
+      <select id="new-note-status" style="width: 100%;">
+        <option value="Firsthand">Firsthand</option>
+        <option value="Secondhand">Secondhand</option>
+        <option value="Rumor">Rumor</option>
+      </select>
+    </label><br><br>
+    <label>Note Text:<br><textarea id="new-note-text" rows="4" style="width: 100%;"></textarea></label><br><br>
+    <button id="save-new-note">✅ Save Note</button>
+    <button id="cancel-new-note">❌ Cancel</button>
+  `;
+  document.getElementById("band-content").appendChild(formContainer);
+
+  document.getElementById("save-new-note").addEventListener("click", async () => {
+    const title = document.getElementById("new-note-title").value.trim();
+    const status = document.getElementById("new-note-status").value.trim();
+    const text = document.getElementById("new-note-text").value.trim();
+
+    if (!title || !status || !text) {
+      alert("All fields are required.");
+      return;
+    }
+
+    const newNote = {
+      title,
+      status,
+      text,
+      user: currentUser.email.replace("@punkarchives.com", "")
+    };
+
+    try {
+      const newNoteKey = push(ref(db, `bands/${band.key}/notes`)).key;
+      await set(ref(db, `bands/${band.key}/notes/${newNoteKey}`), newNote);
+      await logChange(db, band.key, `notes/${newNoteKey}`, "New Note", JSON.stringify(newNote));
+      location.reload();
+    } catch (err) {
+      alert("Error saving note: " + err.message);
+    }
+  });
+
+  document.getElementById("cancel-new-note").addEventListener("click", () => {
+    formContainer.remove();
+  });
+});
+
+// --- Edit Existing Notes ---
+document.querySelectorAll(".edit-note-button").forEach(button => {
+  button.addEventListener("click", () => {
+    const noteKey = button.getAttribute("data-note-key");
+    const note = band.notes[noteKey];
+
+    const formContainer = document.createElement("div");
+    formContainer.style.background = "#f9f9f9";
+    formContainer.style.border = "1px solid #aaa";
+    formContainer.style.padding = "10px";
+    formContainer.style.marginTop = "10px";
+
+    formContainer.innerHTML = `
+      <h3>Edit Note</h3>
+      <label>Title: <input type="text" id="edit-note-title" value="${note.title}" style="width: 100%;" /></label><br><br>
+      <label>Status:
+        <select id="edit-note-status" style="width: 100%;">
+          <option value="Firsthand" ${note.status === "Firsthand" ? "selected" : ""}>Firsthand</option>
+          <option value="Secondhand" ${note.status === "Secondhand" ? "selected" : ""}>Secondhand</option>
+          <option value="Rumor" ${note.status === "Rumor" ? "selected" : ""}>Rumor</option>
+        </select>
+      </label><br><br>
+      <label>Note Text:<br><textarea id="edit-note-text" rows="4" style="width: 100%;">${note.text}</textarea></label><br><br>
+      <button id="save-edit-note">✅ Save Changes</button>
+      <button id="cancel-edit-note">❌ Cancel</button>
+    `;
+    document.getElementById("band-content").appendChild(formContainer);
+
+    document.getElementById("save-edit-note").addEventListener("click", async () => {
+      const title = document.getElementById("edit-note-title").value.trim();
+      const status = document.getElementById("edit-note-status").value.trim();
+      const text = document.getElementById("edit-note-text").value.trim();
+
+      if (!title || !status || !text) {
+        alert("All fields required.");
+        return;
+      }
+
+      const updatedNote = { ...note, title, status, text };
+
+      try {
+        await set(ref(db, `bands/${band.key}/notes/${noteKey}`), updatedNote);
+        await logChange(db, band.key, `notes/${noteKey}`, JSON.stringify(note), JSON.stringify(updatedNote));
+        location.reload();
+      } catch (err) {
+        alert("Error updating note: " + err.message);
+      }
     });
 
-  sortedReleases.forEach((r) => {
-    const isLocked = r.locked === true;
-    const titleStyle = isLocked ? 'style="color: green;"' : '';
-    const lockEmoji = isLocked ? ' 🔒' : '';
+    document.getElementById("cancel-edit-note").addEventListener("click", () => {
+      formContainer.remove();
+    });
+  });
+});
 
-    bandHTML += `
+
+            if (band.releases?.length) {
+                bandHTML += `<hr><h2>Releases</h2>`;
+
+                const sortedReleases = band.releases
+                    .map((release, originalIndex) => ({
+                        ...release,
+                        originalIndex
+                    }))
+                    .sort((a, b) => {
+                        const yearA = parseInt(a?.year) || 0;
+                        const yearB = parseInt(b?.year) || 0;
+                        return yearA - yearB;
+                    });
+
+                sortedReleases.forEach((r) => {
+                    const isLocked = r.locked === true;
+                    const titleStyle = isLocked ? 'style="color: green;"' : '';
+                    const lockEmoji = isLocked ? ' 🔒' : '';
+
+                    bandHTML += `
       <div style="margin-bottom:20px">
         <h3 ${titleStyle}><strong>Title:</strong> <span class="editable-value" data-path="releases/${r.originalIndex}/title" data-band="${band.key}">${r?.title ?? "N/A"}${lockEmoji}</span>
         ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</h3>
@@ -248,128 +382,128 @@ if (band.releases?.length) {
         ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
     `;
 
-    if (Array.isArray(r.tracks) || typeof r.tracks === 'object') {
-      bandHTML += `<p><strong>Tracklist:</strong></p><ol id="tracklist-${r.originalIndex}">`;
-      const tracks = Object.entries(r.tracks || {});
-      tracks.forEach(([index, trackName]) => {
-        bandHTML += `
+                    if (Array.isArray(r.tracks) || typeof r.tracks === 'object') {
+                        bandHTML += `<p><strong>Tracklist:</strong></p><ol id="tracklist-${r.originalIndex}">`;
+                        const tracks = Object.entries(r.tracks || {});
+                        tracks.forEach(([index, trackName]) => {
+                            bandHTML += `
           <li>
             <span class="editable-value" data-path="releases/${r.originalIndex}/tracks/${index}" data-band="${band.key}">${trackName}</span>
             ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}
           </li>`;
-      });
-      bandHTML += `</ol>`;
-      if (!isLocked) {
-        bandHTML += `<button class="add-track-button" data-release-index="${r.originalIndex}" data-band="${band.key}" style="margin-top:5px">➕ Add Track</button>`;
-      }
-    }
+                        });
+                        bandHTML += `</ol>`;
+                        if (!isLocked) {
+                            bandHTML += `<button class="add-track-button" data-release-index="${r.originalIndex}" data-band="${band.key}" style="margin-top:5px">➕ Add Track</button>`;
+                        }
+                    }
 
-    bandHTML += `</div><h2></h2>`;
-  });
-}
+                    bandHTML += `</div><h2></h2>`;
+                });
+            }
 
-bandHTML += `<button id="addReleaseButton">Add New Release</button>`;
+            bandHTML += `<button id="addReleaseButton">Add New Release</button>`;
 
-document.addEventListener("click", async (event) => {
-  if (event.target.id === "addReleaseButton") {
-    if (!band.releases) band.releases = [];
+            document.addEventListener("click", async (event) => {
+                if (event.target.id === "addReleaseButton") {
+                    if (!band.releases) band.releases = [];
 
-    const nextIndex = band.releases.length;
+                    const nextIndex = band.releases.length;
 
-    const newRelease = {
-      title: "undefined",
-      cover_image: "undefined",
-      label: "undefined",
-      year: "undefined",
-      release_type: "undefined",
-      physical_format: "undefined",
-      limitation: "undefined",
-      extra_info: "undefined",
-      tracks: {
-	0: "undefined"
-      }
-    };
+                    const newRelease = {
+                        title: "undefined",
+                        cover_image: "undefined",
+                        label: "undefined",
+                        year: "undefined",
+                        release_type: "undefined",
+                        physical_format: "undefined",
+                        limitation: "undefined",
+                        extra_info: "undefined",
+                        tracks: {
+                            0: "undefined"
+                        }
+                    };
 
-    try {
-      // Save to Firebase
-      await set(ref(db, `bands/${band.key}/releases/${nextIndex}`), newRelease);
-      await logChange(db, band.key, `releases/${nextIndex}`, "New Release Added", JSON.stringify(newRelease));
+                    try {
+                        // Save to Firebase
+                        await set(ref(db, `bands/${band.key}/releases/${nextIndex}`), newRelease);
+                        await logChange(db, band.key, `releases/${nextIndex}`, "New Release Added", JSON.stringify(newRelease));
 
-      // Update local object and refresh the UI
-      band.releases.push(newRelease);
-      updateReleaseUI();
-    } catch (err) {
-      alert("Failed to add new release: " + err.message);
-    }
-  }
-});
-function updateReleaseUI() {
-location.reload()
-}
+                        // Update local object and refresh the UI
+                        band.releases.push(newRelease);
+                        updateReleaseUI();
+                    } catch (err) {
+                        alert("Failed to add new release: " + err.message);
+                    }
+                }
+            });
+
+            function updateReleaseUI() {
+                location.reload()
+            }
 
 
-        const bandContainer = document.getElementById("band-content");
-        if (bandContainer) {
-            bandContainer.innerHTML = bandHTML;
-            console.log("Band content loaded. Edit buttons should now be visible.");
-            attachEditListeners();
+            const bandContainer = document.getElementById("band-content");
+            if (bandContainer) {
+                bandContainer.innerHTML = bandHTML;
+                console.log("Band content loaded. Edit buttons should now be visible.");
+                attachEditListeners();
 
-document.querySelectorAll(".add-track-button").forEach(button => {
-  button.addEventListener("click", async () => {
-    const releaseIndex = button.getAttribute("data-release-index");
-    const bandKey = button.getAttribute("data-band");
+                document.querySelectorAll(".add-track-button").forEach(button => {
+                    button.addEventListener("click", async () => {
+                        const releaseIndex = button.getAttribute("data-release-index");
+                        const bandKey = button.getAttribute("data-band");
 
-    const tracklistRef = ref(db, `bands/${bandKey}/releases/${releaseIndex}/tracks`);
-    const snapshot = await get(tracklistRef);
-    const currentTracks = snapshot.exists() ? snapshot.val() : {};
+                        const tracklistRef = ref(db, `bands/${bandKey}/releases/${releaseIndex}/tracks`);
+                        const snapshot = await get(tracklistRef);
+                        const currentTracks = snapshot.exists() ? snapshot.val() : {};
 
-    const nextIndex = Object.keys(currentTracks).length;
-    const newTrackName = "undefined";
+                        const nextIndex = Object.keys(currentTracks).length;
+                        const newTrackName = "undefined";
 
-    try {
-      await set(ref(db, `bands/${bandKey}/releases/${releaseIndex}/tracks/${nextIndex}`), newTrackName);
-      await logChange(db, bandKey, `releases/${releaseIndex}/tracks/${nextIndex}`, "Track added", newTrackName);
+                        try {
+                            await set(ref(db, `bands/${bandKey}/releases/${releaseIndex}/tracks/${nextIndex}`), newTrackName);
+                            await logChange(db, bandKey, `releases/${releaseIndex}/tracks/${nextIndex}`, "Track added", newTrackName);
 
-      const tracklistElement = document.getElementById(`tracklist-${releaseIndex}`);
-      const newLi = document.createElement("li");
-      newLi.innerHTML = `
+                            const tracklistElement = document.getElementById(`tracklist-${releaseIndex}`);
+                            const newLi = document.createElement("li");
+                            newLi.innerHTML = `
         <span class="editable-value" data-path="releases/${releaseIndex}/tracks/${nextIndex}" data-band="${bandKey}">${newTrackName}</span>
         <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
       `;
-      tracklistElement.appendChild(newLi);
-      attachEditListeners();
+                            tracklistElement.appendChild(newLi);
+                            attachEditListeners();
 
-    } catch (err) {
-      alert("Failed to add track: " + err.message);
-    }
-  });
-});
+                        } catch (err) {
+                            alert("Failed to add track: " + err.message);
+                        }
+                    });
+                });
 
-document.getElementById("add-member-button").addEventListener("click", async () => {
-    const newMember = {
-        name: "undefined",
-        instrument: "undefined",
-        time_active: "undefined",
-        status: "undefined"
-    };
+                document.getElementById("add-member-button").addEventListener("click", async () => {
+                    const newMember = {
+                        name: "undefined",
+                        instrument: "undefined",
+                        time_active: "undefined",
+                        status: "undefined"
+                    };
 
-    try {
-        const membersRef = ref(db, `bands/${band.key}/members`);
-        const snapshot = await get(membersRef);
-        const members = snapshot.exists() ? snapshot.val() : [];
+                    try {
+                        const membersRef = ref(db, `bands/${band.key}/members`);
+                        const snapshot = await get(membersRef);
+                        const members = snapshot.exists() ? snapshot.val() : [];
 
-        members.push(newMember); // Add new member to the array
-        await set(membersRef, members);
+                        members.push(newMember); // Add new member to the array
+                        await set(membersRef, members);
 
-        location.reload();
-    } catch (err) {
-        alert("Failed to add member: " + err.message);
-    }
-});
-}
+                        location.reload();
+                    } catch (err) {
+                        alert("Failed to add member: " + err.message);
+                    }
+                });
+            }
         }
-}
- catch (err) {
+    } catch (err) {
         console.error("Firebase error:", err);
     }
 })

@@ -52,10 +52,16 @@ document.addEventListener("DOMContentLoaded", async function () {
         </div>
       </div>
 
-      <h2>Artists:</h2>
-      <ul>
-        ${(label.bands || []).map(band => `<li><a href="band.html?band=${encodeURIComponent(band)}">${band}</a></li>`).join('')}
-      </ul>
+<h2>Artists:</h2>
+<ul>
+  ${(label.bands || "")
+    .split(",")
+    .map(band => band.trim())
+    .filter(band => band)
+    .map(band => `<li><a href="band.html?band=${encodeURIComponent(band)}">${band}</a></li>`)
+    .join("")}
+</ul>
+
     `;
 
     document.getElementById("label-content").innerHTML = labelHTML;

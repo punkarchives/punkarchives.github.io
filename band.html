@@ -21,12 +21,12 @@
             <li><a href="info.html#">Add New</a></li>
             <h1><font face="MyCustomFont" color="#aa0000">──────────</font></h1>
             <ul>
-               <li><a id="randomBandButton">Random Band
+               <li><a id="randomBandButton" type="module">Random Band
          </font>
          </a></li>
          </ul>
       </div>
-      <script src="scripts/randomband.js"></script>
+      <script src="scripts/randomband.js" type="module"></script>
       </font>
       <div class="sidebar2">
          <center>
@@ -35,13 +35,7 @@
          <button onclick="signUp()">Sign Up</button><br><br>
          <input type="text" id="login-username" placeholder="Username" required><br>
          <input type="password" id="login-password" placeholder="Password" required><br>
-         <button onclick="login()">Log In</button><br><br>
-         <center>
-            <div class="latest-additions">
-               <h2>Latest Additions</h2>
-               <ul id="latest-additions-list"></ul>
-            </div>
-         </center>
+         <button onclick="login()">Log In</button><br>
          <script src="scripts/additions.js"></script>
          <br>
          <center>

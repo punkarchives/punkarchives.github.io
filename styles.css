@@ -5,6 +5,20 @@
             background-color: #000000;
             color: #ffffff;
         }
+  .note-item {
+    margin-bottom: 10px;
+  }
+  .note-toggle {
+    background-color: #eee;
+    border: 1px solid #aaa;
+    padding: 5px 10px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+  }
+  .note-toggle:hover {
+    background-color: #ddd;
+  }
 
         .main-container {
             display: flex;
