@@ -539,7 +539,7 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
                         physical_format: "undefined",
                         limitation: "undefined",
                         extra_info: "undefined",
-                        listen: "undefined",
+                        listen: "",
                         tracks: {
                             0: "undefined"
                         }
