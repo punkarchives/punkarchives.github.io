@@ -1,38 +1,74 @@
+/* === Base Styles === */
+body {
+  margin: 0;
+  background-color: #0a0a0a;
+  color: #f0f0f0;
+  font-family: Arial, sans-serif;
+  line-height: 1.4;
+}
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #000000;
-            color: #ffffff;
-        }
-  .note-item {
-    margin-bottom: 10px;
-  }
-  .note-toggle {
-    background-color: #eee;
-    border: 1px solid #aaa;
-    padding: 5px 10px;
-    cursor: pointer;
-    text-align: left;
-    width: 100%;
-  }
-  .note-toggle:hover {
-    background-color: #ddd;
-  }
+a:link, a:visited {
+  color: #ffaaaa;
+  text-decoration: none;
+}
 
-        .main-container {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding-left: 150px; /* Matches sidebar width */
-            padding-right: 150px; /* Matches sidebar width */
-            padding: 20px;
-        }
+a:hover {
+  color: #aa0000;
+}
 
-	.edit-button {
-	    padding: 1px;
-	}	
+/* === Typography === */
+h1, h2, h4 {
+  font-family: 'Bebas Neue', 'MyCustomFont2', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 0;
+}
 
+.content h1 {
+  font-size: 22px;
+  border-bottom: 3px solid #aa0000;
+  padding-bottom: 10px;
+  color: #aa0000;
+}
+
+.content h2 {
+  font-size: 20px;
+  border-bottom: 2px solid #ffffff;
+  padding-bottom: 8px;
+  color: #aa0000;
+}
+
+.news-item h3 {
+  font-size: 18px;
+  color: #aa0000;
+  margin: 10px 0;
+}
+
+.news-item p {
+  font-size: 16px;
+}
+
+/* === Layout Containers === */
+.main-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-left: 150px;
+  padding-right: 150px;
+  padding: 20px;
+}
+
+.content {
+  width: 75%;
+  background-color: rgba(17, 17, 17, 0.95);
+  padding: 40px;
+  border-radius: 0px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* === Sidebars === */
         .sidebar {
             width: 150px;
             background-color: #121212;
@@ -70,7 +106,6 @@
             font-size: 20px;
             display: block;
             text-align: right;
-            padding: 5px;
             transition: background-color 0.2s ease-in-out;
         }
 
@@ -115,7 +150,6 @@
             font-size: 20px;
             display: block;
             text-align: left;
-            padding: 5px;
             transition: background-color 0.2s ease-in-out;
         }
 
@@ -123,107 +157,104 @@
             background-color: #aa0000;
         }
 
-        button { background-color: #aa0000; color: white; padding: 10px; border: none; cursor: pointer; font-size: 18px; }
-        button:hover { background-color: darkred; }
-
-
-        .content {
-            width: 100%;
-            max-width: 70%; /* Prevents extreme width */
-            padding: 20px;
-        }
-
-        .content h1 {
-            font-family: 'MyCustomFont2', sans-serif;
-            color: #aa0000;
-            font-size: 22px;
-            text-transform: uppercase;
-            border-bottom: 3px solid #aa0000;
-            padding-bottom: 10px;
-        }
-
-        .content h2 {
-            font-size: 20px;
-            border-bottom: 2px solid #ffffff;
-            padding-bottom: 10px;
-            color: #aa0000;
-        }
-
-        .news-item h3 {
-            font-size: 18px;
-            color: #aa0000;
-            margin: 10px 0;
-        }
-
-        .news-item p {
-            line-height: 1.6;
-            font-size: 16px;
-        }
-
-        @font-face {
-            font-family: 'MyCustomFont';
-            src: url('Modest.woff') format('woff');
-        }
-        @font-face {
-            font-family: 'MyCustomFont2';
-            src: url('Crass.ttf') format('truetype');
-        }
-
-        .latest-additions {
-            background-color: #121212;
-            border: 2px solid #aa0000;
-            width: 125px;
-            color: #ffffff;
-        }
-
-        .latest-additions h2 {
-            font-size: 18px;
-            color: #aa0000;
-        }
-
-        .latest-additions ul {
-            list-style: none;
-            padding: 0;
-            font-size: 14px;
-        }
-
-        .latest-additions ul li {
-        }
-
-	.log {
-	font-size: 15px;
-	}
-a:link {
-  color: #ffaaaa;
+/* === Buttons === */
+button {
+  background-color: #aa0000;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 0px;
+  transition: background-color 0.3s;
 }
 
-a:visited {
-  color: #ffaaaa;
+button:hover {
+  background-color: darkred;
 }
 
-a:hover {
+/* === Utility Classes === */
+.note-item {
+  margin-bottom: 12px;
+}
+
+.note-toggle {
+  background-color: #eee;
+  border: 1px solid #aaa;
+  padding: 5px 10px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.note-toggle:hover {
+  background-color: #ddd;
+}
+
+.edit-button {
+  padding: 2px 6px;
+  font-size: 14px;
+}
+
+.log {
+  font-size: 15px;
+}
+
+/* === Album Cover Preview === */
+#album-cover {
+  display: none;
+  position: absolute;
+  width: 200px;
+  border: 2px solid #aa0000;
+  background: #111;
+  padding: 5px;
+  z-index: 1000;
+  box-shadow: 0 0 10px #aa0000;
+  pointer-events: none;
+}
+
+/* === Tables === */
+.release-details {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.release-details td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  font-size: 14px;
+}
+
+/* === Latest Additions === */
+.latest-additions {
+  background-color: #121212;
+  border: 2px solid #aa0000;
+  width: 125px;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 0px;
+}
+
+.latest-additions h2 {
+  font-size: 18px;
   color: #aa0000;
+  margin-top: 0;
 }
 
-    #album-cover {
-        display: none;
-        position: absolute;
-        width: 200px;
-        height: auto;
-        border: 2px solid white;
-        background: black;
-        padding: 5px;
-        z-index: 1000;
-        pointer-events: none; /* Prevents interference with mouse movement */
-    }
+.latest-additions ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 
-    .release-details {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 10px;
-    }
-    .release-details td {
-        border: 1px solid white;
-        padding: 5px;
-        font-size: 14px;
-    }
+/* === Custom Fonts === */
+@font-face {
+  font-family: 'MyCustomFont';
+  src: url('Modest.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'MyCustomFont2';
+  src: url('Crass.ttf') format('truetype');
+}

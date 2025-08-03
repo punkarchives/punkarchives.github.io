@@ -181,8 +181,6 @@ if (categorizedMembers[cleanStatus]) {
   bandHTML += `</table>`;
 }
 
-
-
 if (band.releases?.length) {
   // Sort releases from oldest to newest by release.year
   const sortedReleases = [...band.releases].sort((a, b) => {
@@ -227,7 +225,38 @@ if (band.releases?.length) {
   });
 }
 
+if (band.stories?.length) {
+  const allowedStatuses = ["Firsthand", "Secondhand", "Rumor"];
+  
+  const validStories = band.stories.filter(story =>
+    allowedStatuses.includes(story.status)
+  );
+  
+  if (validStories.length > 0) {
+    bandHTML += `<hr><br><br><br><h2>Stories</h2>`;
+    
+    validStories.forEach((story, idx) => {
+      bandHTML += `
+        <div style="border: 1px solid #ccc; margin-bottom: 15px; padding: 10px;">
+          <h3>${story.title}</h3>
+          <p><strong>Author:</strong> ${story.author || "Unknown"}</p>
+          <p><strong>Status:</strong> ${story.status}</p>
+          <p><strong>Story:</strong></p>
+          <div style="margin-left: 20px; white-space: pre-wrap;">${story.story}</div>
+        </div>
+      `;
+    });
+  }
+}
 
+    // Apply background image if available
+    if (band.backgroundimg) {
+      document.body.style.backgroundImage = `url(${band.backgroundimg})`;
+      document.body.style.backgroundSize = 'cover';
+      document.body.style.backgroundPosition = 'center';
+      document.body.style.backgroundRepeat = 'no-repeat';
+      document.body.style.backgroundAttachment = 'fixed';
+    }
 
     document.getElementById("band-content").innerHTML = bandHTML;
 const flagBtn = document.getElementById("flag-incomplete-btn");

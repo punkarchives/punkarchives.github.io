@@ -61,32 +61,109 @@ function capitalize(text) {
 
 function attachEditListeners() {
     document.querySelectorAll(".edit-button").forEach(button => {
-        button.addEventListener("click", function() {
+        button.addEventListener("click", async function() {
             const span = this.previousElementSibling;
             const fieldPath = span.getAttribute("data-path");
             const bandKey = span.getAttribute("data-band");
             const currentValue = span.textContent;
             const container = span.parentElement;
+            
+            // Check if this is a trusted-only field and verify user permissions
+            if (this.classList.contains("trusted-only")) {
+                const user = auth.currentUser;
+                if (!user) {
+                    alert("You must be logged in to edit this field.");
+                    return;
+                }
+                
+                console.log("Current user:", user.email);
+                console.log("User UID:", user.uid);
+                
+                try {
+                    // Try different possible paths for user data
+                    const possiblePaths = [
+                        `users/${user.uid}`,
+                        `users/${user.email.replace("@punkarchives.com", "")}`,
+                        `users/nxdx`
+                    ];
+                    
+                    let userData = null;
+                    let foundPath = null;
+                    
+                    for (const path of possiblePaths) {
+                        console.log("Checking path:", path);
+                        const userRef = ref(db, path);
+                        const userSnapshot = await get(userRef);
+                        if (userSnapshot.exists()) {
+                            userData = userSnapshot.val();
+                            foundPath = path;
+                            console.log("Found user data at:", path, userData);
+                            break;
+                        }
+                    }
+                    
+                    if (!userData) {
+                        console.log("No user data found in any path");
+                        alert("User data not found. Please contact an administrator.");
+                        return;
+                    }
+                    
+                    console.log("User trusted value:", userData.trusted, "Type:", typeof userData.trusted);
+                    
+                    if (userData.trusted !== "true") {
+                        alert("Your account is not trusted enough for this action. Please contact an administrator.");
+                        return;
+                    }
+                    
+                    console.log("User is trusted, proceeding with edit");
+                    
+                } catch (error) {
+                    console.error("Error checking user permissions:", error);
+                    alert("Error checking user permissions. Please try again.");
+                    return;
+                }
+            }
 
-            container.innerHTML = `
-                <input type="text" value="${currentValue}" class="edit-input" />
-                <button class="save-button" style="margin-left: 5px;">✅</button>
-                <button class="cancel-button" style="margin-left: 5px;">❌</button>
-            `;
+            // Check if this is a story field and use textarea for better editing
+            const isStoryField = fieldPath.includes("/story");
+            
+            if (isStoryField) {
+                container.innerHTML = `
+                    <textarea class="edit-input" rows="8" style="width: 100%; min-height: 150px;">${currentValue}</textarea>
+                    <button class="save-button" style="margin-left: 5px;">✅</button>
+                    <button class="cancel-button" style="margin-left: 5px;">❌</button>
+                `;
+            } else {
+                container.innerHTML = `
+                    <input type="text" class="edit-input" value="${currentValue}" />
+                    <button class="save-button" style="margin-left: 5px;">✅</button>
+                    <button class="cancel-button" style="margin-left: 5px;">❌</button>
+                `;
+            }
 
             container.querySelector(".save-button").addEventListener("click", async () => {
                 const fieldName = fieldPath.split("/").pop().replace(/_/g, " ");
-                const newValue = container.querySelector(".edit-input").value;
+                const newValue = container.querySelector(".edit-input").value || container.querySelector(".edit-input").textContent;
                 try {
                     await set(ref(db, `bands/${bandKey}/${fieldPath}`), newValue);
                     await logChange(db, bandKey, fieldPath, currentValue, newValue);
                     const isMemberField = fieldPath.startsWith("members/");
                     const isTrackField = fieldPath.includes("/tracks/");
-                    container.innerHTML = `
-                        ${!isMemberField && !isTrackField ? `<strong>${capitalize(fieldName)}:</strong>` : ""}
-                        <span class="editable-value" data-path="${fieldPath}" data-band="${bandKey}">${newValue}</span>
-                        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
-                    `;
+                    const isStoryField = fieldPath.includes("/story");
+                    
+                    // Rebuild the original HTML structure based on field type
+                    if (isStoryField) {
+                        container.innerHTML = `
+                            <span class="editable-value" data-path="${fieldPath}" data-band="${bandKey}">${newValue}</span>
+                            <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
+                        `;
+                    } else {
+                        container.innerHTML = `
+                            ${!isMemberField && !isTrackField ? `<strong>${capitalize(fieldName)}:</strong>` : ""}
+                            <span class="editable-value" data-path="${fieldPath}" data-band="${bandKey}">${newValue}</span>
+                            <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
+                        `;
+                    }
                     attachEditListeners();
                 } catch (err) {
                     alert("Update failed: " + err.message);
@@ -97,11 +174,21 @@ function attachEditListeners() {
                 const fieldName = fieldPath.split("/").pop().replace(/_/g, " ");
                 const isMemberField = fieldPath.startsWith("members/");
                 const isTrackField = fieldPath.includes("/tracks/");
-                container.innerHTML = `
-                    ${!isMemberField && !isTrackField ? `<strong>${capitalize(fieldName)}:</strong>` : ""}
-                    <span class="editable-value" data-path="${fieldPath}" data-band="${bandKey}">${currentValue}</span>
-                    <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
-                `;
+                const isStoryField = fieldPath.includes("/story");
+                
+                // For story fields, just restore the original content without rebuilding the entire structure
+                if (isStoryField) {
+                    container.innerHTML = `
+                        <span class="editable-value" data-path="${fieldPath}" data-band="${bandKey}">${currentValue}</span>
+                        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        ${!isMemberField && !isTrackField ? `<strong>${capitalize(fieldName)}:</strong>` : ""}
+                        <span class="editable-value" data-path="${fieldPath}" data-band="${bandKey}">${currentValue}</span>
+                        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
+                    `;
+                }
                 attachEditListeners();
             });
         });
@@ -145,6 +232,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         bandHTML += ["Genres", "Location", "Years_Active", "Description", "Related_Bands"]
             .map(field => editableField(field, band[field], band.key)).join("");
+        
+        // Add background image field with trusted user check
+        bandHTML += `<p><strong>Background Image:</strong> <span class="editable-value" data-path="backgroundimg" data-band="${band.key}">${band?.backgroundimg ?? "N/A"}</span>
+        <button class="edit-button trusted-only" style="margin-left: 5px; display: inline-block;">✏️</button></p>`;
 
         if (band.members?.length) {
             // Categorize members by status, including unknowns
@@ -378,6 +469,8 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
         ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
         <p><strong>Extra Info:</strong> <span class="editable-value" data-path="releases/${r.originalIndex}/extra_info" data-band="${band.key}">${r?.extra_info ?? "N/A"}</span>
         ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
+        <p><strong>YouTube Link:</strong> <span class="editable-value" data-path="releases/${r.originalIndex}/listen" data-band="${band.key}">${r?.listen ?? "N/A"}</span>
+        ${!isLocked ? '<button class="edit-button trusted-only" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
         <p><strong>Flag ('Delete' or 'Restore'):</strong> <span class="editable-value" data-path="releases/${r.originalIndex}/flag" data-band="${band.key}">${r?.flag ?? "N/A"}</span>
         ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
     `;
@@ -403,6 +496,33 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
             }
 
             bandHTML += `<button id="addReleaseButton">Add New Release</button>`;
+            
+            // Add Stories Section
+            if (band.stories?.length) {
+                bandHTML += `<hr><h2>Stories</h2><p>note: stories will not display unless theyre given a status of "Firsthand", "Secondhand", or "Rumor"</p>`;
+                
+                band.stories.forEach((story, storyIndex) => {
+                    const currentUser = auth.currentUser;
+                    const canEdit = currentUser && story.author === currentUser.email.replace("@punkarchives.com", "");
+                    
+                    bandHTML += `
+                        <div style="border: 1px solid #ccc; margin-bottom: 15px; padding: 10px;">
+                            <h3><strong>Title:</strong> <span class="editable-value" data-path="stories/${storyIndex}/title" data-band="${band.key}">${story?.title ?? "N/A"}</span>
+                            ${canEdit ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</h3>
+                            <p><strong>Author:</strong> ${story?.author ?? "Unknown"}</p>
+                            <p><strong>Status:</strong> <span class="editable-value" data-path="stories/${storyIndex}/status" data-band="${band.key}">${story?.status ?? "N/A"}</span>
+                            ${canEdit ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
+                            <p><strong>Story:</strong></p>
+                            <div style="margin-left: 20px;">
+                                <span class="editable-value" data-path="stories/${storyIndex}/story" data-band="${band.key}">${story?.story ?? "N/A"}</span>
+                                ${canEdit ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            bandHTML += `<button id="addStoryButton">Add New Story</button>`;
 
             document.addEventListener("click", async (event) => {
                 if (event.target.id === "addReleaseButton") {
@@ -419,6 +539,7 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
                         physical_format: "undefined",
                         limitation: "undefined",
                         extra_info: "undefined",
+                        listen: "undefined",
                         tracks: {
                             0: "undefined"
                         }
@@ -434,6 +555,37 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
                         updateReleaseUI();
                     } catch (err) {
                         alert("Failed to add new release: " + err.message);
+                    }
+                }
+                
+                if (event.target.id === "addStoryButton") {
+                    const user = auth.currentUser;
+                    if (!user) {
+                        alert("You must be logged in to add a story.");
+                        return;
+                    }
+                    
+                    if (!band.stories) band.stories = [];
+                    
+                    const nextIndex = band.stories.length;
+                    const author = user.email.replace("@punkarchives.com", "");
+                    
+                    const newStory = {
+                        title: "undefined",
+                        author: author,
+                        status: "undefined",
+                        story: "undefined"
+                    };
+                    
+                    try {
+                        // Save to Firebase
+                        await set(ref(db, `bands/${band.key}/stories/${nextIndex}`), newStory);
+                        await logChange(db, band.key, `stories/${nextIndex}`, "New Story Added", JSON.stringify(newStory));
+                        
+                        // Reload the page to show the new story
+                        location.reload();
+                    } catch (err) {
+                        alert("Failed to add new story: " + err.message);
                     }
                 }
             });
