@@ -59,6 +59,32 @@ function capitalize(text) {
     return text.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
 }
 
+async function isUserVeryTrusted() {
+    const user = auth.currentUser;
+    if (!user) return false;
+    
+    try {
+        const possiblePaths = [
+            `users/${user.uid}`,
+            `users/${user.email.replace("@punkarchives.com", "")}`,
+            `users/nxdx`
+        ];
+        
+        for (const path of possiblePaths) {
+            const userRef = ref(db, path);
+            const userSnapshot = await get(userRef);
+            if (userSnapshot.exists()) {
+                const userData = userSnapshot.val();
+                return userData.verytrusted === "true";
+            }
+        }
+        return false;
+    } catch (error) {
+        console.error("Error checking verytrusted status:", error);
+        return false;
+    }
+}
+
 function attachEditListeners() {
     document.querySelectorAll(".edit-button").forEach(button => {
         button.addEventListener("click", async function() {
@@ -124,6 +150,62 @@ function attachEditListeners() {
                 }
             }
 
+            // Check if this is a verytrusted-only field and verify user permissions
+            if (this.classList.contains("verytrusted-only")) {
+                const user = auth.currentUser;
+                if (!user) {
+                    alert("You must be logged in to edit this field.");
+                    return;
+                }
+                
+                console.log("Current user:", user.email);
+                console.log("User UID:", user.uid);
+                
+                try {
+                    // Try different possible paths for user data
+                    const possiblePaths = [
+                        `users/${user.uid}`,
+                        `users/${user.email.replace("@punkarchives.com", "")}`,
+                        `users/nxdx`
+                    ];
+                    
+                    let userData = null;
+                    let foundPath = null;
+                    
+                    for (const path of possiblePaths) {
+                        console.log("Checking path:", path);
+                        const userRef = ref(db, path);
+                        const userSnapshot = await get(userRef);
+                        if (userSnapshot.exists()) {
+                            userData = userSnapshot.val();
+                            foundPath = path;
+                            console.log("Found user data at:", path, userData);
+                            break;
+                        }
+                    }
+                    
+                    if (!userData) {
+                        console.log("No user data found in any path");
+                        alert("User data not found. Please contact an administrator.");
+                        return;
+                    }
+                    
+                    console.log("User verytrusted value:", userData.verytrusted, "Type:", typeof userData.verytrusted);
+                    
+                    if (userData.verytrusted !== "true") {
+                        alert("Your account is not verytrusted enough for this action. Please contact an administrator.");
+                        return;
+                    }
+                    
+                    console.log("User is verytrusted, proceeding with edit");
+                    
+                } catch (error) {
+                    console.error("Error checking user permissions:", error);
+                    alert("Error checking user permissions. Please try again.");
+                    return;
+                }
+            }
+
             // Check if this is a story field and use textarea for better editing
             const isStoryField = fieldPath.includes("/story");
             
@@ -157,9 +239,103 @@ function attachEditListeners() {
                             <span class="editable-value" data-path="${fieldPath}" data-band="${bandKey}">${newValue}</span>
                             <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
                         `;
+                    } else if (isTrackField) {
+                        // For track fields, only rebuild the track name and buttons, not the entire structure
+                        const trackIndex = fieldPath.split('/')[3]; // Get track index from path
+                        const releaseIndex = fieldPath.split('/')[1]; // Get release index from path
+                        
+                        // Only rebuild the track name span and its immediate buttons
+                        container.innerHTML = `<span class="editable-value" data-path="${fieldPath}" data-band="${bandKey}">${newValue}</span>
+                            <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
+                            <button class="lyrics-button" data-release-index="${releaseIndex}" data-track-index="${trackIndex}" data-band="${bandKey}" style="margin-left: 5px; display: inline-block; 
+: #4ecdc4; color: white; border: none; padding: 2px 6px; cursor: pointer;">📝 Lyrics</button>`;
+                        
+                        attachEditListeners();
+                        
+                        // Reattach lyrics button event listener
+                        const lyricsBtn = container.querySelector('.lyrics-button');
+                        if (lyricsBtn) {
+                            lyricsBtn.addEventListener("click", async () => {
+                                // Get current track data
+                                const trackRef = ref(db, `bands/${bandKey}/releases/${releaseIndex}/tracks/${trackIndex}`);
+                                const trackSnapshot = await get(trackRef);
+                                const trackData = trackSnapshot.exists() ? trackSnapshot.val() : {};
+                                const currentLyrics = trackData.lyrics || '';
+
+                                // Create lyrics editor modal
+                                const modal = document.createElement("div");
+                                modal.style.cssText = `
+                                    position: fixed;
+                                    top: 0;
+                                    left: 0;
+                                    width: 100%;
+                                    height: 100%;
+                                    background-color: rgba(0, 0, 0, 0.7);
+                                    z-index: 1000;
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                `;
+
+                                modal.innerHTML = `
+                                    <div style="
+                                        background: #0a0a0a;
+                                        padding: 20px;
+                                        border-radius: 8px;
+                                        width: 80%;
+                                        max-width: 600px;
+                                        max-height: 80%;
+                                        overflow-y: auto;
+                                    ">
+                                        <h3>Edit Lyrics</h3>
+                                        <p><strong>Track:</strong> ${trackData.name || 'Unknown Track'}</p>
+                                        <textarea id="lyrics-editor" rows="15" style="width: 100%; margin: 10px 0; font-family: monospace;">${currentLyrics}</textarea>
+                                        <div style="margin-top: 15px;">
+                                            <button id="save-lyrics" style="color: white; border: none; padding: 8px 16px; margin-right: 10px; cursor: pointer;">💾 Save Lyrics</button>
+                                            <button id="cancel-lyrics" style="color: white; border: none; padding: 8px 16px; cursor: pointer;">❌ Cancel</button>
+                                        </div>
+                                    </div>
+                                `;
+
+                                document.body.appendChild(modal);
+
+                                // Save lyrics
+                                document.getElementById("save-lyrics").addEventListener("click", async () => {
+                                    const newLyrics = document.getElementById("lyrics-editor").value;
+                                    
+                                    try {
+                                        const updatedTrackData = { 
+                                            ...trackData, 
+                                            name: trackData.name || 'Unknown Track',
+                                            lyrics: newLyrics 
+                                        };
+                                        await set(ref(db, `bands/${bandKey}/releases/${releaseIndex}/tracks/${trackIndex}`), updatedTrackData);
+                                        await logChange(db, bandKey, `releases/${releaseIndex}/tracks/${trackIndex}/lyrics`, currentLyrics, newLyrics);
+                                        
+                                        document.body.removeChild(modal);
+                                        location.reload();
+                                    } catch (err) {
+                                        alert("Failed to save lyrics: " + err.message);
+                                    }
+                                });
+
+                                // Cancel
+                                document.getElementById("cancel-lyrics").addEventListener("click", () => {
+                                    document.body.removeChild(modal);
+                                });
+
+                                // Close modal when clicking outside
+                                modal.addEventListener("click", (e) => {
+                                    if (e.target === modal) {
+                                        document.body.removeChild(modal);
+                                    }
+                                });
+                            });
+                        }
+                        return;
                     } else {
                         container.innerHTML = `
-                            ${!isMemberField && !isTrackField ? `<strong>${capitalize(fieldName)}:</strong>` : ""}
+                            ${!isMemberField ? `<strong>${capitalize(fieldName)}:</strong>` : ""}
                             <span class="editable-value" data-path="${fieldPath}" data-band="${bandKey}">${newValue}</span>
                             <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
                         `;
@@ -182,9 +358,102 @@ function attachEditListeners() {
                         <span class="editable-value" data-path="${fieldPath}" data-band="${bandKey}">${currentValue}</span>
                         <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
                     `;
+                } else if (isTrackField) {
+                    // For track fields, only rebuild the track name and buttons, not the entire structure
+                    const trackIndex = fieldPath.split('/')[3]; // Get track index from path
+                    const releaseIndex = fieldPath.split('/')[1]; // Get release index from path
+                    
+                    // Only rebuild the track name span and its immediate buttons
+                    container.innerHTML = `<span class="editable-value" data-path="${fieldPath}" data-band="${bandKey}">${currentValue}</span>
+                        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
+                        <button class="lyrics-button" data-release-index="${releaseIndex}" data-track-index="${trackIndex}" data-band="${bandKey}" style="margin-left: 5px; display: inline-block; background-color: #4ecdc4; color: white; border: none; padding: 2px 6px; cursor: pointer;">📝 Lyrics</button>`;
+                    
+                    attachEditListeners();
+                    
+                    // Reattach lyrics button event listener
+                    const lyricsBtn = container.querySelector('.lyrics-button');
+                    if (lyricsBtn) {
+                        lyricsBtn.addEventListener("click", async () => {
+                            // Get current track data
+                            const trackRef = ref(db, `bands/${bandKey}/releases/${releaseIndex}/tracks/${trackIndex}`);
+                            const trackSnapshot = await get(trackRef);
+                            const trackData = trackSnapshot.exists() ? trackSnapshot.val() : {};
+                            const currentLyrics = trackData.lyrics || '';
+
+                            // Create lyrics editor modal
+                            const modal = document.createElement("div");
+                            modal.style.cssText = `
+                                position: fixed;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 100%;
+                                background-color: rgba(0, 0, 0, 0.7);
+                                z-index: 1000;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                            `;
+
+                            modal.innerHTML = `
+                                <div style="
+                                    background: #0a0a0a;
+                                    padding: 20px;
+                                    border-radius: 8px;
+                                    width: 80%;
+                                    max-width: 600px;
+                                    max-height: 80%;
+                                    overflow-y: auto;
+                                ">
+                                    <h3>Edit Lyrics</h3>
+                                    <p><strong>Track:</strong> ${trackData.name || 'Unknown Track'}</p>
+                                    <textarea id="lyrics-editor" rows="15" style="width: 100%; margin: 10px 0; font-family: monospace;">${currentLyrics}</textarea>
+                                    <div style="margin-top: 15px;">
+                                        <button id="save-lyrics" style="color: white; border: none; padding: 8px 16px; margin-right: 10px; cursor: pointer;">💾 Save Lyrics</button>
+                                        <button id="cancel-lyrics" style="color: white; border: none; padding: 8px 16px; cursor: pointer;">❌ Cancel</button>
+                                    </div>
+                                </div>
+                            `;
+
+                            document.body.appendChild(modal);
+
+                            // Save lyrics
+                            document.getElementById("save-lyrics").addEventListener("click", async () => {
+                                const newLyrics = document.getElementById("lyrics-editor").value;
+                                
+                                try {
+                                    const updatedTrackData = { 
+                                        ...trackData, 
+                                        name: trackData.name || 'Unknown Track',
+                                        lyrics: newLyrics 
+                                    };
+                                    await set(ref(db, `bands/${bandKey}/releases/${releaseIndex}/tracks/${trackIndex}`), updatedTrackData);
+                                    await logChange(db, bandKey, `releases/${releaseIndex}/tracks/${trackIndex}/lyrics`, currentLyrics, newLyrics);
+                                    
+                                    document.body.removeChild(modal);
+                                    location.reload();
+                                } catch (err) {
+                                    alert("Failed to save lyrics: " + err.message);
+                                }
+                            });
+
+                            // Cancel
+                            document.getElementById("cancel-lyrics").addEventListener("click", () => {
+                                document.body.removeChild(modal);
+                            });
+
+                            // Close modal when clicking outside
+                            modal.addEventListener("click", (e) => {
+                                if (e.target === modal) {
+                                    document.body.removeChild(modal);
+                                }
+                            });
+                        });
+                    }
+                    return;
                 } else {
                     container.innerHTML = `
-                        ${!isMemberField && !isTrackField ? `<strong>${capitalize(fieldName)}:</strong>` : ""}
+                        ${!isMemberField ? `<strong>${capitalize(fieldName)}:</strong>` : ""}
                         <span class="editable-value" data-path="${fieldPath}" data-band="${bandKey}">${currentValue}</span>
                         <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
                     `;
@@ -446,15 +715,20 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
                         return yearA - yearB;
                     });
 
+                // Check if user is verytrusted once for all releases
+                const isVeryTrusted = await isUserVeryTrusted();
+                
                 sortedReleases.forEach((r) => {
                     const isLocked = r.locked === true;
                     const titleStyle = isLocked ? 'style="color: green;"' : '';
                     const lockEmoji = isLocked ? ' 🔒' : '';
+                    const lockButton = isVeryTrusted ? 
+                        `<button class="lock-toggle-button verytrusted-only" data-release-index="${r.originalIndex}" data-band="${band.key}" data-current-locked="${isLocked}" style="margin-left: 5px; display: inline-block; color: white; border: none; padding: 2px 6px; cursor: pointer;">${isLocked ? '🔓 Unlock' : '🔒 Lock'}</button>` : '';
 
                     bandHTML += `
       <div style="margin-bottom:20px">
         <h3 ${titleStyle}><strong>Title:</strong> <span class="editable-value" data-path="releases/${r.originalIndex}/title" data-band="${band.key}">${r?.title ?? "N/A"}${lockEmoji}</span>
-        ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</h3>
+        ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}${lockButton}</h3>
         <p><strong>Image Link:</strong> <span class="editable-value" data-path="releases/${r.originalIndex}/cover_image" data-band="${band.key}">${r?.cover_image ?? "N/A"}</span>
         ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
         <p><strong>Label:</strong> <span class="editable-value" data-path="releases/${r.originalIndex}/label" data-band="${band.key}">${r?.label ?? "N/A"}</span>
@@ -479,11 +753,43 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
                         bandHTML += `<p><strong>Tracklist:</strong></p><ol id="tracklist-${r.originalIndex}">`;
                         const tracks = Object.entries(r.tracks || {});
                         tracks.forEach(([index, trackName]) => {
-                            bandHTML += `
-          <li>
-            <span class="editable-value" data-path="releases/${r.originalIndex}/tracks/${index}" data-band="${band.key}">${trackName}</span>
-            ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}
-          </li>`;
+                            // Handle both string and object track data
+                            let trackData;
+                            if (typeof trackName === 'object' && trackName !== null) {
+                                trackData = trackName;
+                            } else {
+                                trackData = { name: trackName || 'Unknown Track' };
+                            }
+                            const lyrics = trackData.lyrics || '';
+                            const hasLyrics = lyrics && lyrics.trim() !== '';
+                            
+                            // Ensure track name is preserved
+                            if (!trackData.name) {
+                                trackData.name = trackName || 'Unknown Track';
+                            }
+                            
+                            const editButtonHTML = !isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : '';
+                            const lyricsButtonHTML = !isLocked ? 
+                                '<button class="lyrics-button" data-release-index="' + r.originalIndex + '" data-track-index="' + index + '" data-band="' + band.key + '" style="margin-left: 5px; display: inline-block; color: white; border: none; padding: 2px 6px; cursor: pointer;">📝 Lyrics</button>' : '';
+                            
+                            bandHTML += '<li><div>' +
+                                '<span class="editable-value" data-path="releases/' + r.originalIndex + '/tracks/' + index + '/name" data-band="' + band.key + '">' + trackData.name + '</span>' +
+                                editButtonHTML +
+                                lyricsButtonHTML +
+                                '</div>';
+                            
+                            console.log(`Created lyrics button for track ${index}:`, trackData.name);
+                            
+                            if (hasLyrics) {
+                                bandHTML += '<div style="margin-left: 20px; margin-top: 5px;">' +
+                                    '<button class="toggle-lyrics-btn" data-release-index="' + r.originalIndex + '" data-track-index="' + index + '" style="color: white; border: none; padding: 4px 8px; cursor: pointer; margin-bottom: 5px;">Show Lyrics</button>' +
+                                    '<div class="lyrics-content" data-release-index="' + r.originalIndex + '" data-track-index="' + index + '" style="display: none; padding: 10px; border-left: 3px solid #4ecdc4;">' +
+                                    '<strong>Lyrics:</strong>' +
+                                    '<div style="white-space: pre-wrap; margin-top: 5px;">' + lyrics + '</div>' +
+                                    '</div>';
+                            }
+                            
+                            bandHTML += '</li>';
                         });
                         bandHTML += `</ol>`;
                         if (!isLocked) {
@@ -601,6 +907,31 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
                 console.log("Band content loaded. Edit buttons should now be visible.");
                 attachEditListeners();
 
+                // Add event listeners for lock toggle buttons
+                document.querySelectorAll(".lock-toggle-button").forEach(button => {
+                    button.addEventListener("click", async () => {
+                        const releaseIndex = button.getAttribute("data-release-index");
+                        const bandKey = button.getAttribute("data-band");
+                        const currentLocked = button.getAttribute("data-current-locked") === "true";
+                        const newLockedValue = !currentLocked;
+
+                        try {
+                            await set(ref(db, `bands/${bandKey}/releases/${releaseIndex}/locked`), newLockedValue);
+                            await logChange(db, bandKey, `releases/${releaseIndex}/locked`, currentLocked, newLockedValue);
+                            
+                            // Update button appearance
+                            button.setAttribute("data-current-locked", newLockedValue.toString());
+                            button.textContent = newLockedValue ? '🔓 Unlock' : '🔒 Lock';
+                            button.style.backgroundColor = newLockedValue ? '#ff6b6b' : '#4ecdc4';
+                            
+                            // Reload the page to update all UI elements
+                            location.reload();
+                        } catch (err) {
+                            alert("Failed to toggle lock status: " + err.message);
+                        }
+                    });
+                });
+
                 document.querySelectorAll(".add-track-button").forEach(button => {
                     button.addEventListener("click", async () => {
                         const releaseIndex = button.getAttribute("data-release-index");
@@ -611,23 +942,140 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
                         const currentTracks = snapshot.exists() ? snapshot.val() : {};
 
                         const nextIndex = Object.keys(currentTracks).length;
-                        const newTrackName = "undefined";
+                        const newTrack = { name: "undefined" };
 
                         try {
-                            await set(ref(db, `bands/${bandKey}/releases/${releaseIndex}/tracks/${nextIndex}`), newTrackName);
-                            await logChange(db, bandKey, `releases/${releaseIndex}/tracks/${nextIndex}`, "Track added", newTrackName);
+                            await set(ref(db, `bands/${bandKey}/releases/${releaseIndex}/tracks/${nextIndex}`), newTrack);
+                            await logChange(db, bandKey, `releases/${releaseIndex}/tracks/${nextIndex}`, "Track added", JSON.stringify(newTrack));
 
-                            const tracklistElement = document.getElementById(`tracklist-${releaseIndex}`);
-                            const newLi = document.createElement("li");
-                            newLi.innerHTML = `
-        <span class="editable-value" data-path="releases/${releaseIndex}/tracks/${nextIndex}" data-band="${bandKey}">${newTrackName}</span>
-        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
-      `;
-                            tracklistElement.appendChild(newLi);
-                            attachEditListeners();
+                            location.reload();
 
                         } catch (err) {
                             alert("Failed to add track: " + err.message);
+                        }
+                    });
+                });
+
+                // Add event listeners for lyrics buttons
+                const lyricsButtons = document.querySelectorAll(".lyrics-button");
+                console.log(`Found ${lyricsButtons.length} lyrics buttons`);
+                lyricsButtons.forEach(button => {
+                    console.log("Found lyrics button:", button);
+                    button.addEventListener("click", async () => {
+                        console.log("Lyrics button clicked!");
+                        const releaseIndex = button.getAttribute("data-release-index");
+                        const trackIndex = button.getAttribute("data-track-index");
+                        const bandKey = button.getAttribute("data-band");
+                        
+                        console.log("Release index:", releaseIndex);
+                        console.log("Track index:", trackIndex);
+                        console.log("Band key:", bandKey);
+
+                        // Get current track data
+                        const trackRef = ref(db, `bands/${bandKey}/releases/${releaseIndex}/tracks/${trackIndex}`);
+                        const trackSnapshot = await get(trackRef);
+                        const trackData = trackSnapshot.exists() ? trackSnapshot.val() : {};
+                        const currentLyrics = trackData.lyrics || '';
+                        
+                        console.log("Track data:", trackData);
+                        console.log("Current lyrics:", currentLyrics);
+
+                        // Create lyrics editor modal
+                        const modal = document.createElement("div");
+                        modal.style.cssText = `
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background-color: rgba(0, 0, 0, 0.7);
+                            z-index: 1000;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                        `;
+
+                        modal.innerHTML = `
+                            <div style="
+                                background: #0a0a0a;
+                                padding: 20px;
+                                border-radius: 8px;
+                                width: 80%;
+                                max-width: 600px;
+                                max-height: 80%;
+                                overflow-y: auto;
+                            ">
+                                <h3>Edit Lyrics</h3>
+                                <p><strong>Track:</strong> ${trackData.name || 'Unknown Track'}</p>
+                                <textarea id="lyrics-editor" rows="15" style="width: 100%; margin: 10px 0; font-family: monospace;">${currentLyrics}</textarea>
+                                <div style="margin-top: 15px;">
+                                    <button id="save-lyrics" style="color: white; border: none; padding: 8px 16px; margin-right: 10px; cursor: pointer;">💾 Save Lyrics</button>
+                                    <button id="cancel-lyrics" style="color: white; border: none; padding: 8px 16px; cursor: pointer;">❌ Cancel</button>
+                                </div>
+                            </div>
+                        `;
+
+                        console.log("Modal created, appending to body...");
+                        document.body.appendChild(modal);
+                        console.log("Modal appended to body");
+
+                        // Save lyrics
+                        document.getElementById("save-lyrics").addEventListener("click", async () => {
+                            const newLyrics = document.getElementById("lyrics-editor").value;
+                            
+                            try {
+                                // Ensure we preserve the track name and structure
+                                let updatedTrackData;
+                                if (typeof trackData === 'object' && trackData !== null) {
+                                    // Preserve all existing properties including name
+                                    updatedTrackData = { 
+                                        ...trackData, 
+                                        name: trackData.name || 'Unknown Track',
+                                        lyrics: newLyrics 
+                                    };
+                                } else {
+                                    // If trackData is a string, convert it to object format
+                                    updatedTrackData = { name: trackData || 'Unknown Track', lyrics: newLyrics };
+                                }
+                                
+                                await set(ref(db, `bands/${bandKey}/releases/${releaseIndex}/tracks/${trackIndex}`), updatedTrackData);
+                                await logChange(db, bandKey, `releases/${releaseIndex}/tracks/${trackIndex}/lyrics`, currentLyrics, newLyrics);
+                                
+                                document.body.removeChild(modal);
+                                location.reload();
+                            } catch (err) {
+                                alert("Failed to save lyrics: " + err.message);
+                            }
+                        });
+
+                        // Cancel
+                        document.getElementById("cancel-lyrics").addEventListener("click", () => {
+                            document.body.removeChild(modal);
+                        });
+
+                        // Close modal when clicking outside
+                        modal.addEventListener("click", (e) => {
+                            if (e.target === modal) {
+                                document.body.removeChild(modal);
+                            }
+                        });
+                    });
+                });
+
+                // Add event listeners for toggle lyrics buttons
+                document.querySelectorAll(".toggle-lyrics-btn").forEach(button => {
+                    button.addEventListener("click", () => {
+                        const trackIndex = button.getAttribute("data-track-index");
+                        const releaseIndex = button.getAttribute("data-release-index");
+                        const lyricsContent = document.querySelector('.lyrics-content[data-release-index="' + releaseIndex + '"][data-track-index="' + trackIndex + '"]');
+                        const isVisible = lyricsContent.style.display !== 'none';
+                        
+                        if (isVisible) {
+                            lyricsContent.style.display = 'none';
+                            button.textContent = 'Show Lyrics';
+                        } else {
+                            lyricsContent.style.display = 'block';
+                            button.textContent = 'Hide Lyrics';
                         }
                     });
                 });

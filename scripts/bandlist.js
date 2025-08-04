@@ -59,10 +59,10 @@ get(child(dbRef, 'bands')) // 'bands' is the root node in your Firebase for band
     console.error("Error fetching band data:", error);
   });
 
-// Scroll to letter function stays the same
-function scrollToLetter(letter) {
+// Scroll to letter function - make it globally available
+window.scrollToLetter = function(letter) {
   let section = document.getElementById(`letter-${letter}`);
   if (section) {
     section.scrollIntoView({ behavior: "smooth" });
   }
-}
+};

@@ -189,7 +189,7 @@ if (band.releases?.length) {
     return yearA - yearB;
   });
 
-  bandHTML += `<hr><h2>Discography</h2><p>Note: Hover your mouse over an album title to see the album art.</p>`;
+  bandHTML += `<hr><h2>Discography</h2><p>Note: Hover your mouse over an album title to see the album art.<br>Click on an album title for more details such as lyrics or extra images.</p>`;
 
   sortedReleases.forEach((release, index) => {
     // Determine status text based on flag
@@ -204,7 +204,9 @@ if (band.releases?.length) {
       <div style="margin-bottom: 10px;">
         <u>
           <h3 class="release-title" data-image="${release.cover_image}" style="margin-bottom: 5px; cursor: pointer; display: inline-block;">
-            ${release.title}${statusText}
+            <a href="release.html?band=${encodeURIComponent(bandName)}&release=${encodeURIComponent(release.title)}" style="color: inherit; text-decoration: inherit;">
+              ${release.title}${statusText}
+            </a>
           </h3>
         </u>
         <button class="download-image" data-image="${release.cover_image}" style="margin-left: 10px;">Download Image</button>
@@ -254,8 +256,26 @@ if (band.stories?.length) {
       document.body.style.backgroundImage = `url(${band.backgroundimg})`;
       document.body.style.backgroundSize = 'cover';
       document.body.style.backgroundPosition = 'center';
-      document.body.style.backgroundRepeat = 'no-repeat';
-      document.body.style.backgroundAttachment = 'fixed';
+      document.body.style.backgroundRepeat = 'repeat';
+      
+      // Check if image has 1:1 aspect ratio to avoid fixed attachment (PC only)
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobile) {
+        // Mobile users always get fixed attachment
+        document.body.style.backgroundAttachment = 'fixed';
+      } else {
+        // PC users: check aspect ratio
+        const img = new Image();
+        img.onload = function() {
+          const aspectRatio = this.width / this.height;
+          // If aspect ratio is close to 1:1 (within 0.1 tolerance), don't set fixed attachment
+          if (Math.abs(aspectRatio - 1) > 0.1) {
+            document.body.style.backgroundAttachment = 'fixed';
+          }
+        };
+        img.src = band.backgroundimg;
+      }
     }
 
     document.getElementById("band-content").innerHTML = bandHTML;

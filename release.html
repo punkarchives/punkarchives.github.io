@@ -4,8 +4,9 @@
       <meta charset="UTF-8">
       <meta name="viewport" content="width=1000, user-scalable=yes">
       <script type="module" src="scripts/main.js"></script>
-      <title>Punk Archives</title>
+      <script type="module" src="scripts/releasedata.js"></script>
       <link rel="stylesheet" href="styles.css">
+      <title>Punk Archives - Release</title>
    </head>
    <style>
       body {
@@ -43,8 +44,9 @@
          <button onclick="signUp()">Sign Up</button><br><br>
          <input type="text" id="login-username" placeholder="Username" required><br>
          <input type="password" id="login-password" placeholder="Password" required><br>
-         <button onclick="login()">Log In</button><br><br>
+         <button onclick="login()">Log In</button><br>
          <script src="scripts/additions.js"></script>
+         <br>
          <center>
             <div class="latest-additions">
                <h2>Bands Added</h2>
@@ -60,34 +62,17 @@
          </center>
          <button onclick="logout()">Log Out</button><br><br>
       </div>
-      <script src="scripts/searchzines.js"></script>
+      <script src="scripts/search.js" type="module"></script>
       <div class="main-container">
          <div class="content">
-            <center>
-               <div class="search-container">
-                  <input type="text" id="searchBar" placeholder="Search..." oninput="searchBands()" style="width: 400px; padding: 8px;">
-                  <ul id="searchResults" style="list-style: none; padding: 0; display: none; background: #121212; border: 1px solid #aa0000; width: 400px; max-height: 200px; overflow-y: auto;"></ul>
-               </div>
-            </center>
-            <h1>All Zines</h1>
-            <div id="letterNav" style="text-align: center; margin-bottom: 20px;">
-               <script>
-                  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-                  document.write('<div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 5px;">');
-                  letters.forEach(letter => {
-                      document.write(`<button onclick="scrollToLetter('${letter}')" style="background-color: #aa0000; color: white; border: none; padding: 5px 10px; cursor: pointer;">${letter}</button>`);
-                  });
-                  document.write('</div>');
-               </script>
+
+            <div id="release-content">
+               <h1>Loading release...</h1>
             </div>
-            <font color="#ffffff">
-               <ul id="artistList" class="artist-list"></ul>
-            </font>
          </div>
       </div>
       <center>
          <p>Is this page incomplete? Help by submitting info.</p>
       </center>
-      <script src="scripts/zinelist.js" type="module"></script>
    </body>
-</html>
+</html> 
