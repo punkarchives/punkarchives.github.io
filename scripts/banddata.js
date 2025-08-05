@@ -221,7 +221,16 @@ if (band.releases?.length) {
         </table>
         <button class="toggle-tracks" data-index="${index}" style="display: block; margin-top: 5px; background: black; color: white; border: 1px solid red; padding: 5px;">Show Tracklist</button>
         <ol class="tracklist" id="tracklist-${index}" style="display: none; margin-top: 5px; padding-left: 20px;">
-          ${release.tracks?.map(track => `<li>${track}</li>`).join("")}
+          ${release.tracks?.map(track => {
+            // Handle both string and object track data
+            let trackName;
+            if (typeof track === 'object' && track !== null) {
+              trackName = track.name || 'Unknown Track';
+            } else {
+              trackName = track || 'Unknown Track';
+            }
+            return `<li>${trackName}</li>`;
+          }).join("")}
         </ol>
       </div>`;
   });
