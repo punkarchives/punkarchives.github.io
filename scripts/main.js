@@ -44,7 +44,7 @@ window.loadLeaderboard = function () {
 
         sortedUsers.forEach((user, index) => {
           const entry = document.createElement("p");
-          entry.textContent = `${user.username}: ${user.points}`;
+          entry.innerHTML = `<u><a href="user.html?user=${encodeURIComponent(user.username)}" style="color: #fff; text-decoration: none;">${user.username}: ${user.points}</a></u>`;
           leaderboardDiv.appendChild(entry);
         });
       } else {
@@ -95,6 +95,7 @@ window.signUp = function () {
                 set(ref(db, "users/" + username), { 
                   userId: userId,
                   points: 0, // Initial points set to 0
+                  creationDate: new Date().toISOString() // Store creation date
                 })
                 .then(() => {
                 })
@@ -116,7 +117,7 @@ window.displayUsername = function () {
     if (user) {
       const email = user.email;
       const username = email.replace("@punkarchives.com", ""); // Extract username from email
-      document.getElementById("logged-in-user").innerText = username;
+      document.getElementById("logged-in-user").innerHTML = `<u><a href="user.html?user=${encodeURIComponent(username)}" style="color: #fff; text-decoration: none;">${username}</a></u>`;
     } else {
       document.getElementById("logged-in-user").innerText = "Not logged in.";
     }

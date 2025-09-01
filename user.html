@@ -3,13 +3,13 @@
    <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=1000, user-scalable=yes">
-      <link rel="stylesheet" href="styles.css">
       <script type="module" src="scripts/main.js"></script>
-      <title>Punk Archives</title>
+      <title>Punk Archives - User Profile</title>
+      <link rel="stylesheet" href="styles.css">
    </head>
    <body>
       <div class="sidebar">
-         <a href="index.html#" style="text-decoration:none"><img src="assets/logo.png" width="140px"></a>
+	 <a href="index.html#" style="text-decoration:none"><img src="assets/logo.png" width="140px"></a>
          <ul>
          <font face="MyCustomFont">
             <li></li>
@@ -22,12 +22,13 @@
             <li><a href="info.html#">Add New</a></li>
             <h1><font face="MyCustomFont" color="#aa0000">─────────</font></h1>
             <ul>
-               <li><a id="randomBandButton">Random Band
+               <li><a id="randomBandButton" type="module">Random Band
          </font>
          </a></li>
          </ul>
       </div>
-      <script src="scripts/randomband.js" type="module"></script></font>
+      <script src="scripts/randomband.js" type="module"></script>
+      </font>
       <div class="sidebar2">
          <center>
          <input type="text" id="signup-username" placeholder="Username" required><br>
@@ -35,8 +36,9 @@
          <button onclick="signUp()">Sign Up</button><br><br>
          <input type="text" id="login-username" placeholder="Username" required><br>
          <input type="password" id="login-password" placeholder="Password" required><br>
-         <button onclick="login()">Log In</button><br><br>
+         <button onclick="login()">Log In</button><br>
          <script src="scripts/additions.js"></script>
+         <br>
          <center>
             <div class="latest-additions">
                <h2>Bands Added</h2>
@@ -53,9 +55,13 @@
          <button onclick="logout()">Log Out</button><br><br>
       </div>
       <div class="main-container">
-      <div class="content">
-         <h1><img src="assets/logo.png" width="100px"></h1>
-         <h2>You're forbidden from accessing that page until you log in.</h2>
+         <div id="user-content" class="content">
+            <h1>Loading...</h1>
+         </div>
       </div>
+      <script src="scripts/userdata.js" type="module"></script>
+      <center>
+         <p>Is this page incomplete? Help by submitting info.</p>
+      </center>
    </body>
 </html>

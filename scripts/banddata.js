@@ -18,6 +18,99 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
+async function getReleaseId(bandName, releaseTitle) {
+  try {
+    const bandsRef = ref(db, 'bands');
+    const bandsSnapshot = await get(bandsRef);
+    
+    if (!bandsSnapshot.exists()) {
+      return null;
+    }
+    
+    const bands = Object.entries(bandsSnapshot.val()).map(([key, val]) => ({ key, ...val }));
+    const band = bands.find(b => b.band_name === bandName);
+    
+    if (!band || !band.releases) {
+      return null;
+    }
+    
+    const releaseIndex = band.releases.findIndex(r => r.title === releaseTitle);
+    return releaseIndex !== -1 ? releaseIndex : null;
+  } catch (error) {
+    console.error('Error getting release ID:', error);
+    return null;
+  }
+}
+
+async function isInCollection(username, bandName, releaseId) {
+  try {
+    const collectionRef = ref(db, `users/${username}/collection`);
+    const collectionSnapshot = await get(collectionRef);
+    
+    if (!collectionSnapshot.exists()) {
+      return false;
+    }
+    
+    const collection = collectionSnapshot.val();
+    return Object.values(collection).some(item => 
+      item.band === bandName && item.releaseId === releaseId
+    );
+  } catch (error) {
+    console.error('Error checking collection:', error);
+    return false;
+  }
+}
+
+async function addToCollection(username, bandName, releaseId, releaseTitle, releaseYear) {
+  try {
+    const collectionRef = ref(db, `users/${username}/collection`);
+    const collectionSnapshot = await get(collectionRef);
+    
+    let collection = collectionSnapshot.exists() ? collectionSnapshot.val() : {};
+    const collectionId = Object.keys(collection).length;
+    
+    collection[collectionId] = {
+      band: bandName,
+      releaseId: releaseId,
+      releaseTitle: releaseTitle,
+      releaseYear: releaseYear || "Unknown"
+    };
+    
+    await set(collectionRef, collection);
+    return true;
+  } catch (error) {
+    console.error('Error adding to collection:', error);
+    return false;
+  }
+}
+
+async function removeFromCollection(username, bandName, releaseId) {
+  try {
+    const collectionRef = ref(db, `users/${username}/collection`);
+    const collectionSnapshot = await get(collectionRef);
+    
+    if (!collectionSnapshot.exists()) {
+      return false;
+    }
+    
+    const collection = collectionSnapshot.val();
+    const entryToRemove = Object.entries(collection).find(([key, item]) => 
+      item.band === bandName && item.releaseId === releaseId
+    );
+    
+    if (entryToRemove) {
+      delete collection[entryToRemove[0]];
+      await set(collectionRef, collection);
+      return true;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('Error removing from collection:', error);
+    return false;
+  }
+}
+
 async function logChange(db, bandKey, field, oldValue, newValue) {
   const user = auth.currentUser;
   let username = "unknown";
@@ -209,7 +302,7 @@ if (band.releases?.length) {
             </a>
           </h3>
         </u>
-        <button class="download-image" data-image="${release.cover_image}" style="margin-left: 10px;">Download Image</button>
+        <button class="collection-btn" data-band="${bandName}" data-release="${release.title}" data-year="${release.year}" style="margin-left: 10px; background-color: #aa0000; color: white; border: none; padding: 4px 8px; cursor: pointer;">Loading...</button>
         ${release.listen ? `<button class="listen" style="margin-left: 10px;" onclick="window.open('${release.listen}', '_blank')">Listen</button>` : ""}
         <table class="release-details" style="border-collapse: collapse; border: 2px solid #aa0000;">
           <tr><td style="border: 1px solid #aa0000;"><strong>Label:</strong></td><td style="border: 1px solid #aa0000;">${release.label ? `<a href="label.html?label=${encodeURIComponent(release.label)}">${release.label}</a>` : "N/A"}</td></tr>
@@ -221,7 +314,16 @@ if (band.releases?.length) {
         </table>
         <button class="toggle-tracks" data-index="${index}" style="display: block; margin-top: 5px; background: black; color: white; border: 1px solid red; padding: 5px;">Show Tracklist</button>
         <ol class="tracklist" id="tracklist-${index}" style="display: none; margin-top: 5px; padding-left: 20px;">
-          ${release.tracks?.map(track => `<li>${track}</li>`).join("")}
+          ${release.tracks?.map(track => {
+            // Handle both string and object track data
+            let trackName;
+            if (typeof track === 'object' && track !== null) {
+              trackName = track.name || 'Unknown Track';
+            } else {
+              trackName = track || 'Unknown Track';
+            }
+            return `<li>${trackName}</li>`;
+          }).join("")}
         </ol>
       </div>`;
   });
@@ -237,11 +339,46 @@ if (band.stories?.length) {
   if (validStories.length > 0) {
     bandHTML += `<hr><br><br><br><h2>Stories</h2>`;
     
+    // Get unique authors to fetch profile pictures
+    const uniqueAuthors = [...new Set(validStories.map(story => story.author).filter(author => author && author !== "Unknown"))];
+    const authorProfilePictures = {};
+    
+    // Fetch profile pictures for all story authors
+    for (const author of uniqueAuthors) {
+      try {
+        const userRef = ref(db, `users/${author}`);
+        const userSnapshot = await get(userRef);
+        if (userSnapshot.exists()) {
+          const userData = userSnapshot.val();
+          authorProfilePictures[author] = userData.profilePicture || null;
+        }
+      } catch (error) {
+        console.error(`Error fetching profile picture for ${author}:`, error);
+        authorProfilePictures[author] = null;
+      }
+    }
+    
     validStories.forEach((story, idx) => {
+      const author = story.author || "Unknown";
+      const profilePicture = authorProfilePictures[author];
+      
+      // Create profile picture HTML
+      const profilePictureHTML = profilePicture 
+        ? `<img src="${profilePicture}" alt="${author}'s profile picture" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #aa0000; margin-right: 8px; object-fit: cover;" />`
+        : `<div style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #aa0000; margin-right: 8px; background-color: #333; display: flex; align-items: center; justify-content: center; color: #666; font-size: 12px;">N/A</div>`;
+      
+      // Create clickable username HTML
+      const authorHTML = author !== "Unknown" 
+        ? `<a href="user.html?user=${encodeURIComponent(author)}" style="color: #aa0000; text-decoration: none;">${author}</a>`
+        : "Unknown";
+      
       bandHTML += `
         <div style="border: 1px solid #ccc; margin-bottom: 15px; padding: 10px;">
-          <h3>${story.title}</h3>
-          <p><strong>Author:</strong> ${story.author || "Unknown"}</p>
+          <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            ${profilePictureHTML}
+            <div>${authorHTML}</div>
+          </div>
+          <h3 style="margin: 10px 0;">${story.title}</h3>
           <p><strong>Status:</strong> ${story.status}</p>
           <p><strong>Story:</strong></p>
           <div style="margin-left: 20px; white-space: pre-wrap;">${story.story}</div>
@@ -350,19 +487,59 @@ flagBtn.addEventListener("click", async () => {
       });
     });
 
-    document.querySelectorAll(".download-image").forEach(button => {
-      button.addEventListener("click", function () {
-        const imageUrl = this.getAttribute("data-image");
-        if (imageUrl) {
-          const link = document.createElement("a");
-          link.href = imageUrl;
-          link.download = imageUrl.split("/").pop();
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+    // Setup collection buttons for band page
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      const username = currentUser.email.replace("@punkarchives.com", "");
+      
+      document.querySelectorAll(".collection-btn").forEach(async (button) => {
+        const bandName = button.getAttribute("data-band");
+        const releaseTitle = button.getAttribute("data-release");
+        const releaseYear = button.getAttribute("data-year");
+        
+        const releaseId = await getReleaseId(bandName, releaseTitle);
+        
+        if (releaseId !== null) {
+          const inCollection = await isInCollection(username, bandName, releaseId);
+          
+          if (inCollection) {
+            button.textContent = 'Remove from Collection';
+            button.style.backgroundColor = '#cc0000';
+          } else {
+            button.textContent = 'Add to Collection';
+            button.style.backgroundColor = '#aa0000';
+          }
+          
+          button.addEventListener('click', async () => {
+            const currentInCollection = await isInCollection(username, bandName, releaseId);
+            
+            if (currentInCollection) {
+              const success = await removeFromCollection(username, bandName, releaseId);
+              if (success) {
+                button.textContent = 'Add to Collection';
+                button.style.backgroundColor = '#aa0000';
+              }
+            } else {
+              const success = await addToCollection(username, bandName, releaseId, releaseTitle, releaseYear);
+              if (success) {
+                button.textContent = 'Remove from Collection';
+                button.style.backgroundColor = '#cc0000';
+              }
+            }
+          });
+        } else {
+          button.textContent = 'Collection Unavailable';
+          button.disabled = true;
+          button.style.backgroundColor = '#666';
         }
       });
-    });
+    } else {
+      document.querySelectorAll(".collection-btn").forEach(button => {
+        button.textContent = 'Login to Use Collection';
+        button.disabled = true;
+        button.style.backgroundColor = '#666';
+      });
+    }
 
     document.querySelectorAll(".toggle-tracks").forEach(button => {
       button.addEventListener("click", function () {

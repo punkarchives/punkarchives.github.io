@@ -69,6 +69,178 @@ async function logChange(db, bandKey, field, oldValue, newValue) {
   }
 }
 
+async function getReleaseId(bandName, releaseTitle) {
+  try {
+    const bandsRef = ref(db, 'bands');
+    const bandsSnapshot = await get(bandsRef);
+    
+    if (!bandsSnapshot.exists()) {
+      return null;
+    }
+    
+    const bands = Object.entries(bandsSnapshot.val()).map(([key, val]) => ({ key, ...val }));
+    const band = bands.find(b => b.band_name === bandName);
+    
+    if (!band || !band.releases) {
+      return null;
+    }
+    
+    const releaseIndex = band.releases.findIndex(r => r.title === releaseTitle);
+    return releaseIndex !== -1 ? releaseIndex : null;
+  } catch (error) {
+    console.error('Error getting release ID:', error);
+    return null;
+  }
+}
+
+async function isInCollection(username, bandName, releaseId) {
+  try {
+    const collectionRef = ref(db, `users/${username}/collection`);
+    const collectionSnapshot = await get(collectionRef);
+    
+    if (!collectionSnapshot.exists()) {
+      return false;
+    }
+    
+    const collection = collectionSnapshot.val();
+    return Object.values(collection).some(item => 
+      item.band === bandName && item.releaseId === releaseId
+    );
+  } catch (error) {
+    console.error('Error checking collection:', error);
+    return false;
+  }
+}
+
+async function addToCollection(username, bandName, releaseId, releaseTitle, releaseYear) {
+  try {
+    const collectionRef = ref(db, `users/${username}/collection`);
+    const collectionSnapshot = await get(collectionRef);
+    
+    let collection = collectionSnapshot.exists() ? collectionSnapshot.val() : {};
+    const collectionId = Object.keys(collection).length;
+    
+    collection[collectionId] = {
+      band: bandName,
+      releaseId: releaseId,
+      releaseTitle: releaseTitle,
+      releaseYear: releaseYear || "Unknown"
+    };
+    
+    await set(collectionRef, collection);
+    return true;
+  } catch (error) {
+    console.error('Error adding to collection:', error);
+    return false;
+  }
+}
+
+async function removeFromCollection(username, bandName, releaseId) {
+  try {
+    const collectionRef = ref(db, `users/${username}/collection`);
+    const collectionSnapshot = await get(collectionRef);
+    
+    if (!collectionSnapshot.exists()) {
+      return false;
+    }
+    
+    const collection = collectionSnapshot.val();
+    const entryToRemove = Object.entries(collection).find(([key, item]) => 
+      item.band === bandName && item.releaseId === releaseId
+    );
+    
+    if (entryToRemove) {
+      delete collection[entryToRemove[0]];
+      await set(collectionRef, collection);
+      return true;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('Error removing from collection:', error);
+    return false;
+  }
+}
+
+async function loadReviews(bandName, releaseTitle) {
+  try {
+    const reviewsRef = ref(db, 'reviews');
+    const reviewsSnapshot = await get(reviewsRef);
+    
+    const reviewsContainer = document.getElementById('reviews-container');
+    
+    if (!reviewsSnapshot.exists()) {
+      reviewsContainer.innerHTML = '<p>No reviews yet. Be the first to review this release!</p>';
+      return;
+    }
+    
+    const allReviews = reviewsSnapshot.val();
+    const releaseReviews = Object.values(allReviews).filter(review => 
+      review.band === bandName && review.release === releaseTitle
+    );
+    
+    if (releaseReviews.length === 0) {
+      reviewsContainer.innerHTML = '<p>No reviews yet. Be the first to review this release!</p>';
+      return;
+    }
+    
+    // Sort reviews by timestamp (newest first)
+    releaseReviews.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+    // Get unique usernames to fetch profile pictures
+    const uniqueUsers = [...new Set(releaseReviews.map(review => review.user))];
+    const userProfilePictures = {};
+    
+    // Fetch profile pictures for all reviewers
+    for (const username of uniqueUsers) {
+      try {
+        const userRef = ref(db, `users/${username}`);
+        const userSnapshot = await get(userRef);
+        if (userSnapshot.exists()) {
+          const userData = userSnapshot.val();
+          userProfilePictures[username] = userData.profilePicture || null;
+        }
+      } catch (error) {
+        console.error(`Error fetching profile picture for ${username}:`, error);
+        userProfilePictures[username] = null;
+      }
+    }
+    
+    let reviewsHTML = '';
+    releaseReviews.forEach((review, index) => {
+      const date = new Date(review.timestamp).toLocaleDateString();
+      const profilePicture = userProfilePictures[review.user];
+      
+      // Create profile picture HTML
+      const profilePictureHTML = profilePicture 
+        ? `<img src="${profilePicture}" alt="${review.user}'s profile picture" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #aa0000; margin-right: 8px; object-fit: cover;" />`
+        : `<div style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #aa0000; margin-right: 8px; background-color: #333; display: flex; align-items: center; justify-content: center; color: #666; font-size: 12px;">N/A</div>`;
+      
+      reviewsHTML += `
+        <div style="border: 1px solid #ccc; margin-bottom: 15px; padding: 10px; background-color: rgba(0,0,0,0.2);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center;">
+              ${profilePictureHTML}
+              <div>
+                <strong><a href="user.html?user=${encodeURIComponent(review.user)}" style="color: #aa0000; text-decoration: none;">${review.user}</a></strong> - ${review.rating}/10
+              </div>
+            </div>
+            <div style="color: #666; font-size: 12px;">
+              ${date}
+            </div>
+          </div>
+          <div style="white-space: pre-wrap;">${review.review}</div>
+        </div>
+      `;
+    });
+    
+    reviewsContainer.innerHTML = reviewsHTML;
+  } catch (error) {
+    console.error('Error loading reviews:', error);
+    document.getElementById('reviews-container').innerHTML = '<p>Error loading reviews.</p>';
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const bandName = urlParams.get("band");
@@ -144,8 +316,18 @@ document.addEventListener("DOMContentLoaded", async () => {
               <img src="${release.cover_image}" alt="Album Cover" style="max-width: 300px; max-height: 300px; border: 2px solid #aa0000;">
               <br>
               <button class="download-image" data-image="${release.cover_image}" style="margin-top: 10px;">Download Image</button>
+              <br>
+              <button id="collection-btn" style="margin-top: 10px; background-color: #aa0000; color: white; border: none; padding: 8px 16px; cursor: pointer;">
+                Loading...
+              </button>
             </div>
-          ` : ''}
+          ` : `
+            <div style="text-align: center;">
+              <button id="collection-btn" style="background-color: #aa0000; color: white; border: none; padding: 8px 16px; cursor: pointer;">
+                Loading...
+              </button>
+            </div>
+          `}
         </div>
       </div>
 
@@ -234,7 +416,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         };
         img.src = band.backgroundimg;
       }
+         }
+
+    // Add reviews section
+    releaseHTML += `<hr><h2>User Reviews</h2>`;
+    
+    // Add review submission form for logged-in users
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      releaseHTML += `
+        <div style="border: 1px solid #aa0000; padding: 15px; margin-bottom: 20px; background-color: rgba(0,0,0,0.3);">
+          <h3>Write a Review</h3>
+          <form id="review-form">
+            <div style="margin-bottom: 10px;">
+              <label for="review-rating" style="display: block; margin-bottom: 5px;">Rating (1-10):</label>
+              <input type="number" id="review-rating" min="1" max="10" required style="width: 80px; padding: 5px;">
+            </div>
+            <div style="margin-bottom: 10px;">
+              <label for="review-text" style="display: block; margin-bottom: 5px;">Review:</label>
+              <textarea id="review-text" rows="4" cols="50" required style="width: 100%; padding: 5px; resize: vertical;"></textarea>
+            </div>
+            <button type="submit" style="background-color: #aa0000; color: white; border: none; padding: 8px 16px; cursor: pointer;">Submit Review</button>
+          </form>
+        </div>
+      `;
     }
+
+    // Add reviews display area
+    releaseHTML += `<div id="reviews-container"></div>`;
 
     document.getElementById("release-content").innerHTML = releaseHTML;
 
@@ -370,6 +579,121 @@ document.addEventListener("DOMContentLoaded", async () => {
          });
        }
      }
+
+    // Load and display reviews
+    await loadReviews(bandName, releaseTitle);
+
+    // Setup collection button
+    const collectionBtn = document.getElementById('collection-btn');
+    if (collectionBtn && currentUser) {
+      const username = currentUser.email.replace("@punkarchives.com", "");
+      const releaseId = await getReleaseId(bandName, releaseTitle);
+      
+      if (releaseId !== null) {
+        const inCollection = await isInCollection(username, bandName, releaseId);
+        
+        if (inCollection) {
+          collectionBtn.textContent = 'Remove from Collection';
+          collectionBtn.style.backgroundColor = '#cc0000';
+        } else {
+          collectionBtn.textContent = 'Add to Collection';
+          collectionBtn.style.backgroundColor = '#aa0000';
+        }
+        
+        collectionBtn.addEventListener('click', async () => {
+          const currentInCollection = await isInCollection(username, bandName, releaseId);
+          
+          if (currentInCollection) {
+            const success = await removeFromCollection(username, bandName, releaseId);
+            if (success) {
+              collectionBtn.textContent = 'Add to Collection';
+              collectionBtn.style.backgroundColor = '#aa0000';
+            }
+          } else {
+            const success = await addToCollection(username, bandName, releaseId, releaseTitle, release.year);
+            if (success) {
+              collectionBtn.textContent = 'Remove from Collection';
+              collectionBtn.style.backgroundColor = '#cc0000';
+            }
+          }
+        });
+      } else {
+        collectionBtn.textContent = 'Collection Unavailable';
+        collectionBtn.disabled = true;
+        collectionBtn.style.backgroundColor = '#666';
+      }
+    } else if (collectionBtn) {
+      collectionBtn.textContent = 'Login to Use Collection';
+      collectionBtn.disabled = true;
+      collectionBtn.style.backgroundColor = '#666';
+    }
+
+    // Add event listener for review form submission
+    const reviewForm = document.getElementById('review-form');
+    if (reviewForm) {
+      reviewForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const rating = parseInt(document.getElementById('review-rating').value);
+        const reviewText = document.getElementById('review-text').value.trim();
+        
+        if (!currentUser) {
+          alert('You must be logged in to submit a review.');
+          return;
+        }
+        
+        if (rating < 1 || rating > 10) {
+          alert('Rating must be between 1 and 10.');
+          return;
+        }
+        
+        if (reviewText.length === 0) {
+          alert('Please enter a review.');
+          return;
+        }
+        
+        try {
+          // Get current username
+          const username = currentUser.email.replace("@punkarchives.com", "");
+          
+          // Get next review ID
+          const reviewsRef = ref(db, 'reviews');
+          const reviewsSnapshot = await get(reviewsRef);
+          let nextId = 0;
+          
+          if (reviewsSnapshot.exists()) {
+            const reviews = reviewsSnapshot.val();
+            const existingIds = Object.keys(reviews).map(id => parseInt(id));
+            nextId = existingIds.length > 0 ? Math.max(...existingIds) + 1 : 0;
+          }
+          
+          // Create review object
+          const review = {
+            user: username,
+            rating: rating,
+            review: reviewText,
+            band: bandName,
+            release: releaseTitle,
+            timestamp: new Date().toISOString()
+          };
+          
+          // Save review to Firebase
+          await set(ref(db, `reviews/${nextId}`), review);
+          
+          // Clear form
+          document.getElementById('review-rating').value = '';
+          document.getElementById('review-text').value = '';
+          
+          // Reload reviews
+          await loadReviews(bandName, releaseTitle);
+          
+          alert('Review submitted successfully!');
+        } catch (error) {
+          console.error('Error submitting review:', error);
+          alert('Failed to submit review: ' + error.message);
+        }
+      });
+    }
 
   } catch (err) {
     console.error("Firebase error:", err);
