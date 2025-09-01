@@ -250,7 +250,7 @@ if (membersArray.length) {
   bandHTML += `<hr><h2>Band Members</h2>
     <table border="1" style="border-collapse: collapse; width: 100%; text-align: left; border: 2px #aa0000;">
       <tr>
-        <th>Name</th><th>Instrument</th><th>Time Active</th><th>Status</th>
+        <th>Name</th><th>Real Name</th><th>Instrument</th><th>Time Active</th><th>Status</th>
       </tr>`;
 
   ["Current", "Last Known Lineup", "Former"].forEach(status => {
@@ -261,9 +261,15 @@ if (categorizedMembers[cleanStatus]) {
   categorizedMembers[cleanStatus].push(member);
 }
 
+      // Use real_name for the link if available, otherwise use the display name
+      const linkName = member.real_name && member.real_name !== "undefined" && member.real_name !== "N/A" 
+        ? member.real_name 
+        : member.name;
+      
       bandHTML += `
         <tr>
-          <td>${member.name}</td>
+          <td><a href="member.html?member=${encodeURIComponent(linkName)}" style="color: white; text-decoration: underline;">${member.name}</a></td>
+          <td>${member.real_name || "N/A"}</td>
           <td>${member.instrument}</td>
           <td>${member.time_active || "N/A"}</td>
           <td>${member.status}</td>

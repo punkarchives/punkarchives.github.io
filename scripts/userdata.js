@@ -81,6 +81,65 @@ async function loadUserCollection(username) {
   }
 }
 
+async function generateAchievementsHTML(username, userData) {
+  const achievements = [];
+  
+  // Check "Add 1 Band" achievement
+  if (userData.points >= 1) {
+    achievements.push({
+      emoji: "🎸",
+      text: "Newbie - Added your first band to the archive"
+    });
+  }
+  
+  // Check "Add 5 Bands" achievement
+  if (userData.points >= 5) {
+    achievements.push({
+      emoji: "🏆",
+      text: "Pro Archivist - Added 5 bands to the archive"
+    });
+  }
+  
+  // Check "OG Archiver" achievement (joined in 2025)
+  if (userData.creationDate) {
+    const joinYear = new Date(userData.creationDate).getFullYear();
+    if (joinYear === 2025) {
+      achievements.push({
+        emoji: "👑",
+        text: "OG Archivist - Joined Punk Archives in 2025"
+      });
+    }
+  }
+  
+  // Check "Add A Review" achievement
+  try {
+    const reviewsRef = ref(db, 'reviews');
+    const reviewsSnapshot = await get(reviewsRef);
+    if (reviewsSnapshot.exists()) {
+      const allReviews = reviewsSnapshot.val();
+      const userReviews = Object.values(allReviews).filter(review => 
+        review.user === username
+      );
+      if (userReviews.length > 0) {
+        achievements.push({
+          emoji: "✍️",
+          text: "Journalist - Wrote your first review"
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Error checking review achievement:', error);
+  }
+  
+  if (achievements.length === 0) {
+    return '<span style="color: #666;">No achievements yet</span>';
+  }
+  
+  return achievements.map(achievement => 
+    `<span class="achievement" data-text="${achievement.text}" style="cursor: pointer; font-size: 20px;">${achievement.emoji}</span>`
+  ).join('');
+}
+
 async function loadUserReviews(username) {
   try {
     const reviewsRef = ref(db, 'reviews');
@@ -226,6 +285,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                    Edit
                  </button>
                ` : ""}
+             </div>
+           </div>
+           
+           <div style="margin-top: 15px;">
+             <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+               <div id="achievements-container" style="display: flex; gap: 5px;">
+                 ${await generateAchievementsHTML(username, userData)}
+               </div>
              </div>
            </div>
          </div>
@@ -391,6 +458,43 @@ document.addEventListener("DOMContentLoaded", async () => {
      
      // Load reviews by default
      await loadUserReviews(username);
+
+     // Add achievement hover functionality
+     const achievementElements = document.querySelectorAll('.achievement');
+     achievementElements.forEach(element => {
+       element.addEventListener('mouseenter', (e) => {
+         const text = e.target.getAttribute('data-text');
+         const tooltip = document.createElement('div');
+         tooltip.id = 'achievement-tooltip';
+         tooltip.textContent = text;
+         tooltip.style.cssText = `
+           position: absolute;
+           background: #111;
+           color: white;
+           padding: 8px 12px;
+           border: 2px solid #aa0000;
+           border-radius: 4px;
+           font-size: 14px;
+           z-index: 1000;
+           pointer-events: none;
+           max-width: 200px;
+           word-wrap: break-word;
+         `;
+         document.body.appendChild(tooltip);
+         
+         // Position tooltip near mouse
+         const rect = e.target.getBoundingClientRect();
+         tooltip.style.left = rect.right + 10 + 'px';
+         tooltip.style.top = rect.top + 'px';
+       });
+       
+       element.addEventListener('mouseleave', () => {
+         const tooltip = document.getElementById('achievement-tooltip');
+         if (tooltip) {
+           document.body.removeChild(tooltip);
+         }
+       });
+     });
 
    } catch (err) {
     console.error("Firebase error:", err);

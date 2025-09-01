@@ -526,8 +526,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
             });
 
-            bandHTML += `<hr><h2>Band Members</h2><p>note: members will not display unless theyre given a status of "Current", "Former", or "Last Known Lineup"
-    <table border="1"><tr><th>Name</th><th>Instrument</th><th>Time Active</th><th>Status</th></tr>`;
+                        bandHTML += `<hr><h2>Band Members</h2><p>note: members will not display unless theyre given a status of "Current", "Former", or "Last Known Lineup"
+            <table border="1"><tr><th>Name</th><th>Real Name</th><th>Instrument</th><th>Time Active</th><th>Status</th></tr>`;
 
             const knownCategories = ["Current", "Former", "Last Known Lineup"];
 
@@ -535,7 +535,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             knownCategories.forEach(status => {
                 categorizedMembers[status].forEach(member => {
                     bandHTML += `<tr>`;
-                    ["name", "instrument", "time_active", "status"].forEach(attr => {
+                    ["name", "real_name", "instrument", "time_active", "status"].forEach(attr => {
                         const safeValue = member?.[attr] ?? "N/A";
                         bandHTML += `<td>
                     <span class="editable-value" data-path="members/${member.index}/${attr}" data-band="${band.key}">${safeValue}</span>
@@ -551,7 +551,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (!knownCategories.includes(category)) {
                     categorizedMembers[category].forEach(member => {
                         bandHTML += `<tr>`;
-                        ["name", "instrument", "time_active", "status"].forEach(attr => {
+                        ["name", "real_name", "instrument", "time_active", "status"].forEach(attr => {
                             const safeValue = member?.[attr] ?? "N/A";
                             bandHTML += `<td>
                         <span class="editable-value" data-path="members/${member.index}/${attr}" data-band="${band.key}">${safeValue}</span>
@@ -1083,6 +1083,7 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
                 document.getElementById("add-member-button").addEventListener("click", async () => {
                     const newMember = {
                         name: "undefined",
+                        real_name: "undefined",
                         instrument: "undefined",
                         time_active: "undefined",
                         status: "undefined"

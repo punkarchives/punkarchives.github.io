@@ -112,7 +112,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         <div style="margin-bottom: 10px;">
           <u>
           <h3 class="release-title" data-image="${release.cover_image}" style="margin-bottom: 5px; cursor: pointer; display: inline-block;">
-            ${release.title}${statusText}
+            <a href="release.html?band=${encodeURIComponent(release.artist)}&release=${encodeURIComponent(release.title)}" style="color: inherit; text-decoration: inherit;">
+              ${release.title}${statusText}
+            </a>
           </h3>
           </u>
           <button class="download-image" data-image="${release.cover_image}" style="margin-left: 10px;">Download Image</button>
@@ -125,15 +127,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             <tr><td style="border: 1px solid #aa0000;"><strong>Limitation:</strong></td><td style="border: 1px solid #aa0000;">${release.limitation || "N/A"}</td></tr>
             <tr><td style="border: 1px solid #aa0000;"><strong>Extra Info:</strong></td><td style="border: 1px solid #aa0000;">${release.extra_info || "N/A"}</td></tr>
           </table>
-
-          <button class="toggle-tracks" data-index="${index}" 
-            style="display: block; margin-top: 5px; background: black; color: white; border: 1px solid red; padding: 5px;">
-            Show Tracklist
-          </button>
-          <ol class="tracklist" id="tracklist-${index}" 
-            style="display: none; margin-top: 5px; padding-left: 20px;">
-            ${(release.tracks || []).map(track => `<li>${track}</li>`).join("")}
-          </ol>
         </div>
       `;
     });
@@ -146,14 +139,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Interactivity
     setTimeout(() => {
-      document.querySelectorAll(".toggle-tracks").forEach(button => {
-        button.addEventListener("click", function () {
-          const index = this.getAttribute("data-index");
-          const tracklist = document.getElementById(`tracklist-${index}`);
-          tracklist.style.display = tracklist.style.display === "none" ? "block" : "none";
-          this.textContent = tracklist.style.display === "none" ? "Show Tracklist" : "Hide Tracklist";
-        });
-      });
 
       const albumCover = document.createElement("img");
       albumCover.id = "album-cover";

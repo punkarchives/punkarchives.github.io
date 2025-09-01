@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=1000, user-scalable=yes">
+      <script type="module" src="scripts/main.js"></script>
+      <title>Punk Archives - Edit Member</title>
+      <link rel="stylesheet" href="styles.css">
+   </head>
+   <body>
+      <div class="sidebar">
+	 <a href="index.html#" style="text-decoration:none"><img src="assets/logo.png" width="140px"></a>
+         <ul>
+         <font face="MyCustomFont">
+            <li></li>
+            <li><a href="bands.html#">All Bands</a></li>
+            <li><a href="zines.html#">Zines</a></li>
+            <li><a href="labels.html#">Labels</a></li>
+            <h1><font face="MyCustomFont" color="#aa0000">─────────</font></h1>
+            <li><a href="https://discordapp.com/users/767006494595350578">Contact</a></li>
+            <li><a href="users.html#">Users</a></li>
+            <li><a href="info.html#">Add New</a></li>
+            <h1><font face="MyCustomFont" color="#aa0000">─────────</font></h1>
+            <ul>
+               <li><a id="randomBandButton">Random Band
+         </font>
+         </a></li>
+         </ul>
+      </div>
+      <script src="scripts/randomband.js" type="module"></script>
+      </font>
+      <div class="sidebar2">
+         <center>
+         <input type="text" id="signup-username" placeholder="Username" required><br>
+         <input type="password" id="signup-password" placeholder="Password" required><br>
+         <button onclick="signUp()">Sign Up</button><br><br>
+         <input type="text" id="login-username" placeholder="Username" required><br>
+         <input type="password" id="login-password" placeholder="Password" required><br>
+         <button onclick="login()">Log In</button><br>
+         <script src="scripts/additions.js"></script>
+         <br>
+         <center>
+            <div class="latest-additions">
+               <h2>Bands Added</h2>
+               <div id="leaderboard"></div>
+            </div>
+         </center>
+         <center>
+            <p>
+               <font size="3">
+                  Logged In As: 
+            </p>
+            <p class="log" id="logged-in-user">Not logged in.</font></p>
+         </center>
+         <button onclick="logout()">Log Out</button><br><br>
+      </div>
+      <div class="main-container">
+         <!-- Member Edit Content will be updated here -->
+         <div id="member-edit-content" class="content">
+            <h1>Loading...</h1>
+         </div>
+      </div>
+      <script src="scripts/memberdataedit.js" type="module"></script>
+      <center>
+         <p>Is this page incomplete? Help by submitting info.</p>
+      </center>
+      <script>
+         document.getElementById("randomBandButton").addEventListener("click", function () {
+             fetch("banddata.json")
+                 .then(response => response.json())
+                 .then(bands => {
+                     if (bands.length === 0) {
+                         alert("No bands available.");
+                         return;
+                     }
+                     const randomBand = bands[Math.floor(Math.random() * bands.length)];
+                     window.location.href = `band.html?band=${encodeURIComponent(randomBand.band_name)}`;
+                 })
+                 .catch(error => console.error("Error loading band data:", error));
+         });
+      </script>
+   </body>
+</html>
