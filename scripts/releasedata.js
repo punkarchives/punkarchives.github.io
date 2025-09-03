@@ -336,6 +336,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           <button class="listen" onclick="window.open('${release.listen}', '_blank')" style="background: #aa0000; color: white; border: none; padding: 10px 20px; cursor: pointer; font-size: 16px;">🎵 Listen</button>
         </div>
       ` : ''}
+
+ 
     `;
 
     // Add tracklist if available
@@ -691,6 +693,53 @@ document.addEventListener("DOMContentLoaded", async () => {
         } catch (error) {
           console.error('Error submitting review:', error);
           alert('Failed to submit review: ' + error.message);
+        }
+      });
+    }
+
+    // Add Discogs import functionality
+    const discogsImportBtn = document.getElementById('discogs-import-btn');
+    if (discogsImportBtn) {
+      discogsImportBtn.addEventListener('click', async () => {
+        try {
+          // Check if user is trusted
+          const isTrusted = await isUserTrusted();
+          if (!isTrusted) {
+            alert('You must be a trusted user to import data from Discogs.');
+            return;
+          }
+
+          // Prompt for Discogs URL
+          const discogsUrl = prompt('Enter Discogs release URL or ID:');
+          if (!discogsUrl) return;
+
+          const statusSpan = document.getElementById('discogs-import-status');
+          statusSpan.textContent = 'Importing...';
+          discogsImportBtn.disabled = true;
+
+          try {
+            // Import data from Discogs
+            const importedData = await window.discogsImport.importFromDiscogs(discogsUrl);
+            
+            // Update the release in Firebase
+            await window.discogsImport.updateReleaseInFirebase(bandName, releaseTitle, importedData);
+            
+            statusSpan.textContent = 'Import successful! Refreshing page...';
+            statusSpan.style.color = '#4ecdc4';
+            
+            // Refresh the page to show updated data
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
+            
+          } catch (error) {
+            statusSpan.textContent = `Import failed: ${error.message}`;
+            statusSpan.style.color = '#ff6b6b';
+            discogsImportBtn.disabled = false;
+          }
+        } catch (error) {
+          console.error('Discogs import error:', error);
+          alert('Error setting up Discogs import: ' + error.message);
         }
       });
     }

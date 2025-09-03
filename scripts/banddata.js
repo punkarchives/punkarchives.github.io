@@ -206,32 +206,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>
       </div>
     `;
-if (band.notes) {
-  const allowedStatuses = ["Firsthand", "Secondhand", "Rumor"];
 
-  const validNotes = Object.values(band.notes).filter(note =>
-    allowedStatuses.includes(note.status)
-  );
+    // Add tabbed navigation
+    bandHTML += `<hr><div class="section-nav" style="margin: 20px 0;">
+        <button class="nav-tab active" data-section="discography">Discography</button>
+        <button class="nav-tab" data-section="members">Members</button>
+        <button class="nav-tab" data-section="stories">Community Stories</button>
+    </div>`;
 
-  if (validNotes.length > 0) {
-    bandHTML += `<hr><h2>Community Notes</h2><div id="community-notes">`;
-
-    validNotes.forEach((note, idx) => {
-      bandHTML += `
-        <div class="note-item">
-          <button class="note-toggle" data-index="${idx}">${note.title}</button>
-          <div class="note-content" id="note-content-${idx}" style="display: none; border: 1px solid #ccc; padding: 5px; margin-top: 5px;">
-            <p><strong>Submitted by:</strong> ${note.user || "Unknown"}</p>
-            <p><strong>Status:</strong> ${note.status}</p>
-            <p><strong>Note:</strong><br>${note.text}</p>
-          </div>
-        </div>`;
-    });
-
-    bandHTML += `</div>`;
-  }
-}
-const membersArray = band.members ? Object.values(band.members) : [];
+    // Band Members Section
+    bandHTML += `<div id="members-section" class="content-section">`;
+    const membersArray = band.members ? Object.values(band.members) : [];
 
 if (membersArray.length) {
   // Categorize members by status
@@ -247,7 +232,7 @@ if (membersArray.length) {
     }
   });
 
-  bandHTML += `<hr><h2>Band Members</h2>
+  bandHTML += `
     <table border="1" style="border-collapse: collapse; width: 100%; text-align: left; border: 2px #aa0000;">
       <tr>
         <th>Name</th><th>Real Name</th><th>Instrument</th><th>Time Active</th><th>Status</th>
@@ -279,7 +264,10 @@ if (categorizedMembers[cleanStatus]) {
 
   bandHTML += `</table>`;
 }
+bandHTML += `</div>`;
 
+// Discography Section
+bandHTML += `<div id="discography-section" class="content-section active"><p>Note: Click an album title for more details.</p>`;
 if (band.releases?.length) {
   // Sort releases from oldest to newest by release.year
   const sortedReleases = [...band.releases].sort((a, b) => {
@@ -288,9 +276,8 @@ if (band.releases?.length) {
     return yearA - yearB;
   });
 
-  bandHTML += `<hr><h2>Discography</h2><p>Note: Hover your mouse over an album title to see the album art.<br>Click on an album title for more details such as lyrics or extra images.</p>`;
 
-  sortedReleases.forEach((release, index) => {
+    sortedReleases.forEach((release, index) => {
     // Determine status text based on flag
     let statusText = "";
     if (release.flag === "Delete") {
@@ -300,41 +287,60 @@ if (band.releases?.length) {
     }
 
     bandHTML += `
-      <div style="margin-bottom: 10px;">
-        <u>
-          <h3 class="release-title" data-image="${release.cover_image}" style="margin-bottom: 5px; cursor: pointer; display: inline-block;">
-            <a href="release.html?band=${encodeURIComponent(bandName)}&release=${encodeURIComponent(release.title)}" style="color: inherit; text-decoration: inherit;">
+      <div class="release-item" style="margin-bottom: 15px; padding: 15px; background: rgba(15,15,15); border-left: 4px solid #aa0000;">
+        <div class="release-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 class="release-title" data-image="${release.cover_image}" style="margin: 0; cursor: pointer;">
+            <a href="release.html?band=${encodeURIComponent(bandName)}&release=${encodeURIComponent(release.title)}" style="color: #aa0000; text-decoration: none; font-size: 18px;">
               ${release.title}${statusText}
             </a>
           </h3>
-        </u>
-        <button class="collection-btn" data-band="${bandName}" data-release="${release.title}" data-year="${release.year}" style="margin-left: 10px; background-color: #aa0000; color: white; border: none; padding: 4px 8px; cursor: pointer;">Loading...</button>
-        ${release.listen ? `<button class="listen" style="margin-left: 10px;" onclick="window.open('${release.listen}', '_blank')">Listen</button>` : ""}
-        <table class="release-details" style="border-collapse: collapse; border: 2px solid #aa0000;">
-          <tr><td style="border: 1px solid #aa0000;"><strong>Label:</strong></td><td style="border: 1px solid #aa0000;">${release.label ? `<a href="label.html?label=${encodeURIComponent(release.label)}">${release.label}</a>` : "N/A"}</td></tr>
-          <tr><td style="border: 1px solid #aa0000;"><strong>Release Date:</strong></td><td style="border: 1px solid #aa0000;">${release.year || "Unknown"}</td></tr>
-          <tr><td style="border: 1px solid #aa0000;"><strong>Type:</strong></td><td style="border: 1px solid #aa0000;">${release.release_type || "N/A"}</td></tr>
-          <tr><td style="border: 1px solid #aa0000;"><strong>Format:</strong></td><td style="border: 1px solid #aa0000;">${release.physical_format || "N/A"}</td></tr>
-          <tr><td style="border: 1px solid #aa0000;"><strong>Limitation:</strong></td><td style="border: 1px solid #aa0000;">${release.limitation || "N/A"}</td></tr>
-          <tr><td style="border: 1px solid #aa0000;"><strong>Extra Info:</strong></td><td style="border: 1px solid #aa0000;">${release.extra_info || "N/A"}</td></tr>
-        </table>
-        <button class="toggle-tracks" data-index="${index}" style="display: block; margin-top: 5px; background: black; color: white; border: 1px solid red; padding: 5px;">Show Tracklist</button>
-        <ol class="tracklist" id="tracklist-${index}" style="display: none; margin-top: 5px; padding-left: 20px;">
-          ${release.tracks?.map(track => {
-            // Handle both string and object track data
-            let trackName;
-            if (typeof track === 'object' && track !== null) {
-              trackName = track.name || 'Unknown Track';
-            } else {
-              trackName = track || 'Unknown Track';
-            }
-            return `<li>${trackName}</li>`;
-          }).join("")}
-        </ol>
+          <div class="release-actions" style="display: flex; gap: 8px;">
+            <button class="collection-btn" data-band="${bandName}" data-release="${release.title}" data-year="${release.year}" style="background-color: #aa0000; color: white; border: none; padding: 4px 8px; cursor: pointer; font-size: 12px; border-radius: 3px;">Loading...</button>
+            ${release.listen ? `<button class="listen" onclick="window.open('${release.listen}', '_blank')" style="background: #333; color: white; border: none; padding: 4px 8px; cursor: pointer; font-size: 12px; border-radius: 3px;">🎵 Listen</button>` : ""}
+          </div>
+        </div>
+        
+        <div class="release-info" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 10px;">
+          <div class="info-item">
+            <span class="info-label" style="color: #aa0000; font-weight: bold;">Type:</span>
+            <span class="info-value">${release.release_type || "N/A"}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label" style="color: #aa0000; font-weight: bold;">Year:</span>
+            <span class="info-value">${release.year || "N/A"}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label" style="color: #aa0000; font-weight: bold;">Format:</span>
+            <span class="info-value">${release.physical_format || "N/A"}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label" style="color: #aa0000; font-weight: bold;">Label:</span>
+            <span class="info-value">${release.label ? `<a href="label.html?label=${encodeURIComponent(release.label)}" style="color: #ffaaaa;">${release.label}</a>` : "N/A"}</span>
+          </div>
+        </div>
+        
+        <div class="release-extra" style="margin-top: 10px;">
+          <button class="toggle-tracks" data-index="${index}" style="background: #333; color: white; border: 1px solid #aa0000; padding: 6px 12px; cursor: pointer; font-size: 12px; border-radius: 3px;">Show Tracklist</button>
+          <ol class="tracklist" id="tracklist-${index}" style="display: none; margin-top: 10px; padding-left: 20px; list-style-type: decimal;">
+            ${release.tracks?.map(track => {
+              // Handle both string and object track data
+              let trackName;
+              if (typeof track === 'object' && track !== null) {
+                trackName = track.name || 'Unknown Track';
+              } else {
+                trackName = track || 'Unknown Track';
+              }
+              return `<li style="margin-bottom: 5px; color: #ccc;">${trackName}</li>`;
+            }).join("")}
+          </ol>
+        </div>
       </div>`;
   });
 }
+bandHTML += `</div>`;
 
+// Stories Section
+bandHTML += `<div id="stories-section" class="content-section">`;
 if (band.stories?.length) {
   const allowedStatuses = ["Firsthand", "Secondhand", "Rumor"];
   
@@ -343,7 +349,6 @@ if (band.stories?.length) {
   );
   
   if (validStories.length > 0) {
-    bandHTML += `<hr><br><br><br><h2>Stories</h2>`;
     
     // Get unique authors to fetch profile pictures
     const uniqueAuthors = [...new Set(validStories.map(story => story.author).filter(author => author && author !== "Unknown"))];
@@ -393,6 +398,9 @@ if (band.stories?.length) {
     });
   }
 }
+bandHTML += `</div>`;
+
+
 
     // Apply background image if available
     if (band.backgroundimg) {
@@ -601,6 +609,29 @@ flagBtn.addEventListener("click", async () => {
           `;
           container.querySelector(".edit-button").addEventListener("click", handleEditClick);
         });
+      });
+    });
+
+    // Add tabbed navigation functionality
+    document.querySelectorAll(".nav-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        // Remove active class from all tabs and sections
+        document.querySelectorAll(".nav-tab").forEach(t => {
+          t.classList.remove("active");
+          t.style.background = "#333"; // Reset to inactive color
+        });
+        document.querySelectorAll(".content-section").forEach(s => s.classList.remove("active"));
+        
+        // Add active class to clicked tab and change color
+        tab.classList.add("active");
+        tab.style.background = "#aa0000"; // Active color
+        
+        // Show corresponding section
+        const sectionId = tab.getAttribute("data-section") + "-section";
+        const section = document.getElementById(sectionId);
+        if (section) {
+          section.classList.add("active");
+        }
       });
     });
 

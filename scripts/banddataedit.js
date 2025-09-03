@@ -85,6 +85,32 @@ async function isUserVeryTrusted() {
     }
 }
 
+async function isUserTrusted() {
+    const user = auth.currentUser;
+    if (!user) return false;
+    
+    try {
+        const possiblePaths = [
+            `users/${user.uid}`,
+            `users/${user.email.replace("@punkarchives.com", "")}`,
+            `users/nxdx`
+        ];
+        
+        for (const path of possiblePaths) {
+            const userRef = ref(db, path);
+            const userSnapshot = await get(userRef);
+            if (userSnapshot.exists()) {
+                const userData = userSnapshot.val();
+                return userData.trusted === "true";
+            }
+        }
+        return false;
+    } catch (error) {
+        console.error("Error checking trusted status:", error);
+        return false;
+    }
+}
+
 function attachEditListeners() {
     document.querySelectorAll(".edit-button").forEach(button => {
         button.addEventListener("click", async function() {
@@ -502,6 +528,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         bandHTML += ["Genres", "Location", "Years_Active", "Description", "Related_Bands"]
             .map(field => editableField(field, band[field], band.key)).join("");
         
+        // Add logo field with trusted user check
+        bandHTML += `<p><strong>Logo:</strong> <span class="editable-value" data-path="logo" data-band="${band.key}">${band?.logo ?? "N/A"}</span>
+        <button class="edit-button trusted-only" style="margin-left: 5px; display: inline-block;">✏️</button></p>`;
+        
+        // Add logo preview if available
+        if (band?.logo) {
+            bandHTML += `<div style="margin: 10px 0;"><img src="${band.logo}" alt="Current Logo" style="max-width: 200px; max-height: 100px; border: 1px solid #ccc;" /></div>`;
+        }
+        
+        // Add band picture field with trusted user check
+        bandHTML += `<p><strong>Band Picture:</strong> <span class="editable-value" data-path="bandpic" data-band="${band.key}">${band?.bandpic ?? "N/A"}</span>
+        <button class="edit-button trusted-only" style="margin-left: 5px; display: inline-block;">✏️</button></p>`;
+        
+        // Add band picture preview if available
+        if (band?.bandpic) {
+            bandHTML += `<div style="margin: 10px 0;"><img src="${band.bandpic}" alt="Current Band Picture" style="max-width: 200px; max-height: 150px; border: 1px solid #ccc;" /></div>`;
+        }
+        
         // Add background image field with trusted user check
         bandHTML += `<p><strong>Background Image:</strong> <span class="editable-value" data-path="backgroundimg" data-band="${band.key}">${band?.backgroundimg ?? "N/A"}</span>
         <button class="edit-button trusted-only" style="margin-left: 5px; display: inline-block;">✏️</button></p>`;
@@ -747,6 +791,10 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
         ${!isLocked ? '<button class="edit-button trusted-only" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
         <p><strong>Flag ('Delete' or 'Restore'):</strong> <span class="editable-value" data-path="releases/${r.originalIndex}/flag" data-band="${band.key}">${r?.flag ?? "N/A"}</span>
         ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
+        
+        <!-- Discogs Import Button -->
+        ${!isLocked ? `<button class="discogs-import-btn" data-release-index="${r.originalIndex}" data-band="${band.key}" data-release-title="${r?.title}" style="background: #aa0000; color: white; border: none; padding: 8px 16px; cursor: pointer; margin-top: 10px;">📥 Import Data From Discogs</button>
+        <span class="discogs-import-status" style="color: #666; font-size: 14px; margin-left: 10px;"></span>` : ''}
     `;
 
                     if (Array.isArray(r.tracks) || typeof r.tracks === 'object') {
@@ -1101,6 +1149,56 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
                     } catch (err) {
                         alert("Failed to add member: " + err.message);
                     }
+                });
+
+                // Add Discogs import event listeners
+                document.querySelectorAll(".discogs-import-btn").forEach(button => {
+                    button.addEventListener("click", async () => {
+                        try {
+                            const releaseIndex = button.getAttribute("data-release-index");
+                            const bandKey = button.getAttribute("data-band");
+                            const releaseTitle = button.getAttribute("data-release-title");
+                            const statusSpan = button.nextElementSibling;
+                            
+                            // Check if user is trusted using the existing function
+                            const isTrusted = await isUserTrusted();
+                            if (!isTrusted) {
+                                alert('You must be a trusted user to import data from Discogs.');
+                                return;
+                            }
+
+                            // Prompt for Discogs URL
+                            const discogsUrl = prompt('Enter Discogs release URL or ID: (make sure to use a release URL, not a master)');
+                            if (!discogsUrl) return;
+
+                            statusSpan.textContent = 'Importing...';
+                            button.disabled = true;
+
+                            try {
+                                // Import data from Discogs
+                                const importedData = await window.discogsImport.importFromDiscogs(discogsUrl);
+                                
+                                // Update the release in Firebase
+                                await window.discogsImport.updateReleaseInFirebase(band.band_name, releaseTitle, importedData);
+                                
+                                statusSpan.textContent = 'Import successful! Refreshing page...';
+                                statusSpan.style.color = '#4ecdc4';
+                                
+                                // Refresh the page to show updated data
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1500);
+                                
+                            } catch (error) {
+                                statusSpan.textContent = `Import failed: ${error.message}`;
+                                statusSpan.style.color = '#ff6b6b';
+                                button.disabled = false;
+                            }
+                        } catch (error) {
+                            console.error('Discogs import error:', error);
+                            alert('Error setting up Discogs import: ' + error.message);
+                        }
+                    });
                 });
             }
         }
