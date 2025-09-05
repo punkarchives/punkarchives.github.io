@@ -570,7 +570,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
             });
 
-                        bandHTML += `<hr><h2>Band Members</h2><p>note: members will not display unless theyre given a status of "Current", "Former", or "Last Known Lineup"
+                        bandHTML += `<hr><h2>Band Members</h2><p><b><u><i>note: members will not display unless theyre given a status of "Current", "Former", or "Last Known Lineup" <-- READ THIS</i></u></b>
             <table border="1"><tr><th>Name</th><th>Real Name</th><th>Instrument</th><th>Time Active</th><th>Status</th></tr>`;
 
             const knownCategories = ["Current", "Former", "Last Known Lineup"];
