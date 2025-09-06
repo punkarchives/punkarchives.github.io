@@ -20,7 +20,6 @@ const db = getDatabase(app);
 
 async function getUserJoinDate(username) {
   try {
-    // Get the creation date from the user's database record
     const userRef = ref(db, `users/${username}`);
     const userSnapshot = await get(userRef);
     
@@ -56,7 +55,6 @@ async function loadUserCollection(username) {
       return;
     }
     
-    // Sort collection by release year (newest first)
     collectionItems.sort((a, b) => {
       const yearA = parseInt(a.releaseYear) || 0;
       const yearB = parseInt(b.releaseYear) || 0;
@@ -84,23 +82,41 @@ async function loadUserCollection(username) {
 async function generateAchievementsHTML(username, userData) {
   const achievements = [];
   
-  // Check "Add 1 Band" achievement
   if (userData.points >= 1) {
     achievements.push({
-      emoji: "🎸",
-      text: "Newbie - Added your first band to the archive"
+      emoji: "🖊️",
+      text: "Newbie - Gained your first point"
     });
   }
   
-  // Check "Add 5 Bands" achievement
   if (userData.points >= 5) {
     achievements.push({
-      emoji: "🏆",
-      text: "Pro Archivist - Added 5 bands to the archive"
+      emoji: "📜",
+      text: "Archivist - Gained 5 points"
+    });
+  }
+
+  if (userData.points >= 50) {
+    achievements.push({
+      emoji: "📁",
+      text: "Pro Archivist - Gained 50 points"
+    });
+  }
+
+  if (userData.points >= 250) {
+    achievements.push({
+      emoji: "📔",
+      text: "Legendary Archivist - Gained 250 points"
+    });
+  }
+
+  if (userData.points >= 1000) {
+    achievements.push({
+      emoji: "📚",
+      text: "Archive God - Gained 1000 points"
     });
   }
   
-  // Check "OG Archiver" achievement (joined in 2025)
   if (userData.creationDate) {
     const joinYear = new Date(userData.creationDate).getFullYear();
     if (joinYear === 2025) {
@@ -111,7 +127,6 @@ async function generateAchievementsHTML(username, userData) {
     }
   }
   
-  // Check "Add A Review" achievement
   try {
     const reviewsRef = ref(db, 'reviews');
     const reviewsSnapshot = await get(reviewsRef);
@@ -123,7 +138,7 @@ async function generateAchievementsHTML(username, userData) {
       if (userReviews.length > 0) {
         achievements.push({
           emoji: "✍️",
-          text: "Journalist - Wrote your first review"
+          text: "Journalist - Wrote a review"
         });
       }
     }
@@ -273,7 +288,7 @@ document.addEventListener("DOMContentLoaded", async () => {
          <div style="text-align: center;">
            <h1>${username}</h1>
            ${statusIndicators}
-           <p><strong>Bands Added:</strong> ${userData.points || 0}</p>
+           <p><strong>Points:</strong> ${userData.points || 0}</p>
            <p><strong>Joined:</strong> ${formattedJoinDate}</p>
          </div>
          

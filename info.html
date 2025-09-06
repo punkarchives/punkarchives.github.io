@@ -142,6 +142,12 @@ function addEntry(type) {
     return;
   }
 
+  // Check if it's a band and starts with "the "
+  if (type === "band" && name.toLowerCase().startsWith("the ")) {
+    alert("Band names cannot start with 'the '. Please format it like 'Hives, The' instead.");
+    return;
+  }
+
   const key = `${type}_${slugify(name)}`;
   const path = `${type}s/${key}`;
   const data = getDefaultData(type, name);
@@ -233,12 +239,12 @@ function addEntry(type) {
 <br>
 <center>
   <div class="latest-additions">
-    <h2>Bands Added</h2>
+    <h2>Points</h2>
 <div id="leaderboard"></div>
   </div>
 </center>
 
-<center><p><font size="3">Logged In As: </p><p class="log" id="logged-in-user">Not logged in.</font></p></center>
+<center><p><font size="3">Logged In As: </p><p class="log" id="logged-in-user">(you are logged in this part is just broken rn)</font></p></center>
 
 <button onclick="logout()">Log Out</button><br><br>
 </div>

@@ -968,6 +968,34 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
                         await set(ref(db, `bands/${band.key}/releases/${nextIndex}`), newRelease);
                         await logChange(db, band.key, `releases/${nextIndex}`, "New Release Added", JSON.stringify(newRelease));
 
+                        // Award points to user for adding a release
+                        const user = auth.currentUser;
+                        if (user) {
+                            const lowercaseUsername = user.email.replace("@punkarchives.com", "").toLowerCase();
+                            
+                            // Find the proper capitalized username from database
+                            const usersRef = ref(db, "users");
+                            const usersSnapshot = await get(usersRef);
+                            let properUsername = lowercaseUsername; // fallback
+                            
+                            if (usersSnapshot.exists()) {
+                                const users = usersSnapshot.val();
+                                const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
+                                if (userEntry) {
+                                    properUsername = userEntry[0]; // This is the properly capitalized username
+                                }
+                            }
+                            
+                            const userRef = ref(db, `users/${properUsername}/points`);
+                            const snapshot = await get(userRef);
+                            let currentPoints = 0;
+                            if (snapshot.exists()) {
+                                currentPoints = snapshot.val();
+                            }
+
+                            await set(userRef, currentPoints + 1);
+                        }
+
                         // Update local object and refresh the UI
                         band.releases.push(newRelease);
                         updateReleaseUI();

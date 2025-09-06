@@ -192,6 +192,35 @@ auth.onAuthStateChanged((user) => {
                 const nextIndex = label.compilations?.length || 0;
                 await set(ref(db, `labels/${label.key}/compilations/${nextIndex}`), newRelease);
                 await logChange(db, label.key, `releases/${nextIndex}`, "New Compilation Added", JSON.stringify(newRelease));
+                
+                // Award points to user for adding a compilation
+                const user = auth.currentUser;
+                if (user) {
+                    const lowercaseUsername = user.email.replace("@punkarchives.com", "").toLowerCase();
+                    
+                    // Find the proper capitalized username from database
+                    const usersRef = ref(db, "users");
+                    const usersSnapshot = await get(usersRef);
+                    let properUsername = lowercaseUsername; // fallback
+                    
+                    if (usersSnapshot.exists()) {
+                        const users = usersSnapshot.val();
+                        const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
+                        if (userEntry) {
+                            properUsername = userEntry[0]; // This is the properly capitalized username
+                        }
+                    }
+                    
+                    const userRef = ref(db, `users/${properUsername}/points`);
+                    const snapshot = await get(userRef);
+                    let currentPoints = 0;
+                    if (snapshot.exists()) {
+                        currentPoints = snapshot.val();
+                    }
+
+                    await set(userRef, currentPoints + 1);
+                }
+                
                 location.reload();
             } catch (err) {
                 alert("Failed to add new compilation: " + err.message);
