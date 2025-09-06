@@ -63,20 +63,28 @@ window.loadLeaderboard = function () {
 // Run function when page loads
 // Global functions so they can be used in HTML
 window.signUp = function () {
-  const username = document.getElementById("signup-username").value.trim();
+  const originalUsername = document.getElementById("signup-username").value.trim();
   const password = document.getElementById("signup-password").value;
+  const username = originalUsername.toLowerCase(); // Normalize to lowercase for storage
 
-  if (!username || !password) {
+  if (!originalUsername || !password) {
     alert("Username and password are required!");
     return;
   }
 
-  if (username.length > 15) {
+  if (originalUsername.length > 15) {
     alert("Username cannot be longer than 15 characters!");
     return;
   }
 
   const fakeEmail = `${username}@punkarchives.com`;
+
+  // Disable the signup button to prevent multiple submissions
+  const signupButton = document.querySelector('button[onclick="signUp()"]');
+  if (signupButton) {
+    signupButton.disabled = true;
+    signupButton.textContent = "Creating Account...";
+  }
 
   // Fetch user's IP address
   fetch("https://api64.ipify.org?format=json")
@@ -86,46 +94,49 @@ window.signUp = function () {
 
       // Check if IP is banned
       const bannedIPsRef = ref(db, "banned_ips/" + userIP);
-      get(bannedIPsRef).then((snapshot) => {
+      return get(bannedIPsRef).then((snapshot) => {
         if (snapshot.exists()) {
-          alert("Sign-up denied: This IP address has been banned.");
-          return;
+          throw new Error("Sign-up denied: This IP address has been banned.");
         }
-
-        // Check if username already exists
-        const userRef = ref(db, "users/" + username);
-        get(userRef).then((snapshot) => {
-          if (snapshot.exists()) {
-            alert("Username already taken!");
-          } else {
-            // Create account with Firebase
-            createUserWithEmailAndPassword(auth, fakeEmail, password)
-              .then((userCredential) => {
-                const userId = userCredential.user.uid;
-
-                // Store the username, userId, initial points, and IP in the database
-                set(ref(db, "users/" + username), { 
-                  userId: userId,
-                  points: 0, // Initial points set to 0
-                  ip: userIP // Store IP address
-                })
-                .then(() => {
-                  alert("Sign-up successful! You can now log in.");
-                })
-                .catch((error) => {
-                  console.error("Database error:", error);
-                });
-              })
-              .catch((error) => {
-                alert("Sign-up error: " + error.message);
-              });
-          }
-        });
+        
+        // First, try to create the Firebase account
+        return createUserWithEmailAndPassword(auth, fakeEmail, password);
       });
     })
-    .catch(error => {
-      console.error("IP fetch error:", error);
-      alert("Error: Check your internet connection.");
+    .then((userCredential) => {
+      const userId = userCredential.user.uid;
+      
+      // Store user data with proper capitalization in database
+      return set(ref(db, "users/" + originalUsername), { 
+        userId: userId,
+        points: 0,
+        ip: userIP
+      });
+    })
+    .then(() => {
+      alert("Sign-up successful! You can now log in.");
+      // Clear the form
+      document.getElementById("signup-username").value = "";
+      document.getElementById("signup-password").value = "";
+    })
+    .catch((error) => {
+      console.error("Sign-up error:", error);
+      
+      // Handle specific Firebase errors
+      if (error.code === 'auth/email-already-in-use') {
+        alert("Username already taken! Please choose a different username.");
+      } else if (error.code === 'auth/weak-password') {
+        alert("Password is too weak. Please choose a stronger password.");
+      } else {
+        alert("Sign-up error: " + error.message);
+      }
+    })
+    .finally(() => {
+      // Re-enable the signup button
+      if (signupButton) {
+        signupButton.disabled = false;
+        signupButton.textContent = "Sign Up";
+      }
     });
 };
 
@@ -134,8 +145,30 @@ window.displayUsername = function () {
   onAuthStateChanged(auth, (user) => {
     if (user) {
       const email = user.email;
-      const username = email.replace("@punkarchives.com", ""); // Extract username from email
-      document.getElementById("logged-in-user").innerText = username;
+      const username = email.replace("@punkarchives.com", ""); // Extract username from email (lowercase)
+      
+      // Find the user in the database to get the proper capitalization
+      const usersRef = ref(db, "users");
+      get(usersRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          const users = snapshot.val();
+          // Find the user by matching the userId
+          const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
+          if (userEntry) {
+            const displayUsername = userEntry[0]; // This is the properly capitalized username
+            document.getElementById("logged-in-user").innerText = displayUsername;
+          } else {
+            // Fallback to lowercase username if no match found
+            document.getElementById("logged-in-user").innerText = username;
+          }
+        } else {
+          // Fallback to lowercase username if no users found
+          document.getElementById("logged-in-user").innerText = username;
+        }
+      }).catch((error) => {
+        // Fallback to lowercase username on error
+        document.getElementById("logged-in-user").innerText = username;
+      });
     } else {
       document.getElementById("logged-in-user").innerText = "Not logged in.";
     }
@@ -148,21 +181,23 @@ window.onload = function () {
 };
 
 window.login = function () {
-  const username = document.getElementById("login-username").value;
+  const originalUsername = document.getElementById("login-username").value;
   const password = document.getElementById("login-password").value;
+  const username = originalUsername.toLowerCase(); // Normalize to lowercase for Firebase Auth
 
-  if (!username || !password) {
+  if (!originalUsername || !password) {
     alert("Username and password are required!");
     return;
   }
 
-  // Look up the username in the database to find the fake email
-  const userRef = ref(db, "users/" + username);
-  get(userRef).then((snapshot) => {
+  // Try to find the user by checking both lowercase and original capitalization
+  const userRefLower = ref(db, "users/" + username);
+  const userRefOriginal = ref(db, "users/" + originalUsername);
+  
+  // First try lowercase lookup
+  get(userRefLower).then((snapshot) => {
     if (snapshot.exists()) {
       const fakeEmail = `${username}@punkarchives.com`;
-
-      // Log in using the fake email
       signInWithEmailAndPassword(auth, fakeEmail, password)
         .then((userCredential) => {
           alert("Login successful!");
@@ -171,7 +206,21 @@ window.login = function () {
           alert("Login error: " + error.message);
         });
     } else {
-      alert("Username not found.");
+      // If not found with lowercase, try original capitalization
+      get(userRefOriginal).then((snapshot) => {
+        if (snapshot.exists()) {
+          const fakeEmail = `${username}@punkarchives.com`;
+          signInWithEmailAndPassword(auth, fakeEmail, password)
+            .then((userCredential) => {
+              alert("Login successful!");
+            })
+            .catch((error) => {
+              alert("Login error: " + error.message);
+            });
+        } else {
+          alert("Username not found.");
+        }
+      });
     }
   });
 };
@@ -212,7 +261,20 @@ window.saveBand = function () {
     return;
   }
 
-  const username = user.email.replace("@punkarchives.com", "");
+  const lowercaseUsername = user.email.replace("@punkarchives.com", "").toLowerCase();
+  
+  // Find the proper capitalized username from database
+  const usersRef = ref(db, "users");
+  const usersSnapshot = await get(usersRef);
+  let username = lowercaseUsername; // fallback
+  
+  if (usersSnapshot.exists()) {
+    const users = usersSnapshot.val();
+    const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
+    if (userEntry) {
+      username = userEntry[0]; // This is the properly capitalized username
+    }
+  }
 const bandName = getValue("bandband-name");
 
 
@@ -268,7 +330,20 @@ window.saveBand2 = function () {
     return;
   }
 
-  const username = user.email.replace("@punkarchives.com", "");
+  const lowercaseUsername = user.email.replace("@punkarchives.com", "").toLowerCase();
+  
+  // Find the proper capitalized username from database
+  const usersRef = ref(db, "users");
+  const usersSnapshot = await get(usersRef);
+  let username = lowercaseUsername; // fallback
+  
+  if (usersSnapshot.exists()) {
+    const users = usersSnapshot.val();
+    const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
+    if (userEntry) {
+      username = userEntry[0]; // This is the properly capitalized username
+    }
+  }
 const bandName = getValue("zinezine-name");
 
 
@@ -320,7 +395,20 @@ window.saveBand3 = function () {
     return;
   }
 
-  const username = user.email.replace("@punkarchives.com", "");
+  const lowercaseUsername = user.email.replace("@punkarchives.com", "").toLowerCase();
+  
+  // Find the proper capitalized username from database
+  const usersRef = ref(db, "users");
+  const usersSnapshot = await get(usersRef);
+  let username = lowercaseUsername; // fallback
+  
+  if (usersSnapshot.exists()) {
+    const users = usersSnapshot.val();
+    const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
+    if (userEntry) {
+      username = userEntry[0]; // This is the properly capitalized username
+    }
+  }
 const bandName = getValue("complabel-name");
 
 
@@ -373,7 +461,20 @@ window.saveBand4 = function () {
     return;
   }
 
-  const username = user.email.replace("@punkarchives.com", "");
+  const lowercaseUsername = user.email.replace("@punkarchives.com", "").toLowerCase();
+  
+  // Find the proper capitalized username from database
+  const usersRef = ref(db, "users");
+  const usersSnapshot = await get(usersRef);
+  let username = lowercaseUsername; // fallback
+  
+  if (usersSnapshot.exists()) {
+    const users = usersSnapshot.val();
+    const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
+    if (userEntry) {
+      username = userEntry[0]; // This is the properly capitalized username
+    }
+  }
 const bandName = getValue("labellabel-name");
 
 
@@ -418,20 +519,28 @@ window.onload = function () {
 
 // Global functions so they can be used in HTML
 window.signUp = function () {
-  const username = document.getElementById("signup-username").value.trim();
+  const originalUsername = document.getElementById("signup-username").value.trim();
   const password = document.getElementById("signup-password").value;
+  const username = originalUsername.toLowerCase(); // Normalize to lowercase for storage
 
-  if (!username || !password) {
+  if (!originalUsername || !password) {
     alert("Username and password are required!");
     return;
   }
 
-  if (username.length > 15) {
+  if (originalUsername.length > 15) {
     alert("Username cannot be longer than 15 characters!");
     return;
   }
 
   const fakeEmail = `${username}@punkarchives.com`;
+
+  // Disable the signup button to prevent multiple submissions
+  const signupButton = document.querySelector('button[onclick="signUp()"]');
+  if (signupButton) {
+    signupButton.disabled = true;
+    signupButton.textContent = "Creating Account...";
+  }
 
   // Fetch user's IP address
   fetch("https://api64.ipify.org?format=json")
@@ -439,39 +548,51 @@ window.signUp = function () {
     .then(data => {
       const userIP = data.ip; // Store user's IP address
 
-        // Check if username already exists
-        const userRef = ref(db, "users/" + username);
-        get(userRef).then((snapshot) => {
-          if (snapshot.exists()) {
-            alert("Username already taken!");
-          } else {
-            // Create account with Firebase
-            createUserWithEmailAndPassword(auth, fakeEmail, password)
-              .then((userCredential) => {
-                const userId = userCredential.user.uid;
-
-                // Store the username, userId, initial points, and IP in the database
-                set(ref(db, "users/" + username), { 
-                  userId: userId,
-                  points: 0, // Initial points set to 0
-                  ip: userIP // Store IP address
-                })
-                .then(() => {
-                  alert("Sign-up successful! You can now log in.");
-                })
-                .catch((error) => {
-                  console.error("Database error:", error);
-                });
-              })
-              .catch((error) => {
-                alert("Sign-up error: " + error.message);
-              });
-          }
+      // Check if IP is banned
+      const bannedIPsRef = ref(db, "banned_ips/" + userIP);
+      return get(bannedIPsRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          throw new Error("Sign-up denied: This IP address has been banned.");
+        }
+        
+        // First, try to create the Firebase account
+        return createUserWithEmailAndPassword(auth, fakeEmail, password);
       });
     })
-    .catch(error => {
-      console.error("IP fetch error:", error);
-      alert("Error: Check your internet connection.");
+    .then((userCredential) => {
+      const userId = userCredential.user.uid;
+      
+      // Store user data with proper capitalization in database
+      return set(ref(db, "users/" + originalUsername), { 
+        userId: userId,
+        points: 0,
+        ip: userIP
+      });
+    })
+    .then(() => {
+      alert("Sign-up successful! You can now log in.");
+      // Clear the form
+      document.getElementById("signup-username").value = "";
+      document.getElementById("signup-password").value = "";
+    })
+    .catch((error) => {
+      console.error("Sign-up error:", error);
+      
+      // Handle specific Firebase errors
+      if (error.code === 'auth/email-already-in-use') {
+        alert("Username already taken! Please choose a different username.");
+      } else if (error.code === 'auth/weak-password') {
+        alert("Password is too weak. Please choose a stronger password.");
+      } else {
+        alert("Sign-up error: " + error.message);
+      }
+    })
+    .finally(() => {
+      // Re-enable the signup button
+      if (signupButton) {
+        signupButton.disabled = false;
+        signupButton.textContent = "Sign Up";
+      }
     });
 };
 
@@ -480,8 +601,30 @@ window.displayUsername = function () {
   onAuthStateChanged(auth, (user) => {
     if (user) {
       const email = user.email;
-      const username = email.replace("@punkarchives.com", ""); // Extract username from email
-      document.getElementById("logged-in-user").innerText = username;
+      const username = email.replace("@punkarchives.com", ""); // Extract username from email (lowercase)
+      
+      // Find the user in the database to get the proper capitalization
+      const usersRef = ref(db, "users");
+      get(usersRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          const users = snapshot.val();
+          // Find the user by matching the userId
+          const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
+          if (userEntry) {
+            const displayUsername = userEntry[0]; // This is the properly capitalized username
+            document.getElementById("logged-in-user").innerText = displayUsername;
+          } else {
+            // Fallback to lowercase username if no match found
+            document.getElementById("logged-in-user").innerText = username;
+          }
+        } else {
+          // Fallback to lowercase username if no users found
+          document.getElementById("logged-in-user").innerText = username;
+        }
+      }).catch((error) => {
+        // Fallback to lowercase username on error
+        document.getElementById("logged-in-user").innerText = username;
+      });
     } else {
       document.getElementById("logged-in-user").innerText = "Not logged in.";
     }
@@ -494,21 +637,23 @@ window.onload = function () {
 };
 
 window.login = function () {
-  const username = document.getElementById("login-username").value;
+  const originalUsername = document.getElementById("login-username").value;
   const password = document.getElementById("login-password").value;
+  const username = originalUsername.toLowerCase(); // Normalize to lowercase for Firebase Auth
 
-  if (!username || !password) {
+  if (!originalUsername || !password) {
     alert("Username and password are required!");
     return;
   }
 
-  // Look up the username in the database to find the fake email
-  const userRef = ref(db, "users/" + username);
-  get(userRef).then((snapshot) => {
+  // Try to find the user by checking both lowercase and original capitalization
+  const userRefLower = ref(db, "users/" + username);
+  const userRefOriginal = ref(db, "users/" + originalUsername);
+  
+  // First try lowercase lookup
+  get(userRefLower).then((snapshot) => {
     if (snapshot.exists()) {
       const fakeEmail = `${username}@punkarchives.com`;
-
-      // Log in using the fake email
       signInWithEmailAndPassword(auth, fakeEmail, password)
         .then((userCredential) => {
           alert("Login successful!");
@@ -517,7 +662,21 @@ window.login = function () {
           alert("Login error: " + error.message);
         });
     } else {
-      alert("Username not found.");
+      // If not found with lowercase, try original capitalization
+      get(userRefOriginal).then((snapshot) => {
+        if (snapshot.exists()) {
+          const fakeEmail = `${username}@punkarchives.com`;
+          signInWithEmailAndPassword(auth, fakeEmail, password)
+            .then((userCredential) => {
+              alert("Login successful!");
+            })
+            .catch((error) => {
+              alert("Login error: " + error.message);
+            });
+        } else {
+          alert("Username not found.");
+        }
+      });
     }
   });
 };

@@ -28,9 +28,25 @@ async function isUserTrusted() {
   if (!user) return false;
   
   try {
+    const lowercaseUsername = user.email.replace("@punkarchives.com", "").toLowerCase();
+    
+    // Find the proper capitalized username from database
+    const usersRef = ref(db, "users");
+    const usersSnapshot = await get(usersRef);
+    let properUsername = lowercaseUsername; // fallback
+    
+    if (usersSnapshot.exists()) {
+      const users = usersSnapshot.val();
+      const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
+      if (userEntry) {
+        properUsername = userEntry[0]; // This is the properly capitalized username
+      }
+    }
+    
     const possiblePaths = [
       `users/${user.uid}`,
-      `users/${user.email.replace("@punkarchives.com", "")}`,
+      `users/${properUsername}`,
+      `users/${lowercaseUsername}`,
       `users/nxdx`
     ];
     

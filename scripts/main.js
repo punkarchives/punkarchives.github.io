@@ -65,50 +65,69 @@ window.onload = function () {
 
 // Global functions so they can be used in HTML
 window.signUp = function () {
-  const username = document.getElementById("signup-username").value.trim();
+  const originalUsername = document.getElementById("signup-username").value.trim();
   const password = document.getElementById("signup-password").value;
+  const username = originalUsername.toLowerCase(); // Normalize to lowercase for storage
 
-  if (!username || !password) {
+  if (!originalUsername || !password) {
     alert("Username and password are required!");
     return;
   }
 
-  if (username.length > 15) {
+  if (originalUsername.length > 15) {
     alert("Username cannot be longer than 15 characters!");
     return;
   }
 
   const fakeEmail = `${username}@punkarchives.com`;
 
-        // Check if username already exists
-        const userRef = ref(db, "users/" + username);
-        get(userRef).then((snapshot) => {
-          if (snapshot.exists()) {
-            alert("Username already taken!");
-          } else {
-            // Create account with Firebase
-            createUserWithEmailAndPassword(auth, fakeEmail, password)
-              .then((userCredential) => {
-                const userId = userCredential.user.uid;
+  // Disable the signup button to prevent multiple submissions
+  const signupButton = document.querySelector('button[onclick="signUp()"]');
+  if (signupButton) {
+    signupButton.disabled = true;
+    signupButton.textContent = "Creating Account...";
+  }
 
-
-                set(ref(db, "users/" + username), { 
-                  userId: userId,
-                  points: 0, // Initial points set to 0
-                  creationDate: new Date().toISOString() // Store creation date
-                })
-                .then(() => {
-                })
-                .catch((error) => {
-                  console.error("Database error:", error);
-                });
-              })
-              .catch((error) => {
-                alert("Sign-up error: " + error.message);
-              });
-          }
+  // Use a transaction to atomically check and create the user
+  const userRef = ref(db, "users/" + username);
+  
+  // First, try to create the Firebase account
+  createUserWithEmailAndPassword(auth, fakeEmail, password)
+    .then((userCredential) => {
+      const userId = userCredential.user.uid;
+      
+      // Store user data with proper capitalization in database
+      return set(ref(db, "users/" + originalUsername), { 
+        userId: userId,
+        points: 0,
+        creationDate: new Date().toISOString()
       });
-    
+    })
+    .then(() => {
+      alert("Sign-up successful! You can now log in.");
+      // Clear the form
+      document.getElementById("signup-username").value = "";
+      document.getElementById("signup-password").value = "";
+    })
+    .catch((error) => {
+      console.error("Sign-up error:", error);
+      
+      // Handle specific Firebase errors
+      if (error.code === 'auth/email-already-in-use') {
+        alert("Username already taken! Please choose a different username.");
+      } else if (error.code === 'auth/weak-password') {
+        alert("Password is too weak. Please choose a stronger password.");
+      } else {
+        alert("Sign-up error: " + error.message);
+      }
+    })
+    .finally(() => {
+      // Re-enable the signup button
+      if (signupButton) {
+        signupButton.disabled = false;
+        signupButton.textContent = "Sign Up";
+      }
+    });
 };
 
 // Function to display logged-in username
@@ -116,8 +135,30 @@ window.displayUsername = function () {
   onAuthStateChanged(auth, (user) => {
     if (user) {
       const email = user.email;
-      const username = email.replace("@punkarchives.com", ""); // Extract username from email
-      document.getElementById("logged-in-user").innerHTML = `<u><a href="user.html?user=${encodeURIComponent(username)}" style="color: #fff; text-decoration: none;">${username}</a></u>`;
+      const username = email.replace("@punkarchives.com", ""); // Extract username from email (lowercase)
+      
+      // Find the user in the database to get the proper capitalization
+      const usersRef = ref(db, "users");
+      get(usersRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          const users = snapshot.val();
+          // Find the user by matching the userId
+          const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
+          if (userEntry) {
+            const displayUsername = userEntry[0]; // This is the properly capitalized username
+            document.getElementById("logged-in-user").innerHTML = `<u><a href="user.html?user=${encodeURIComponent(displayUsername)}" style="color: #fff; text-decoration: none;">${displayUsername}</a></u>`;
+          } else {
+            // Fallback to lowercase username if no match found
+            document.getElementById("logged-in-user").innerHTML = `<u><a href="user.html?user=${encodeURIComponent(username)}" style="color: #fff; text-decoration: none;">${username}</a></u>`;
+          }
+        } else {
+          // Fallback to lowercase username if no users found
+          document.getElementById("logged-in-user").innerHTML = `<u><a href="user.html?user=${encodeURIComponent(username)}" style="color: #fff; text-decoration: none;">${username}</a></u>`;
+        }
+      }).catch((error) => {
+        // Fallback to lowercase username on error
+        document.getElementById("logged-in-user").innerHTML = `<u><a href="user.html?user=${encodeURIComponent(username)}" style="color: #fff; text-decoration: none;">${username}</a></u>`;
+      });
     } else {
       document.getElementById("logged-in-user").innerText = "Not logged in.";
     }
@@ -130,21 +171,23 @@ window.onload = function () {
 };
 
 window.login = function () {
-  const username = document.getElementById("login-username").value;
+  const originalUsername = document.getElementById("login-username").value;
   const password = document.getElementById("login-password").value;
+  const username = originalUsername.toLowerCase(); // Normalize to lowercase for Firebase Auth
 
-  if (!username || !password) {
+  if (!originalUsername || !password) {
     alert("Username and password are required!");
     return;
   }
 
-  // Look up the username in the database to find the fake email
-  const userRef = ref(db, "users/" + username);
-  get(userRef).then((snapshot) => {
+  // Try to find the user by checking both lowercase and original capitalization
+  const userRefLower = ref(db, "users/" + username);
+  const userRefOriginal = ref(db, "users/" + originalUsername);
+  
+  // First try lowercase lookup
+  get(userRefLower).then((snapshot) => {
     if (snapshot.exists()) {
       const fakeEmail = `${username}@punkarchives.com`;
-
-      // Log in using the fake email
       signInWithEmailAndPassword(auth, fakeEmail, password)
         .then((userCredential) => {
           ;
@@ -153,7 +196,21 @@ window.login = function () {
           alert("Login error: " + error.message);
         });
     } else {
-      alert("Username not found.");
+      // If not found with lowercase, try original capitalization
+      get(userRefOriginal).then((snapshot) => {
+        if (snapshot.exists()) {
+          const fakeEmail = `${username}@punkarchives.com`;
+          signInWithEmailAndPassword(auth, fakeEmail, password)
+            .then((userCredential) => {
+              ;
+            })
+            .catch((error) => {
+              alert("Login error: " + error.message);
+            });
+        } else {
+          alert("Username not found.");
+        }
+      });
     }
   });
 };

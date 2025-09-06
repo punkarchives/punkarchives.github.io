@@ -155,18 +155,34 @@ function addEntry(type) {
       if (type === "band") {
         const user = auth.currentUser;
         if (user) {
-          const username = user.email.split('@')[0]; // or however your usernames are stored
-          const userRef = ref(db, `users/${username}/points`);
-
-          get(userRef).then((snapshot) => {
-            let currentPoints = 0;
-            if (snapshot.exists()) {
-              currentPoints = snapshot.val();
+          const lowercaseUsername = user.email.replace("@punkarchives.com", "").toLowerCase();
+          
+          // Find the proper capitalized username from database
+          const usersRef = ref(db, "users");
+          get(usersRef).then((usersSnapshot) => {
+            let properUsername = lowercaseUsername; // fallback
+            
+            if (usersSnapshot.exists()) {
+              const users = usersSnapshot.val();
+              const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
+              if (userEntry) {
+                properUsername = userEntry[0]; // This is the properly capitalized username
+              }
             }
+            
+            const userRef = ref(db, `users/${properUsername}/points`);
+            get(userRef).then((snapshot) => {
+              let currentPoints = 0;
+              if (snapshot.exists()) {
+                currentPoints = snapshot.val();
+              }
 
-            set(userRef, currentPoints + 1);
+              set(userRef, currentPoints + 1);
+            }).catch((error) => {
+              console.error("Error updating points:", error);
+            });
           }).catch((error) => {
-            console.error("Error updating points:", error);
+            console.error("Error finding user:", error);
           });
         }
       }

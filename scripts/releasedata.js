@@ -23,9 +23,25 @@ async function isUserTrusted() {
   if (!user) return false;
   
   try {
+    const lowercaseUsername = user.email.replace("@punkarchives.com", "").toLowerCase();
+    
+    // Find the proper capitalized username from database
+    const usersRef = ref(db, "users");
+    const usersSnapshot = await get(usersRef);
+    let properUsername = lowercaseUsername; // fallback
+    
+    if (usersSnapshot.exists()) {
+      const users = usersSnapshot.val();
+      const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
+      if (userEntry) {
+        properUsername = userEntry[0]; // This is the properly capitalized username
+      }
+    }
+    
     const possiblePaths = [
       `users/${user.uid}`,
-      `users/${user.email.replace("@punkarchives.com", "")}`,
+      `users/${properUsername}`,
+      `users/${lowercaseUsername}`,
       `users/nxdx`
     ];
     
@@ -588,11 +604,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Setup collection button
     const collectionBtn = document.getElementById('collection-btn');
     if (collectionBtn && currentUser) {
-      const username = currentUser.email.replace("@punkarchives.com", "");
+      const username = currentUser.email.replace("@punkarchives.com", "").toLowerCase();
+      
+      // Find the proper capitalized username from database
+      const usersRef = ref(db, "users");
+      const usersSnapshot = await get(usersRef);
+      let properUsername = username; // fallback
+      
+      if (usersSnapshot.exists()) {
+        const users = usersSnapshot.val();
+        const userEntry = Object.entries(users).find(([key, data]) => data.userId === currentUser.uid);
+        if (userEntry) {
+          properUsername = userEntry[0]; // This is the properly capitalized username
+        }
+      }
+      
       const releaseId = await getReleaseId(bandName, releaseTitle);
       
       if (releaseId !== null) {
-        const inCollection = await isInCollection(username, bandName, releaseId);
+        const inCollection = await isInCollection(properUsername, bandName, releaseId);
         
         if (inCollection) {
           collectionBtn.textContent = 'Remove from Collection';
@@ -603,16 +633,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         
         collectionBtn.addEventListener('click', async () => {
-          const currentInCollection = await isInCollection(username, bandName, releaseId);
+          const currentInCollection = await isInCollection(properUsername, bandName, releaseId);
           
           if (currentInCollection) {
-            const success = await removeFromCollection(username, bandName, releaseId);
+            const success = await removeFromCollection(properUsername, bandName, releaseId);
             if (success) {
               collectionBtn.textContent = 'Add to Collection';
               collectionBtn.style.backgroundColor = '#aa0000';
             }
           } else {
-            const success = await addToCollection(username, bandName, releaseId, releaseTitle, release.year);
+            const success = await addToCollection(properUsername, bandName, releaseId, releaseTitle, release.year);
             if (success) {
               collectionBtn.textContent = 'Remove from Collection';
               collectionBtn.style.backgroundColor = '#cc0000';

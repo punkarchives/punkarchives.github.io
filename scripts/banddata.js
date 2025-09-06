@@ -504,7 +504,20 @@ flagBtn.addEventListener("click", async () => {
     // Setup collection buttons for band page
     const currentUser = auth.currentUser;
     if (currentUser) {
-      const username = currentUser.email.replace("@punkarchives.com", "");
+      const username = currentUser.email.replace("@punkarchives.com", "").toLowerCase();
+      
+      // Find the proper capitalized username from database
+      const usersRef = ref(db, "users");
+      const usersSnapshot = await get(usersRef);
+      let properUsername = username; // fallback
+      
+      if (usersSnapshot.exists()) {
+        const users = usersSnapshot.val();
+        const userEntry = Object.entries(users).find(([key, data]) => data.userId === currentUser.uid);
+        if (userEntry) {
+          properUsername = userEntry[0]; // This is the properly capitalized username
+        }
+      }
       
       document.querySelectorAll(".collection-btn").forEach(async (button) => {
         const bandName = button.getAttribute("data-band");
@@ -514,7 +527,7 @@ flagBtn.addEventListener("click", async () => {
         const releaseId = await getReleaseId(bandName, releaseTitle);
         
         if (releaseId !== null) {
-          const inCollection = await isInCollection(username, bandName, releaseId);
+          const inCollection = await isInCollection(properUsername, bandName, releaseId);
           
           if (inCollection) {
             button.textContent = 'Remove from Collection';
@@ -525,16 +538,16 @@ flagBtn.addEventListener("click", async () => {
           }
           
           button.addEventListener('click', async () => {
-            const currentInCollection = await isInCollection(username, bandName, releaseId);
+            const currentInCollection = await isInCollection(properUsername, bandName, releaseId);
             
             if (currentInCollection) {
-              const success = await removeFromCollection(username, bandName, releaseId);
+              const success = await removeFromCollection(properUsername, bandName, releaseId);
               if (success) {
                 button.textContent = 'Add to Collection';
                 button.style.backgroundColor = '#aa0000';
               }
             } else {
-              const success = await addToCollection(username, bandName, releaseId, releaseTitle, releaseYear);
+              const success = await addToCollection(properUsername, bandName, releaseId, releaseTitle, releaseYear);
               if (success) {
                 button.textContent = 'Remove from Collection';
                 button.style.backgroundColor = '#cc0000';

@@ -212,9 +212,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     const currentUser = auth.currentUser;
     let currentUsername = null;
 
-    // Get current logged-in username
+    // Get current logged-in username with proper capitalization
     if (currentUser && currentUser.email) {
-      currentUsername = currentUser.email.replace("@punkarchives.com", "");
+      const lowercaseUsername = currentUser.email.replace("@punkarchives.com", "").toLowerCase();
+      
+      // Find the proper capitalized username from database
+      const usersRef = ref(db, "users");
+      const usersSnapshot = await get(usersRef);
+      
+      if (usersSnapshot.exists()) {
+        const users = usersSnapshot.val();
+        const userEntry = Object.entries(users).find(([key, data]) => data.userId === currentUser.uid);
+        if (userEntry) {
+          currentUsername = userEntry[0]; // This is the properly capitalized username
+        } else {
+          currentUsername = lowercaseUsername; // fallback
+        }
+      } else {
+        currentUsername = lowercaseUsername; // fallback
+      }
     }
 
     const isOwnProfile = currentUsername === username;
@@ -349,7 +365,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const newUrl = prompt("Enter the URL for your profile picture:", currentPictureUrl);
         
         if (newUrl !== null) { // User didn't cancel
-          // Update the profile picture in Firebase
+          // Update the profile picture in Firebase using proper capitalization
           set(ref(db, `users/${username}/profilePicture`), newUrl)
             .then(() => {
               // Update the display
