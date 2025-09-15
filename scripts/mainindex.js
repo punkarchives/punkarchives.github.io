@@ -34,7 +34,11 @@ window.loadLeaderboard = function () {
         const sortedUsers = Object.entries(users)
           .map(([username, data]) => ({
             username: username,
-            points: data.points || 0, 
+            points: data.points || 0,
+            monthlyBands: data.monthly_bands_points || 0,
+            monthlyReleases: data.monthly_releases_points || 0,
+            monthlyBandsDate: data.monthly_bands_date || 'Never',
+            monthlyReleasesDate: data.monthly_releases_date || 'Never'
           }))
           .sort((a, b) => b.points - a.points) 
           .slice(0, 3); 
@@ -42,7 +46,11 @@ window.loadLeaderboard = function () {
         const sortedUsers2 = Object.entries(users)
           .map(([username, data]) => ({
             username: username,
-            points: data.points || 0, 
+            points: data.points || 0,
+            monthlyBands: data.monthly_bands_points || 0,
+            monthlyReleases: data.monthly_releases_points || 0,
+            monthlyBandsDate: data.monthly_bands_date || 'Never',
+            monthlyReleasesDate: data.monthly_releases_date || 'Never'
           }))
           .sort((a, b) => b.points - a.points) 
           .slice(0, 100); 
@@ -53,12 +61,14 @@ window.loadLeaderboard = function () {
 
         sortedUsers.forEach((user, index) => {
           const entry = document.createElement("p");
-          entry.textContent = `${user.username}: ${user.points}`;
+          entry.innerHTML = `${user.username}: ${user.points}<br>
+            <small style="color: #666;">Monthly Bands: ${user.monthlyBands} (${user.monthlyBandsDate}) | Monthly Releases: ${user.monthlyReleases} (${user.monthlyReleasesDate})</small>`;
           leaderboardDiv.appendChild(entry);
         });
         sortedUsers2.forEach((user, index) => {
           const entry = document.createElement("p");
-          entry.textContent = `${user.username}: ${user.points}`;
+          entry.innerHTML = `${user.username}: ${user.points}<br>
+            <small style="color: #666;">Monthly Bands: ${user.monthlyBands} (${user.monthlyBandsDate}) | Monthly Releases: ${user.monthlyReleases} (${user.monthlyReleasesDate})</small>`;
           leaderboardDiv2.appendChild(entry);
         });
       } else {

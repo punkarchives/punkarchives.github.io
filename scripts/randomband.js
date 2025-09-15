@@ -32,8 +32,41 @@ const firebaseConfig = {
         return;
       }
 
-      const randomBand = bandsArray[Math.floor(Math.random() * bandsArray.length)];
-      const bandName = encodeURIComponent(randomBand.band_name || "Unknown");
+      // Function to check if a band has valid genre information
+      function hasValidGenre(band) {
+        return band.genres && 
+               typeof band.genres === 'string' &&
+               band.genres.trim() !== '' && 
+               band.genres !== 'undefined' && 
+               band.genres !== 'N/A';
+      }
+
+      // Try to find a band with genre info by checking random bands one by one
+      let attempts = 0;
+      const maxAttempts = 50; // Prevent infinite loops
+      let randomBand = null;
+
+      while (attempts < maxAttempts) {
+        const randomIndex = Math.floor(Math.random() * bandsArray.length);
+        const candidateBand = bandsArray[randomIndex];
+        
+        if (hasValidGenre(candidateBand)) {
+          randomBand = candidateBand;
+          break;
+        }
+        attempts++;
+      }
+
+      // If we found a band with genre info, use it
+      if (randomBand) {
+        const bandName = encodeURIComponent(randomBand.band_name || "Unknown");
+        window.location.href = `band.html?band=${bandName}`;
+        return;
+      }
+
+      // If no band with genre info found after max attempts, pick any random band
+      const fallbackBand = bandsArray[Math.floor(Math.random() * bandsArray.length)];
+      const bandName = encodeURIComponent(fallbackBand.band_name || "Unknown");
       window.location.href = `band.html?band=${bandName}`;
     } catch (error) {
       console.error("Error fetching bands from Firebase:", error);

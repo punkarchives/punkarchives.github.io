@@ -143,47 +143,119 @@ function mapDiscogsToPunkArchives(discogsData) {
 function mapReleaseType(formats) {
   if (!formats || formats.length === 0) return '';
   
-  const format = formats[0];
-  const type = format.type?.toLowerCase() || '';
+  // Check all formats for release type information
+  for (const format of formats) {
+    const type = format.type?.toLowerCase() || '';
+    const descriptions = format.descriptions || [];
+    
+    // Check format type
+    if (type.includes('album') || type.includes('lp')) return 'Album';
+    if (type.includes('ep')) return 'EP';
+    if (type.includes('single')) return 'Single';
+    if (type.includes('split')) return 'Split';
+    if (type.includes('compilation')) return 'Compilation';
+    if (type.includes('demo')) return 'Demo';
+    if (type.includes('live')) return 'Live';
+    
+    // Check descriptions for release type hints
+    for (const desc of descriptions) {
+      const descLower = desc.toLowerCase();
+      if (descLower.includes('ep') && !descLower.includes('dep')) return 'EP';
+      if (descLower.includes('single')) return 'Single';
+      if (descLower.includes('split')) return 'Split';
+      if (descLower.includes('compilation')) return 'Compilation';
+      if (descLower.includes('demo')) return 'Demo';
+      if (descLower.includes('live')) return 'Live';
+      if (descLower.includes('album')) return 'Album';
+    }
+  }
   
-  if (type.includes('album') || type.includes('lp')) return 'Album';
-  if (type.includes('ep')) return 'EP';
-  if (type.includes('single')) return 'Single';
-  if (type.includes('split')) return 'Split';
-  if (type.includes('compilation')) return 'Compilation';
-  if (type.includes('demo')) return 'Demo';
-  if (type.includes('live')) return 'Live';
+  // If no specific type found, try to infer from format
+  const firstFormat = formats[0];
+  const firstType = firstFormat.type?.toLowerCase() || '';
   
-  return 'Album'; // Default
+  // Default based on format type
+  if (firstType.includes('vinyl') || firstType.includes('lp')) return 'Album';
+  if (firstType.includes('cd')) return 'Album'; // CDs are usually albums unless specified otherwise
+  if (firstType.includes('cassette')) return 'Album';
+  
+  return 'Album'; // Default fallback
 }
 
 // Map physical format
 function mapPhysicalFormat(formats) {
   if (!formats || formats.length === 0) return '';
-  
+
   const format = formats[0];
   const descriptions = format.descriptions || [];
-  
-  let formatStr = '';
-  
-  // Add format type
-  if (format.type) {
-    formatStr += format.type;
+
+  let formatParts = [];
+
+  // ✅ Use format.name instead of format.type
+  if (format.name) {
+    const nameLower = format.name.toLowerCase();
+    const isReleaseType = nameLower.includes('ep') || 
+                         nameLower.includes('single') || 
+                         nameLower.includes('album') || 
+                         nameLower.includes('compilation') ||
+                         nameLower.includes('demo') ||
+                         nameLower.includes('live') ||
+                         nameLower.includes('split');
+
+    if (!isReleaseType) {
+      formatParts.push(format.name);
+    }
   }
-  
-  // Add basic format descriptions to format field
+
+  // Add physical format descriptions
   descriptions.forEach(desc => {
-    if (desc.toLowerCase().includes('inch') || 
-        desc.toLowerCase().includes('rpm') ||
-        desc.toLowerCase().includes('cd') ||
-        desc.toLowerCase().includes('cassette') ||
-        desc.toLowerCase().includes('tape')) {
-      formatStr += ` ${desc}`;
+    const descLower = desc.toLowerCase();
+
+    if (descLower.includes('inch') ||
+        descLower.includes('rpm') ||
+        descLower.includes('cm') ||
+        descLower.includes('mm') ||
+        descLower.includes('7"') ||
+        descLower.includes('10"') ||
+        descLower.includes('12"') ||
+        descLower.includes('33') ||
+        descLower.includes('45') ||
+        descLower.includes('78') ||
+        descLower.includes('stereo') ||
+        descLower.includes('mono')) {
+      formatParts.push(desc);
     }
   });
-  
-  return formatStr.trim() || 'Unknown';
+
+  // If we still don't have Vinyl/CD/etc, check descriptions
+  if (!formatParts.some(part => 
+    part.toLowerCase().includes('vinyl') ||
+    part.toLowerCase().includes('cd') ||
+    part.toLowerCase().includes('cassette') ||
+    part.toLowerCase().includes('tape'))) {
+
+    for (const desc of descriptions) {
+      const descLower = desc.toLowerCase();
+      if (descLower.includes('vinyl') || descLower.includes('lp')) {
+        formatParts.unshift('Vinyl');
+        break;
+      } else if (descLower.includes('cd')) {
+        formatParts.unshift('CD');
+        break;
+      } else if (descLower.includes('cassette') || descLower.includes('tape')) {
+        formatParts.unshift('Cassette');
+        break;
+      }
+    }
+  }
+
+  let result = formatParts.join(' ').trim();
+  result = result.replace(/\s+/g, ' ');
+  result = result.replace(/,\s*,/g, ',');
+
+  return result || 'Unknown';
 }
+
 
 // Extract limitation info
 function extractLimitation(formats) {

@@ -175,6 +175,23 @@ document.addEventListener("DOMContentLoaded", async () => {
       `;
     }
 
+    function formatMultipleLabels(labelString) {
+      if (!labelString || labelString === "N/A") {
+        return "N/A";
+      }
+      
+      // Split by comma and create individual links
+      const labels = labelString.split(',').map(label => label.trim()).filter(label => label);
+      
+      if (labels.length === 0) {
+        return "N/A";
+      }
+      
+      return labels.map(label => 
+        `<a href="label.html?label=${encodeURIComponent(label)}" style="color: #ffaaaa;">${label}</a>`
+      ).join(', ');
+    }
+
     let bandHTML = `
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
@@ -315,7 +332,7 @@ if (band.releases?.length) {
           </div>
           <div class="info-item">
             <span class="info-label" style="color: #aa0000; font-weight: bold;">Label:</span>
-            <span class="info-value">${release.label ? `<a href="label.html?label=${encodeURIComponent(release.label)}" style="color: #ffaaaa;">${release.label}</a>` : "N/A"}</span>
+            <span class="info-value">${formatMultipleLabels(release.label)}</span>
           </div>
         </div>
         

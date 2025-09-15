@@ -810,7 +810,7 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
 
 
             if (band.releases?.length) {
-                bandHTML += `<hr><h2>Releases</h2>`;
+                bandHTML += `<hr><h2>Releases</h2><p>note: for release format, use either the first version or the vinyl version (assuming multiple were released at the same time)`;
 
                 const sortedReleases = band.releases
                     .map((release, originalIndex) => ({
@@ -994,6 +994,16 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
                             }
 
                             await set(userRef, currentPoints + 1);
+                            
+                            // Award monthly release points
+                            console.log('💿 Attempting to award monthly release points...');
+                            console.log('window.monthlyPoints available:', !!window.monthlyPoints);
+                            if (window.monthlyPoints && window.monthlyPoints.awardMonthlyReleasePoints) {
+                                console.log('✅ Calling awardMonthlyReleasePoints...');
+                                window.monthlyPoints.awardMonthlyReleasePoints();
+                            } else {
+                                console.log('❌ monthlyPoints or awardMonthlyReleasePoints not available');
+                            }
                         }
 
                         // Update local object and refresh the UI

@@ -38,13 +38,13 @@ window.loadLeaderboard = function () {
             points: data.points || 0, // Default to 0 if missing
           }))
           .sort((a, b) => b.points - a.points) // Sort by points
-          .slice(0, 3); // Get top 5
+          .slice(0, 3); // Get top 3
 
         const leaderboardDiv = document.getElementById("leaderboard");
 
         sortedUsers.forEach((user, index) => {
           const entry = document.createElement("p");
-          entry.innerHTML = `<u><a href="user.html?user=${encodeURIComponent(user.username)}" style="color: #fff; text-decoration: none;">${user.username}: ${user.points}</a></u>`;
+          entry.innerHTML = `<u><a href="user.html?user=${encodeURIComponent(user.username)}" style="color: #fff; text-decoration: none;">${user.username}: ${user.points}</a></u><br>`;
           leaderboardDiv.appendChild(entry);
         });
       } else {

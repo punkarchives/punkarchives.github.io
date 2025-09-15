@@ -15,6 +15,23 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+function formatMultipleLabels(labelString) {
+  if (!labelString || labelString === "N/A") {
+    return "N/A";
+  }
+  
+  // Split by comma and create individual links
+  const labels = labelString.split(',').map(label => label.trim()).filter(label => label);
+  
+  if (labels.length === 0) {
+    return "N/A";
+  }
+  
+  return labels.map(label => 
+    `<a href="label.html?label=${encodeURIComponent(label)}" style="color: #aa0000;">${label}</a>`
+  ).join(', ');
+}
+
 document.addEventListener("DOMContentLoaded", async function () {
   const urlParams = new URLSearchParams(window.location.search);
   const labelName = urlParams.get("label");
@@ -120,7 +137,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           <button class="download-image" data-image="${release.cover_image}" style="margin-left: 10px;">Download Image</button>
           <table class="release-details" style="border-collapse: collapse; border: 2px solid #aa0000;">
             <tr><td style="border: 1px solid #aa0000;"><strong>Artist(s):</strong></td><td style="border: 1px solid #aa0000;">${release.artist}</td></tr>
-            <tr><td style="border: 1px solid #aa0000;"><strong>Label:</strong></td><td style="border: 1px solid #aa0000;">${release.label || "N/A"}</td></tr>
+            <tr><td style="border: 1px solid #aa0000;"><strong>Label:</strong></td><td style="border: 1px solid #aa0000;">${formatMultipleLabels(release.label)}</td></tr>
             <tr><td style="border: 1px solid #aa0000;"><strong>Release Date:</strong></td><td style="border: 1px solid #aa0000;">${release.year || "Unknown"}</td></tr>
             <tr><td style="border: 1px solid #aa0000;"><strong>Type:</strong></td><td style="border: 1px solid #aa0000;">${release.release_type || "N/A"}</td></tr>
             <tr><td style="border: 1px solid #aa0000;"><strong>Format:</strong></td><td style="border: 1px solid #aa0000;">${release.physical_format || "N/A"}</td></tr>

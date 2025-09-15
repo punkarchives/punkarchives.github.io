@@ -27,6 +27,10 @@ get(child(dbRef, 'users')) // 'users' is the root node in your Firebase for user
       const users = Object.entries(usersObject).map(([username, data]) => ({
         username: username,
         points: data.points || 0,
+        monthlyBands: data.monthly_bands_points || 0,
+        monthlyReleases: data.monthly_releases_points || 0,
+        monthlyBandsDate: data.monthly_bands_date || 'Never',
+        monthlyReleasesDate: data.monthly_releases_date || 'Never',
         profilePicture: data.profilePicture || null,
         trusted: data.trusted || null,
         verytrusted: data.verytrusted || null

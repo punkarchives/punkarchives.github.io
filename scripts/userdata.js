@@ -80,53 +80,49 @@ async function loadUserCollection(username) {
 }
 
 async function generateAchievementsHTML(username, userData) {
-  const achievements = [];
+  // Define all possible achievements
+  const allAchievements = {
+    points: [
+      { emoji: "🖊️", text: "Newbie - Gained your first point", threshold: 1 },
+      { emoji: "📜", text: "Archivist - Gained 5 points", threshold: 5 },
+      { emoji: "📁", text: "Pro Archivist - Gained 50 points", threshold: 50 },
+      { emoji: "📔", text: "Legendary Archivist - Gained 250 points", threshold: 250 },
+      { emoji: "📚", text: "Archive God - Gained 1000 points", threshold: 1000 }
+    ],
+    reviews: [
+      { emoji: "✍️", text: "Critic - Wrote a review", threshold: 1 },
+      { emoji: "⭐", text: "Reporter - Wrote 5 reviews", threshold: 5 },
+      { emoji: "📝", text: "Snark - Wrote 25 reviews", threshold: 25 },
+      { emoji: "📷", text: "Paparazzi - Wrote 50 reviews", threshold: 50 },
+      { emoji: "📰", text: "Journalist - Wrote 100 reviews", threshold: 100 },
+      { emoji: "💯", text: "Perfect Score - Gave a 10/10 rating to a release", threshold: "perfect_score" },
+      { emoji: "🎨", text: "Variety Seeker - Reviewed releases from 20 different bands", threshold: "variety" }
+    ],
+    collection: [
+      { emoji: "💿", text: "Collector - Added 10 items to your collection", threshold: 10 },
+      { emoji: "🎵", text: "Music Lover - Added 50 items to your collection", threshold: 50 },
+      { emoji: "💽", text: "Vinyl Enthusiast - Added 100 items to your collection", threshold: 100 },
+      { emoji: "📀", text: "Record Hoarder - Added 250 items to your collection", threshold: 250 }
+    ],
+    account: [
+      { emoji: "👑", text: "OG Archivist - Joined Punk Archives in 2025", threshold: "og_2025" },
+      { emoji: "🎂", text: "Anniversary - Been a member for 1 year", threshold: 1 },
+      { emoji: "🏅", text: "Veteran - Been a member for 2+ years", threshold: 2 }
+    ]
+  };
   
-  if (userData.points >= 1) {
-    achievements.push({
-      emoji: "🖊️",
-      text: "Newbie - Gained your first point"
-    });
-  }
+  // Get user's current stats
+  let userStats = {
+    points: userData.points || 0,
+    reviews: 0,
+    collection: 0,
+    hasPerfectScore: false,
+    uniqueBands: 0,
+    yearsSinceJoin: 0,
+    joinYear: null
+  };
   
-  if (userData.points >= 5) {
-    achievements.push({
-      emoji: "📜",
-      text: "Archivist - Gained 5 points"
-    });
-  }
-
-  if (userData.points >= 50) {
-    achievements.push({
-      emoji: "📁",
-      text: "Pro Archivist - Gained 50 points"
-    });
-  }
-
-  if (userData.points >= 250) {
-    achievements.push({
-      emoji: "📔",
-      text: "Legendary Archivist - Gained 250 points"
-    });
-  }
-
-  if (userData.points >= 1000) {
-    achievements.push({
-      emoji: "📚",
-      text: "Archive God - Gained 1000 points"
-    });
-  }
-  
-  if (userData.creationDate) {
-    const joinYear = new Date(userData.creationDate).getFullYear();
-    if (joinYear === 2025) {
-      achievements.push({
-        emoji: "👑",
-        text: "OG Archivist - Joined Punk Archives in 2025"
-      });
-    }
-  }
-  
+  // Get review stats
   try {
     const reviewsRef = ref(db, 'reviews');
     const reviewsSnapshot = await get(reviewsRef);
@@ -135,24 +131,88 @@ async function generateAchievementsHTML(username, userData) {
       const userReviews = Object.values(allReviews).filter(review => 
         review.user === username
       );
-      if (userReviews.length > 0) {
-        achievements.push({
-          emoji: "✍️",
-          text: "Journalist - Wrote a review"
-        });
-      }
+      
+      userStats.reviews = userReviews.length;
+      userStats.hasPerfectScore = userReviews.some(review => review.rating === 10);
+      userStats.uniqueBands = new Set(userReviews.map(review => review.band)).size;
     }
   } catch (error) {
-    console.error('Error checking review achievement:', error);
+    console.error('Error checking review stats:', error);
   }
   
-  if (achievements.length === 0) {
-    return '<span style="color: #666;">No achievements yet</span>';
+  // Get collection stats
+  try {
+    const collectionRef = ref(db, `users/${username}/collection`);
+    const collectionSnapshot = await get(collectionRef);
+    if (collectionSnapshot.exists()) {
+      const collection = collectionSnapshot.val();
+      userStats.collection = Object.values(collection).length;
+    }
+  } catch (error) {
+    console.error('Error checking collection stats:', error);
   }
   
-  return achievements.map(achievement => 
-    `<span class="achievement" data-text="${achievement.text}" style="cursor: pointer; font-size: 20px;">${achievement.emoji}</span>`
-  ).join('');
+  // Get account age stats
+  if (userData.creationDate) {
+    const joinDate = new Date(userData.creationDate);
+    const now = new Date();
+    userStats.yearsSinceJoin = now.getFullYear() - joinDate.getFullYear();
+    userStats.joinYear = joinDate.getFullYear();
+  }
+  
+  // Helper function to check if achievement is earned
+  function isAchievementEarned(category, achievement) {
+    switch (category) {
+      case 'points':
+        return userStats.points >= achievement.threshold;
+      case 'reviews':
+        if (achievement.threshold === 'perfect_score') {
+          return userStats.hasPerfectScore;
+        } else if (achievement.threshold === 'variety') {
+          return userStats.uniqueBands >= 20;
+        } else {
+          return userStats.reviews >= achievement.threshold;
+        }
+      case 'collection':
+        return userStats.collection >= achievement.threshold;
+      case 'account':
+        if (achievement.threshold === 'og_2025') {
+          return userStats.joinYear === 2025;
+        } else {
+          return userStats.yearsSinceJoin >= achievement.threshold;
+        }
+      default:
+        return false;
+    }
+  }
+  
+  // Build HTML with categories
+  let html = '';
+  const categories = [
+    { name: 'Points', key: 'points' },
+    { name: 'Reviews', key: 'reviews' },
+    { name: 'Collection', key: 'collection' },
+    { name: 'Account Age', key: 'account' }
+  ];
+  
+  categories.forEach((category, index) => {
+    if (index > 0) {
+      html += '<br>';
+    }
+    
+    html += `<div style="margin-bottom: 8px;">
+      <strong style="color: #aa0000; font-size: 12px;">${category.name}:</strong><br>
+      ${allAchievements[category.key].map(achievement => {
+        const isEarned = isAchievementEarned(category.key, achievement);
+        const opacity = isEarned ? '1' : '0.1';
+        const cursor = isEarned ? 'pointer' : 'default';
+        
+        return `<span class="achievement" data-text="${achievement.text}" style="cursor: ${cursor}; font-size: 14px; margin-right: 3px; opacity: ${opacity};">${achievement.emoji}</span>`;
+      }).join('')}
+    </div>`;
+  });
+  
+  return html;
 }
 
 async function loadUserReviews(username) {
@@ -293,7 +353,7 @@ document.addEventListener("DOMContentLoaded", async () => {
          </div>
          
          <div style="text-align: center;">
-           <div id="profile-picture-container">
+           <div id="profile-picture-container" style="display: flex; justify-content: center; align-items: center;">
              ${userData.profilePicture ? 
                `<img src="${userData.profilePicture}" alt="${username}'s profile picture" style="max-width: 200px; height: auto; border: 2px solid #aa0000;" />` : 
                `<div style="width: 200px; height: 200px; border: 2px solid #aa0000; display: flex; align-items: center; justify-content: center; background-color: #333;">

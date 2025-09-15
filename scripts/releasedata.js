@@ -178,6 +178,23 @@ async function removeFromCollection(username, bandName, releaseId) {
   }
 }
 
+function formatMultipleLabels(labelString) {
+  if (!labelString || labelString === "N/A") {
+    return "N/A";
+  }
+  
+  // Split by comma and create individual links
+  const labels = labelString.split(',').map(label => label.trim()).filter(label => label);
+  
+  if (labels.length === 0) {
+    return "N/A";
+  }
+  
+  return labels.map(label => 
+    `<a href="label.html?label=${encodeURIComponent(label)}" style="color: #aa0000;">${label}</a>`
+  ).join(', ');
+}
+
 async function loadReviews(bandName, releaseTitle) {
   try {
     const reviewsRef = ref(db, 'reviews');
@@ -306,6 +323,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <h1 style="display: flex; align-items: center; gap: 10px;">
             <span>${release.title}${statusText}</span>
             <a href="band.html?band=${encodeURIComponent(bandName)}" style="font-size: 14px; font-family: Arial;">← Back to ${band.band_name}</a>
+            <a href="releaseedit.html?band=${encodeURIComponent(bandName)}&release=${encodeURIComponent(releaseTitle)}" style="font-size: 14px; font-family: Arial;">EDIT</a>
           </h1>
         </div>
       </div>
@@ -317,7 +335,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div style="flex: 1;">
           <table class="release-details" style="border-collapse: collapse; border: 2px solid #aa0000; width: 100%;">
             <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Band:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;"><a href="band.html?band=${encodeURIComponent(bandName)}">${band.band_name}</a></td></tr>
-            <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Label:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;">${release.label ? `<a href="label.html?label=${encodeURIComponent(release.label)}">${release.label}</a>` : "N/A"}</td></tr>
+            <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Label:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;">${formatMultipleLabels(release.label)}</td></tr>
             <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Release Date:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;">${release.year || "Unknown"}</td></tr>
             <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Type:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;">${release.release_type || "N/A"}</td></tr>
             <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Format:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;">${release.physical_format || "N/A"}</td></tr>
@@ -384,6 +402,44 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
       
              releaseHTML += `</ol>`;
+     }
+
+     // Add extra versions section if available
+     if (release.extra_versions && Object.keys(release.extra_versions).length > 0) {
+       releaseHTML += `<hr><h2>Other Versions</h2>`;
+       releaseHTML += `<div style="margin-bottom: 20px;">`;
+       
+       // Sort versions by year (oldest first)
+       const sortedVersions = Object.entries(release.extra_versions).sort(([,a], [,b]) => {
+         const yearA = parseInt(a.year) || 0;
+         const yearB = parseInt(b.year) || 0;
+         return yearA - yearB;
+       });
+       
+       sortedVersions.forEach(([versionKey, version]) => {
+         const versionTitle = `${version.format || 'Unknown Format'} - ${version.year || 'Unknown Year'}`;
+         releaseHTML += `
+           <div style="border: 1px solid #aa0000; margin-bottom: 10px; background-color: rgba(0,0,0,0.1);">
+             <div class="version-header" style="padding: 5px; cursor: pointer; background-color: rgba(170,0,0,0.1);" data-version-key="${versionKey}">
+               <h3 style="color: #aa0000; margin: 0; display: flex; align-items: center; justify-content: space-between;">
+                 <span>${versionTitle}</span>
+                 <span class="version-toggle" style="font-size: 16px;">▼</span>
+               </h3>
+             </div>
+             <div class="version-content" style="display: none; padding: 15px; border-top: 1px solid #aa0000;">
+               <table style="width: 100%; border-collapse: collapse;">
+                 <tr><td style="border: 1px solid #aa0000; padding: 5px;"><strong>Label:</strong></td><td style="border: 1px solid #aa0000; padding: 5px;">${formatMultipleLabels(version.label)}</td></tr>
+                 <tr><td style="border: 1px solid #aa0000; padding: 5px;"><strong>Year:</strong></td><td style="border: 1px solid #aa0000; padding: 5px;">${version.year || "N/A"}</td></tr>
+                 <tr><td style="border: 1px solid #aa0000; padding: 5px;"><strong>Limitation:</strong></td><td style="border: 1px solid #aa0000; padding: 5px;">${version.limitation || "N/A"}</td></tr>
+                 <tr><td style="border: 1px solid #aa0000; padding: 5px;"><strong>Extra Info:</strong></td><td style="border: 1px solid #aa0000; padding: 5px;">${version.extra_info || "N/A"}</td></tr>
+               </table>
+               ${version.cover_image ? `<div style="text-align: center; margin-top: 10px;"><img src="${version.cover_image}" alt="${version.format} Cover" style="max-width: 150px; max-height: 150px; border: 1px solid #aa0000;" /></div>` : ''}
+             </div>
+           </div>
+         `;
+       });
+       
+       releaseHTML += `</div>`;
      }
 
      // Add extra images slideshow if available
@@ -597,6 +653,23 @@ document.addEventListener("DOMContentLoaded", async () => {
          });
        }
      }
+
+    // Add event listeners for version toggle functionality
+    document.querySelectorAll(".version-header").forEach(header => {
+      header.addEventListener("click", () => {
+        const content = header.nextElementSibling;
+        const toggle = header.querySelector(".version-toggle");
+        const isVisible = content.style.display !== "none";
+        
+        if (isVisible) {
+          content.style.display = "none";
+          toggle.textContent = "▼";
+        } else {
+          content.style.display = "block";
+          toggle.textContent = "▲";
+        }
+      });
+    });
 
     // Load and display reviews
     await loadReviews(bandName, releaseTitle);
