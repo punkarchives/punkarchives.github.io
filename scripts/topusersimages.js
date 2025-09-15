@@ -54,16 +54,19 @@ async function loadTopUsersImages() {
 // Load image for a specific slot
 async function loadImageForSlot(slotNumber, user) {
   try {
-    const imageRef = ref(db, `topUsersImages/slot${slotNumber}`);
-    const imageSnapshot = await get(imageRef);
+    // Get image from user's profile instead of topUsersImages slots
+    const userRef = ref(db, `users/${user.username}`);
+    const userSnapshot = await get(userRef);
     
     const imageElement = document.getElementById(`user-image-${slotNumber}`);
     const infoElement = document.getElementById(`image-info-${slotNumber}`);
     
-    if (imageSnapshot.exists()) {
-      const imageData = imageSnapshot.val();
+    if (userSnapshot.exists()) {
+      const userData = userSnapshot.val();
+      const imageData = userData.featuredImage || {};
+      
       imageElement.src = imageData.imageUrl || `assets/logo.png`;
-      infoElement.innerHTML = `<p class="username">${user.username}</p><p class="description">${imageData.description || 'No description'}</p>`;
+      infoElement.innerHTML = `<p class="username">${user.username}</p><p class="description">${imageData.description || 'No image set'}</p>`;
     } else {
       // Set default image and info
       imageElement.src = `assets/logo.png`;
@@ -112,18 +115,18 @@ async function editImage(slotNumber) {
     const imageData = {
       imageUrl: imageUrl,
       description: description || '',
-      username: currentUser,
       lastUpdated: new Date().toISOString()
     };
     
-    await set(ref(db, `topUsersImages/slot${slotNumber}`), imageData);
+    // Store image in user's profile instead of topUsersImages slots
+    await set(ref(db, `users/${currentUser}/featuredImage`), imageData);
     
-         // Update the display
-     const imageElement = document.getElementById(`user-image-${slotNumber}`);
-     const infoElement = document.getElementById(`image-info-${slotNumber}`);
-     
-     imageElement.src = imageUrl;
-     infoElement.innerHTML = `<p class="username">${currentUser}</p><p class="description">${description || 'No description'}</p>`;
+    // Update the display
+    const imageElement = document.getElementById(`user-image-${slotNumber}`);
+    const infoElement = document.getElementById(`image-info-${slotNumber}`);
+    
+    imageElement.src = imageUrl;
+    infoElement.innerHTML = `<p class="username">${currentUser}</p><p class="description">${description || 'No description'}</p>`;
     
     alert('Image updated successfully!');
   } catch (error) {
