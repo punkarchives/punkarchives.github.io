@@ -3,10 +3,20 @@
    <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=1000, user-scalable=yes">
-      <link rel="stylesheet" href="styles.css">
       <script type="module" src="scripts/main.js"></script>
-      <title>Punk Archives</title>
+      <script type="module" src="scripts/compilationdata.js"></script>
+      <script type="module" src="scripts/discogs-import.js"></script>
+      <link rel="stylesheet" href="styles.css">
+      <title>Punk Archives - Compilation</title>
    </head>
+   <style>
+      body {
+         background-image: url("https://miro.medium.com/v2/resize:fit:1020/1*tlLN9hYP0oa_KlZfNxa33w.jpeg");
+         background-size: cover;
+         background-position: center;
+         background-repeat: no-repeat;
+      }
+   </style>
    <body>
       <div class="sidebar">
 	 <a href="index.html#" style="text-decoration:none"><img src="assets/logo.png" width="140px"></a>
@@ -37,8 +47,9 @@
          <button onclick="signUp()">Sign Up</button><br><br>
          <input type="text" id="login-username" placeholder="Username" required><br>
          <input type="password" id="login-password" placeholder="Password" required><br>
-         <button onclick="login()">Log In</button><br><br>
+         <button onclick="login()">Log In</button><br>
          <script src="scripts/additions.js"></script>
+         <br>
          <center>
             <div class="latest-additions">
                <h2>Points</h2>
@@ -54,13 +65,16 @@
          </center>
          <button onclick="logout()">Log Out</button><br><br>
       </div>
+      <script src="scripts/search.js" type="module"></script>
+      <script src="scripts/miniplayer.js"></script>
       <div class="main-container">
-         <div id="band-content" class="content">
-            <h1>Loading...</h1>
+         <div class="content">
+
+            <div id="compilation-content">
+               <h1>Loading compilation...</h1>
+            </div>
          </div>
       </div>
-      <script src="scripts/zinedataedit.js" type="module"></script>
-      <script src="scripts/miniplayer.js"></script>
       <center>
          <p>Is this page incomplete? Help by submitting info.</p>
       </center>

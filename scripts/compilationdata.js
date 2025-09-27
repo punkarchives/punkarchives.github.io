@@ -1,4 +1,3 @@
-// yes firebase api keys are meant to be public
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-auth.js";
 import { getDatabase, ref, set, get, child, push } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js";
@@ -60,7 +59,7 @@ async function isUserTrusted() {
   }
 }
 
-async function logChange(db, bandKey, field, oldValue, newValue) {
+async function logChange(db, labelKey, field, oldValue, newValue) {
   const user = auth.currentUser;
   let username = "unknown";
 
@@ -69,7 +68,7 @@ async function logChange(db, bandKey, field, oldValue, newValue) {
   }
 
   const logEntry = {
-    bandKey,
+    labelKey,
     field,
     oldValue,
     newValue,
@@ -78,38 +77,38 @@ async function logChange(db, bandKey, field, oldValue, newValue) {
   };
 
   try {
-    await push(ref(db, `logs/${bandKey}`), logEntry);
+    await push(ref(db, `logs/${labelKey}`), logEntry);
     console.log("Change logged:", logEntry);
   } catch (error) {
     console.error("Logging error:", error);
   }
 }
 
-async function getReleaseId(bandName, releaseTitle) {
+async function getCompilationId(labelName, compilationTitle) {
   try {
-    const bandsRef = ref(db, 'bands');
-    const bandsSnapshot = await get(bandsRef);
+    const labelsRef = ref(db, 'labels');
+    const labelsSnapshot = await get(labelsRef);
     
-    if (!bandsSnapshot.exists()) {
+    if (!labelsSnapshot.exists()) {
       return null;
     }
     
-    const bands = Object.entries(bandsSnapshot.val()).map(([key, val]) => ({ key, ...val }));
-    const band = bands.find(b => b.band_name === bandName);
+    const labels = Object.entries(labelsSnapshot.val()).map(([key, val]) => ({ key, ...val }));
+    const label = labels.find(l => l.label_name === labelName);
     
-    if (!band || !band.releases) {
+    if (!label || !label.compilations) {
       return null;
     }
     
-    const releaseIndex = band.releases.findIndex(r => r.title === releaseTitle);
-    return releaseIndex !== -1 ? releaseIndex : null;
+    const compilationIndex = label.compilations.findIndex(c => c.title === compilationTitle);
+    return compilationIndex !== -1 ? compilationIndex : null;
   } catch (error) {
-    console.error('Error getting release ID:', error);
+    console.error('Error getting compilation ID:', error);
     return null;
   }
 }
 
-async function isInCollection(username, bandName, releaseId) {
+async function isInCollection(username, labelName, compilationId) {
   try {
     const collectionRef = ref(db, `users/${username}/collection`);
     const collectionSnapshot = await get(collectionRef);
@@ -120,7 +119,7 @@ async function isInCollection(username, bandName, releaseId) {
     
     const collection = collectionSnapshot.val();
     return Object.values(collection).some(item => 
-      item.band === bandName && item.releaseId === releaseId
+      item.label === labelName && item.compilationId === compilationId
     );
   } catch (error) {
     console.error('Error checking collection:', error);
@@ -128,7 +127,7 @@ async function isInCollection(username, bandName, releaseId) {
   }
 }
 
-async function addToCollection(username, bandName, releaseId, releaseTitle, releaseYear) {
+async function addToCollection(username, labelName, compilationId, compilationTitle, compilationYear) {
   try {
     const collectionRef = ref(db, `users/${username}/collection`);
     const collectionSnapshot = await get(collectionRef);
@@ -137,10 +136,10 @@ async function addToCollection(username, bandName, releaseId, releaseTitle, rele
     const collectionId = Object.keys(collection).length;
     
     collection[collectionId] = {
-      band: bandName,
-      releaseId: releaseId,
-      releaseTitle: releaseTitle,
-      releaseYear: releaseYear || "Unknown"
+      label: labelName,
+      compilationId: compilationId,
+      compilationTitle: compilationTitle,
+      compilationYear: compilationYear || "Unknown"
     };
     
     await set(collectionRef, collection);
@@ -151,7 +150,7 @@ async function addToCollection(username, bandName, releaseId, releaseTitle, rele
   }
 }
 
-async function removeFromCollection(username, bandName, releaseId) {
+async function removeFromCollection(username, labelName, compilationId) {
   try {
     const collectionRef = ref(db, `users/${username}/collection`);
     const collectionSnapshot = await get(collectionRef);
@@ -162,7 +161,7 @@ async function removeFromCollection(username, bandName, releaseId) {
     
     const collection = collectionSnapshot.val();
     const entryToRemove = Object.entries(collection).find(([key, item]) => 
-      item.band === bandName && item.releaseId === releaseId
+      item.label === labelName && item.compilationId === compilationId
     );
     
     if (entryToRemove) {
@@ -195,7 +194,7 @@ function formatMultipleLabels(labelString) {
   ).join(', ');
 }
 
-async function loadReviews(bandName, releaseTitle) {
+async function loadReviews(labelName, compilationTitle) {
   try {
     const reviewsRef = ref(db, 'reviews');
     const reviewsSnapshot = await get(reviewsRef);
@@ -203,22 +202,22 @@ async function loadReviews(bandName, releaseTitle) {
     const reviewsContainer = document.getElementById('reviews-container');
     
     if (!reviewsSnapshot.exists()) {
-      reviewsContainer.innerHTML = '<p>No reviews yet. Be the first to review this release!</p>';
+      reviewsContainer.innerHTML = '<p>No reviews yet. Be the first to review this compilation!</p>';
       return;
     }
     
     const allReviews = reviewsSnapshot.val();
-    const releaseReviews = Object.entries(allReviews).filter(([reviewId, review]) => 
-      review.band === bandName && review.release === releaseTitle
+    const compilationReviews = Object.entries(allReviews).filter(([reviewId, review]) => 
+      review.label === labelName && review.compilation === compilationTitle
     );
     
-    if (releaseReviews.length === 0) {
-      reviewsContainer.innerHTML = '<p>No reviews yet. Be the first to review this release!</p>';
+    if (compilationReviews.length === 0) {
+      reviewsContainer.innerHTML = '<p>No reviews yet. Be the first to review this compilation!</p>';
       return;
     }
     
     // Sort reviews by timestamp (newest first)
-    releaseReviews.sort(([,a], [,b]) => new Date(b.timestamp) - new Date(a.timestamp));
+    compilationReviews.sort(([,a], [,b]) => new Date(b.timestamp) - new Date(a.timestamp));
     
     // Get current user info
     const currentUser = auth.currentUser;
@@ -242,7 +241,7 @@ async function loadReviews(bandName, releaseTitle) {
     }
     
     // Get unique usernames to fetch profile pictures
-    const uniqueUsers = [...new Set(releaseReviews.map(([,review]) => review.user))];
+    const uniqueUsers = [...new Set(compilationReviews.map(([,review]) => review.user))];
     const userProfilePictures = {};
     
     // Fetch profile pictures for all reviewers
@@ -261,7 +260,7 @@ async function loadReviews(bandName, releaseTitle) {
     }
     
     let reviewsHTML = '';
-    releaseReviews.forEach(([reviewId, review], index) => {
+    compilationReviews.forEach(([reviewId, review], index) => {
       const date = new Date(review.timestamp).toLocaleDateString();
       const profilePicture = userProfilePictures[review.user];
       const isOwnReview = currentUsername && review.user === currentUsername;
@@ -319,14 +318,14 @@ async function loadReviews(bandName, releaseTitle) {
     document.querySelectorAll('.edit-review-btn').forEach(button => {
       button.addEventListener('click', () => {
         const reviewId = button.getAttribute('data-review-id');
-        editReview(reviewId, bandName, releaseTitle);
+        editReview(reviewId, labelName, compilationTitle);
       });
     });
     
     document.querySelectorAll('.delete-review-btn').forEach(button => {
       button.addEventListener('click', () => {
         const reviewId = button.getAttribute('data-review-id');
-        deleteReview(reviewId, bandName, releaseTitle);
+        deleteReview(reviewId, labelName, compilationTitle);
       });
     });
     
@@ -334,14 +333,14 @@ async function loadReviews(bandName, releaseTitle) {
     document.querySelectorAll('.like-btn').forEach(button => {
       button.addEventListener('click', () => {
         const reviewId = button.getAttribute('data-review-id');
-        toggleLike(reviewId, bandName, releaseTitle);
+        toggleLike(reviewId, labelName, compilationTitle);
       });
     });
     
     document.querySelectorAll('.dislike-btn').forEach(button => {
       button.addEventListener('click', () => {
         const reviewId = button.getAttribute('data-review-id');
-        toggleDislike(reviewId, bandName, releaseTitle);
+        toggleDislike(reviewId, labelName, compilationTitle);
       });
     });
     
@@ -351,7 +350,7 @@ async function loadReviews(bandName, releaseTitle) {
   }
 }
 
-async function editReview(reviewId, bandName, releaseTitle) {
+async function editReview(reviewId, labelName, compilationTitle) {
   try {
     // Get the current review data
     const reviewRef = ref(db, `reviews/${reviewId}`);
@@ -411,7 +410,7 @@ async function editReview(reviewId, bandName, releaseTitle) {
         await set(reviewRef, updatedReview);
         
         // Reload reviews to show updated content
-        await loadReviews(bandName, releaseTitle);
+        await loadReviews(labelName, compilationTitle);
         
       } catch (error) {
         console.error('Error updating review:', error);
@@ -431,7 +430,7 @@ async function editReview(reviewId, bandName, releaseTitle) {
   }
 }
 
-async function deleteReview(reviewId, bandName, releaseTitle) {
+async function deleteReview(reviewId, labelName, compilationTitle) {
   if (!confirm('Are you sure you want to delete this review? This action cannot be undone.')) {
     return;
   }
@@ -441,7 +440,7 @@ async function deleteReview(reviewId, bandName, releaseTitle) {
     await set(reviewRef, null); // Delete the review
     
     // Reload reviews to show updated content
-    await loadReviews(bandName, releaseTitle);
+    await loadReviews(labelName, compilationTitle);
     
   } catch (error) {
     console.error('Error deleting review:', error);
@@ -449,7 +448,7 @@ async function deleteReview(reviewId, bandName, releaseTitle) {
   }
 }
 
-async function toggleLike(reviewId, bandName, releaseTitle) {
+async function toggleLike(reviewId, labelName, compilationTitle) {
   const currentUser = auth.currentUser;
   if (!currentUser) {
     alert('You must be logged in to like reviews.');
@@ -501,7 +500,7 @@ async function toggleLike(reviewId, bandName, releaseTitle) {
     await set(ref(db, `reviews/${reviewId}/dislikes`), dislikes);
     
     // Reload reviews to update the display
-    await loadReviews(bandName, releaseTitle);
+    await loadReviews(labelName, compilationTitle);
     
   } catch (error) {
     console.error('Error toggling like:', error);
@@ -509,7 +508,7 @@ async function toggleLike(reviewId, bandName, releaseTitle) {
   }
 }
 
-async function toggleDislike(reviewId, bandName, releaseTitle) {
+async function toggleDislike(reviewId, labelName, compilationTitle) {
   const currentUser = auth.currentUser;
   if (!currentUser) {
     alert('You must be logged in to dislike reviews.');
@@ -561,7 +560,7 @@ async function toggleDislike(reviewId, bandName, releaseTitle) {
     await set(ref(db, `reviews/${reviewId}/dislikes`), dislikes);
     
     // Reload reviews to update the display
-    await loadReviews(bandName, releaseTitle);
+    await loadReviews(labelName, compilationTitle);
     
   } catch (error) {
     console.error('Error toggling dislike:', error);
@@ -571,80 +570,79 @@ async function toggleDislike(reviewId, bandName, releaseTitle) {
 
 document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
-  const bandName = urlParams.get("band");
-  const releaseTitle = urlParams.get("release");
+  const labelName = urlParams.get("label");
+  const compilationTitle = urlParams.get("compilation");
 
-  if (!bandName || !releaseTitle) {
-    document.getElementById("release-content").innerHTML = "<h1>No band or release selected.</h1>";
+  if (!labelName || !compilationTitle) {
+    document.getElementById("compilation-content").innerHTML = "<h1>No label or compilation selected.</h1>";
     return;
   }
 
   const dbRef = ref(db);
   try {
-    const snapshot = await get(child(dbRef, 'bands'));
+    const snapshot = await get(child(dbRef, 'labels'));
     if (!snapshot.exists()) {
-      document.getElementById("release-content").innerHTML = "<h1>Error loading bands.</h1>";
+      document.getElementById("compilation-content").innerHTML = "<h1>Error loading labels.</h1>";
       return;
     }
 
-    const bandsRaw = snapshot.val();
-    const bands = Object.entries(bandsRaw).map(([key, val]) => ({ key, ...val }));
-    const band = bands.find(b => b.band_name === bandName);
+    const labelsRaw = snapshot.val();
+    const labels = Object.entries(labelsRaw).map(([key, val]) => ({ key, ...val }));
+    const label = labels.find(l => l.label_name === labelName);
 
-    if (!band) {
-      document.getElementById("release-content").innerHTML = "<h1>Band not found.</h1>";
+    if (!label) {
+      document.getElementById("compilation-content").innerHTML = "<h1>Label not found.</h1>";
       return;
     }
 
-    // Find the specific release
-    const release = band.releases?.find(r => r.title === releaseTitle);
+    // Find the specific compilation
+    const compilation = label.compilations?.find(c => c.title === compilationTitle);
     
-    if (!release) {
-      document.getElementById("release-content").innerHTML = "<h1>Release not found.</h1>";
+    if (!compilation) {
+      document.getElementById("compilation-content").innerHTML = "<h1>Compilation not found.</h1>";
       return;
     }
 
     // Determine status text based on flag
     let statusText = "";
-    if (release.flag === "Delete") {
+    if (compilation.flag === "Delete") {
       statusText = ` <span style="color: red; font-weight: bold;">[Marked for Deletion]</span>`;
-    } else if (release.flag === "Restore") {
+    } else if (compilation.flag === "Restore") {
       statusText = ` <span style="color: green; font-weight: bold;">[Marked for Restore]</span>`;
     }
 
-    let releaseHTML = `
+    let compilationHTML = `
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
           <h1 style="display: flex; align-items: center; gap: 10px;">
-            <span>${release.title}${statusText}</span>
-            <a href="band.html?band=${encodeURIComponent(bandName)}" style="font-size: 14px; font-family: Arial;">← Back to ${band.band_name}</a>
-            <a href="releaseedit.html?band=${encodeURIComponent(bandName)}&release=${encodeURIComponent(releaseTitle)}" style="font-size: 14px; font-family: Arial;">EDIT</a>
+            <span>${compilation.title}${statusText}</span>
+            <a href="label.html?label=${encodeURIComponent(labelName)}" style="font-size: 14px; font-family: Arial;">← Back to ${label.label_name}</a>
+            <a href="compilationedit.html?label=${encodeURIComponent(labelName)}&compilation=${encodeURIComponent(compilationTitle)}" style="font-size: 14px; font-family: Arial;">EDIT</a>
           </h1>
         </div>
       </div>
 
       <hr>
-      <h2>Release Information</h2>
+      <h2>Compilation Information</h2>
       
       <div style="display: flex; gap: 20px; margin-bottom: 20px;">
         <div style="flex: 1;">
-          <table class="release-details" style="border-collapse: collapse; border: 2px solid #aa0000; width: 100%;">
-            <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Band:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;"><a href="band.html?band=${encodeURIComponent(bandName)}">${band.band_name}</a></td></tr>
-            <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Label:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;">${formatMultipleLabels(release.label)}</td></tr>
-            <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Release Date:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;">${release.year || "Unknown"}</td></tr>
-            <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Type:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;">${release.release_type || "N/A"}</td></tr>
-            <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Format:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;">${release.physical_format || "N/A"}</td></tr>
-            <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Limitation:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;">${release.limitation || "N/A"}</td></tr>
-            <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Extra Info:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;">${release.extra_info || "N/A"}</td></tr>
+          <table class="compilation-details" style="border-collapse: collapse; border: 2px solid #aa0000; width: 100%;">
+            <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Label:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;"><a href="label.html?label=${encodeURIComponent(labelName)}">${label.label_name}</a></td></tr>
+            <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Release Date:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;">${compilation.year || "Unknown"}</td></tr>
+            <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Type:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;">${compilation.release_type || "N/A"}</td></tr>
+            <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Format:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;">${compilation.physical_format || "N/A"}</td></tr>
+            <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Limitation:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;">${compilation.limitation || "N/A"}</td></tr>
+            <tr><td style="border: 1px solid #aa0000; padding: 8px;"><strong>Extra Info:</strong></td><td style="border: 1px solid #aa0000; padding: 8px;">${compilation.extra_info || "N/A"}</td></tr>
           </table>
         </div>
         
         <div style="flex: 1;">
-          ${release.cover_image ? `
+          ${compilation.cover_image ? `
             <div style="text-align: center;">
-              <img src="${release.cover_image}" alt="Album Cover" style="max-width: 300px; max-height: 300px; border: 2px solid #aa0000;">
+              <img src="${compilation.cover_image}" alt="Compilation Cover" style="max-width: 300px; max-height: 300px; border: 2px solid #aa0000;">
               <br>
-              <button class="download-image" data-image="${release.cover_image}" style="margin-top: 10px;">Download Image</button>
+              <button class="download-image" data-image="${compilation.cover_image}" style="margin-top: 10px;">Download Image</button>
               <br>
               <button id="collection-btn" style="margin-top: 10px; background-color: #aa0000; color: white; border: none; padding: 8px 16px; cursor: pointer;">
                 Loading...
@@ -660,32 +658,31 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>
       </div>
 
-      ${release.listen ? `
+      ${compilation.listen ? `
         <div style="margin-bottom: 20px;">
-          <button class="listen" onclick="playInMiniPlayer('${release.listen}', '${release.title}', '${bandName}')" style="background: #aa0000; color: white; border: none; padding: 10px 20px; cursor: pointer; font-size: 16px;">🎵 Listen</button>
+          <button class="listen" onclick="playInMiniPlayer('${compilation.listen}', '${compilation.title}', '${labelName}')" style="background: #aa0000; color: white; border: none; padding: 10px 20px; cursor: pointer; font-size: 16px;">🎵 Listen</button>
         </div>
       ` : ''}
 
- 
     `;
 
     // Add tracklist if available
-    if (release.tracks && Object.keys(release.tracks).length > 0) {
-      releaseHTML += `<hr><h2>Tracklist</h2>`;
+    if (compilation.tracks && Object.keys(compilation.tracks).length > 0) {
+      compilationHTML += `<hr><h2>Tracklist</h2>`;
       
-      const tracks = Object.entries(release.tracks);
-      releaseHTML += `<ol style="padding-left: 20px;">`;
+      const tracks = Object.entries(compilation.tracks);
+      compilationHTML += `<ol style="padding-left: 20px;">`;
       
       tracks.forEach(([index, trackData]) => {
         const trackName = typeof trackData === 'object' ? trackData.name : trackData;
         const lyrics = typeof trackData === 'object' ? trackData.lyrics : '';
         const hasLyrics = lyrics && lyrics.trim() !== '';
         
-        releaseHTML += `<li style="margin-bottom: 10px;">
+        compilationHTML += `<li style="margin-bottom: 10px;">
           <strong>${trackName}</strong>`;
         
         if (hasLyrics) {
-          releaseHTML += `
+          compilationHTML += `
             <button class="toggle-lyrics-btn" data-track-index="${index}" style="color: white; border: none; padding: 4px 8px; cursor: pointer; margin-left: 10px;">Show Lyrics</button>
             <div class="lyrics-content" data-track-index="${index}" style="display: none; padding: 10px; border-left: 3px solid #4ecdc4; margin-top: 5px;">
               <strong>Lyrics:</strong>
@@ -693,19 +690,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             </div>`;
         }
         
-        releaseHTML += `</li>`;
+        compilationHTML += `</li>`;
       });
       
-             releaseHTML += `</ol>`;
+      compilationHTML += `</ol>`;
      }
 
      // Add extra versions section if available
-     if (release.extra_versions && Object.keys(release.extra_versions).length > 0) {
-       releaseHTML += `<hr><h2>Other Versions</h2>`;
-       releaseHTML += `<div style="margin-bottom: 20px;">`;
+     if (compilation.extra_versions && Object.keys(compilation.extra_versions).length > 0) {
+       compilationHTML += `<hr><h2>Other Versions</h2>`;
+       compilationHTML += `<div style="margin-bottom: 20px;">`;
        
        // Sort versions by year (oldest first)
-       const sortedVersions = Object.entries(release.extra_versions).sort(([,a], [,b]) => {
+       const sortedVersions = Object.entries(compilation.extra_versions).sort(([,a], [,b]) => {
          const yearA = parseInt(a.year) || 0;
          const yearB = parseInt(b.year) || 0;
          return yearA - yearB;
@@ -713,7 +710,7 @@ document.addEventListener("DOMContentLoaded", async () => {
        
        sortedVersions.forEach(([versionKey, version]) => {
          const versionTitle = `${version.format || 'Unknown Format'} - ${version.year || 'Unknown Year'}`;
-         releaseHTML += `
+         compilationHTML += `
            <div style="border: 1px solid #aa0000; margin-bottom: 10px; background-color: rgba(0,0,0,0.1);">
              <div class="version-header" style="padding: 5px; cursor: pointer; background-color: rgba(170,0,0,0.1);" data-version-key="${versionKey}">
                <h3 style="color: #aa0000; margin: 0; display: flex; align-items: center; justify-content: space-between;">
@@ -734,35 +731,35 @@ document.addEventListener("DOMContentLoaded", async () => {
          `;
        });
        
-       releaseHTML += `</div>`;
+       compilationHTML += `</div>`;
      }
 
      // Add extra images slideshow if available
      const isTrusted = await isUserTrusted();
      
-     if (release.extra_images && Array.isArray(release.extra_images) && release.extra_images.length > 0) {
-       releaseHTML += `<hr><h2>Extra Images</h2>`;
+     if (compilation.extra_images && Array.isArray(compilation.extra_images) && compilation.extra_images.length > 0) {
+       compilationHTML += `<hr><h2>Extra Images</h2>`;
        
-       releaseHTML += `<div style="text-align: center; margin-bottom: 20px;">
+       compilationHTML += `<div style="text-align: center; margin-bottom: 20px;">
          <div style="position: relative; display: inline-block;">
-           <img id="slideshow-image" src="${release.extra_images[0]}" alt="Extra Image 1" style="width: 500px; border-radius: 0px; display: block; margin: 0 auto;">
-           <button id="prev-image" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: rgba(0, 0, 0, 0.5); color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px; display: ${release.extra_images.length > 1 ? 'block' : 'none'};">&#9665;</button>
-           <button id="next-image" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: rgba(0, 0, 0, 0.5); color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px; display: ${release.extra_images.length > 1 ? 'block' : 'none'};">&#9655;</button>
+           <img id="slideshow-image" src="${compilation.extra_images[0]}" alt="Extra Image 1" style="width: 500px; border-radius: 0px; display: block; margin: 0 auto;">
+           <button id="prev-image" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: rgba(0, 0, 0, 0.5); color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px; display: ${compilation.extra_images.length > 1 ? 'block' : 'none'};">&#9665;</button>
+           <button id="next-image" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: rgba(0, 0, 0, 0.5); color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px; display: ${compilation.extra_images.length > 1 ? 'block' : 'none'};">&#9655;</button>
          </div>
          <div style="margin-top: 10px;">
-           <span id="image-counter">1 of ${release.extra_images.length}</span>
+           <span id="image-counter">1 of ${compilation.extra_images.length}</span>
          </div>
          ${isTrusted ? `<button id="edit-extra-images" style="margin-top: 10px; background: #aa0000; color: white; border: none; padding: 8px 16px; cursor: pointer;">✏️ Edit Images</button>` : ''}
        </div>`;
      } else if (isTrusted) {
-       releaseHTML += `<hr><h2>Extra Images</h2>
+       compilationHTML += `<hr><h2>Extra Images</h2>
          <p>No extra images available.</p>
          <button id="add-extra-images" style="background: #aa0000; color: white; border: none; padding: 8px 16px; cursor: pointer;">➕ Add Images</button>`;
      }
 
      // Apply background image if available
-    if (band.backgroundimg) {
-      document.body.style.backgroundImage = `url(${band.backgroundimg})`;
+    if (label.backgroundimg) {
+      document.body.style.backgroundImage = `url(${label.backgroundimg})`;
       document.body.style.backgroundSize = 'cover';
       document.body.style.backgroundPosition = 'center';
       document.body.style.backgroundRepeat = 'repeat';
@@ -783,17 +780,17 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.body.style.backgroundAttachment = 'fixed';
           }
         };
-        img.src = band.backgroundimg;
+        img.src = label.backgroundimg;
       }
          }
 
     // Add reviews section
-    releaseHTML += `<hr><h2>User Reviews</h2>`;
+    compilationHTML += `<hr><h2>User Reviews</h2>`;
     
     // Add review submission form for logged-in users
     const currentUser = auth.currentUser;
     if (currentUser) {
-      releaseHTML += `
+      compilationHTML += `
         <div style="border: 1px solid #aa0000; padding: 15px; margin-bottom: 20px; background-color: rgba(0,0,0,0.3);">
           <h3>Write a Review</h3>
           <form id="review-form">
@@ -812,9 +809,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Add reviews display area
-    releaseHTML += `<div id="reviews-container"></div>`;
+    compilationHTML += `<div id="reviews-container"></div>`;
 
-    document.getElementById("release-content").innerHTML = releaseHTML;
+    document.getElementById("compilation-content").innerHTML = compilationHTML;
 
     // Add event listeners for download image buttons
     document.querySelectorAll(".download-image").forEach(button => {
@@ -849,7 +846,7 @@ document.addEventListener("DOMContentLoaded", async () => {
      });
 
      // Add slideshow functionality for extra images
-     if (release.extra_images && Array.isArray(release.extra_images) && release.extra_images.length > 0) {
+     if (compilation.extra_images && Array.isArray(compilation.extra_images) && compilation.extra_images.length > 0) {
        let currentImageIndex = 0;
        const slideshowImage = document.getElementById('slideshow-image');
        const prevButton = document.getElementById('prev-image');
@@ -857,12 +854,12 @@ document.addEventListener("DOMContentLoaded", async () => {
        const imageCounter = document.getElementById('image-counter');
 
        function updateSlideshow() {
-         slideshowImage.src = release.extra_images[currentImageIndex];
+         slideshowImage.src = compilation.extra_images[currentImageIndex];
          slideshowImage.alt = `Extra Image ${currentImageIndex + 1}`;
-         imageCounter.textContent = `${currentImageIndex + 1} of ${release.extra_images.length}`;
+         imageCounter.textContent = `${currentImageIndex + 1} of ${compilation.extra_images.length}`;
          
          prevButton.style.display = currentImageIndex > 0 ? 'block' : 'none';
-         nextButton.style.display = currentImageIndex < release.extra_images.length - 1 ? 'block' : 'none';
+         nextButton.style.display = currentImageIndex < compilation.extra_images.length - 1 ? 'block' : 'none';
        }
 
        if (prevButton) {
@@ -876,7 +873,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
        if (nextButton) {
          nextButton.addEventListener('click', () => {
-           if (currentImageIndex < release.extra_images.length - 1) {
+           if (currentImageIndex < compilation.extra_images.length - 1) {
              currentImageIndex++;
              updateSlideshow();
            }
@@ -891,22 +888,22 @@ document.addEventListener("DOMContentLoaded", async () => {
        
        if (editButton) {
          editButton.addEventListener('click', () => {
-           const currentImages = release.extra_images || [];
+           const currentImages = compilation.extra_images || [];
            const imageUrls = prompt('Enter image URLs separated by commas:', currentImages.join(', '));
            
            if (imageUrls !== null) {
              const newImages = imageUrls.split(',').map(url => url.trim()).filter(url => url.length > 0);
              
-             // Find the release index in the band's releases array
-             const releaseIndex = band.releases.findIndex(r => r.title === releaseTitle);
+             // Find the compilation index in the label's compilations array
+             const compilationIndex = label.compilations.findIndex(c => c.title === compilationTitle);
              
-             if (releaseIndex !== -1) {
-               // Update the release with new images
-               const updatedRelease = { ...release, extra_images: newImages };
-               const updatedReleases = [...band.releases];
-               updatedReleases[releaseIndex] = updatedRelease;
+             if (compilationIndex !== -1) {
+               // Update the compilation with new images
+               const updatedCompilation = { ...compilation, extra_images: newImages };
+               const updatedCompilations = [...label.compilations];
+               updatedCompilations[compilationIndex] = updatedCompilation;
                
-               set(ref(db, `bands/${band.key}/releases`), updatedReleases)
+               set(ref(db, `labels/${label.key}/compilations`), updatedCompilations)
                  .then(() => {
                    location.reload();
                  })
@@ -925,16 +922,16 @@ document.addEventListener("DOMContentLoaded", async () => {
            if (imageUrls !== null) {
              const newImages = imageUrls.split(',').map(url => url.trim()).filter(url => url.length > 0);
              
-             // Find the release index in the band's releases array
-             const releaseIndex = band.releases.findIndex(r => r.title === releaseTitle);
+             // Find the compilation index in the label's compilations array
+             const compilationIndex = label.compilations.findIndex(c => c.title === compilationTitle);
              
-             if (releaseIndex !== -1) {
-               // Update the release with new images
-               const updatedRelease = { ...release, extra_images: newImages };
-               const updatedReleases = [...band.releases];
-               updatedReleases[releaseIndex] = updatedRelease;
+             if (compilationIndex !== -1) {
+               // Update the compilation with new images
+               const updatedCompilation = { ...compilation, extra_images: newImages };
+               const updatedCompilations = [...label.compilations];
+               updatedCompilations[compilationIndex] = updatedCompilation;
                
-               set(ref(db, `bands/${band.key}/releases`), updatedReleases)
+               set(ref(db, `labels/${label.key}/compilations`), updatedCompilations)
                  .then(() => {
                    location.reload();
                  })
@@ -965,7 +962,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // Load and display reviews
-    await loadReviews(bandName, releaseTitle);
+    await loadReviews(labelName, compilationTitle);
 
     // Setup collection button
     const collectionBtn = document.getElementById('collection-btn');
@@ -985,10 +982,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       }
       
-      const releaseId = await getReleaseId(bandName, releaseTitle);
+      const compilationId = await getCompilationId(labelName, compilationTitle);
       
-      if (releaseId !== null) {
-        const inCollection = await isInCollection(properUsername, bandName, releaseId);
+      if (compilationId !== null) {
+        const inCollection = await isInCollection(properUsername, labelName, compilationId);
         
         if (inCollection) {
           collectionBtn.textContent = 'Remove from Collection';
@@ -999,16 +996,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         
         collectionBtn.addEventListener('click', async () => {
-          const currentInCollection = await isInCollection(properUsername, bandName, releaseId);
+          const currentInCollection = await isInCollection(properUsername, labelName, compilationId);
           
           if (currentInCollection) {
-            const success = await removeFromCollection(properUsername, bandName, releaseId);
+            const success = await removeFromCollection(properUsername, labelName, compilationId);
             if (success) {
               collectionBtn.textContent = 'Add to Collection';
               collectionBtn.style.backgroundColor = '#aa0000';
             }
           } else {
-            const success = await addToCollection(properUsername, bandName, releaseId, releaseTitle, release.year);
+            const success = await addToCollection(properUsername, labelName, compilationId, compilationTitle, compilation.year);
             if (success) {
               collectionBtn.textContent = 'Remove from Collection';
               collectionBtn.style.backgroundColor = '#cc0000';
@@ -1070,8 +1067,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             user: username,
             rating: rating,
             review: reviewText,
-            band: bandName,
-            release: releaseTitle,
+            label: labelName,
+            compilation: compilationTitle,
             timestamp: new Date().toISOString()
           };
           
@@ -1083,7 +1080,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           document.getElementById('review-text').value = '';
           
           // Reload reviews
-          await loadReviews(bandName, releaseTitle);
+          await loadReviews(labelName, compilationTitle);
           
         } catch (error) {
           console.error('Error submitting review:', error);
@@ -1116,8 +1113,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Import data from Discogs
             const importedData = await window.discogsImport.importFromDiscogs(discogsUrl);
             
-            // Update the release in Firebase
-            await window.discogsImport.updateReleaseInFirebase(bandName, releaseTitle, importedData);
+            // Update the compilation in Firebase
+            if (window.discogsImport.updateCompilationInFirebase) {
+              await window.discogsImport.updateCompilationInFirebase(labelName, compilationTitle, importedData);
+            } else if (window.discogsImport.updateReleaseInFirebase) {
+              // fallback if older naming used in your import library
+              await window.discogsImport.updateReleaseInFirebase(labelName, compilationTitle, importedData);
+            }
             
             statusSpan.textContent = 'Import successful! Refreshing page...';
             statusSpan.style.color = '#4ecdc4';
@@ -1141,6 +1143,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   } catch (err) {
     console.error("Firebase error:", err);
-    document.getElementById("release-content").innerHTML = "<h1>Error loading release data.</h1>";
+    document.getElementById("compilation-content").innerHTML = "<h1>Error loading compilation data.</h1>";
   }
-}); 
+});

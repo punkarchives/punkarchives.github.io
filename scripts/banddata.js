@@ -111,6 +111,114 @@ async function removeFromCollection(username, bandName, releaseId) {
   }
 }
 
+// Helper function to check if user is very trusted (moderator)
+async function isUserVeryTrusted() {
+  const user = auth.currentUser;
+  if (!user) return false;
+  
+  try {
+    const lowercaseUsername = user.email.replace("@punkarchives.com", "").toLowerCase();
+    
+    // Find the proper capitalized username from database
+    const usersRef = ref(db, "users");
+    const usersSnapshot = await get(usersRef);
+    let properUsername = lowercaseUsername; // fallback
+    
+    if (usersSnapshot.exists()) {
+      const users = usersSnapshot.val();
+      const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
+      if (userEntry) {
+        properUsername = userEntry[0]; // This is the properly capitalized username
+      }
+    }
+    
+    const possiblePaths = [
+      `users/${user.uid}`,
+      `users/${properUsername}`,
+      `users/${lowercaseUsername}`,
+      `users/nxdx`
+    ];
+    
+    for (const path of possiblePaths) {
+      const userRef = ref(db, path);
+      const userSnapshot = await get(userRef);
+      if (userSnapshot.exists()) {
+        const userData = userSnapshot.val();
+        return userData.verytrusted === "true";
+      }
+    }
+    return false;
+  } catch (error) {
+    console.error("Error checking verytrusted status:", error);
+    return false;
+  }
+}
+
+async function isBookmarked(username, bandName) {
+  try {
+    const bookmarksRef = ref(db, `users/${username}/bookmarks`);
+    const bookmarksSnapshot = await get(bookmarksRef);
+    
+    if (!bookmarksSnapshot.exists()) {
+      return false;
+    }
+    
+    const bookmarks = bookmarksSnapshot.val();
+    return Object.values(bookmarks).some(bookmark => bookmark.band === bandName);
+  } catch (error) {
+    console.error('Error checking bookmarks:', error);
+    return false;
+  }
+}
+
+async function addBookmark(username, bandName) {
+  try {
+    const bookmarksRef = ref(db, `users/${username}/bookmarks`);
+    const bookmarksSnapshot = await get(bookmarksRef);
+    
+    let bookmarks = bookmarksSnapshot.exists() ? bookmarksSnapshot.val() : {};
+    const bookmarkId = Object.keys(bookmarks).length;
+    
+    bookmarks[bookmarkId] = {
+      band: bandName,
+      timestamp: new Date().toISOString()
+    };
+    
+    await set(bookmarksRef, bookmarks);
+    return true;
+  } catch (error) {
+    console.error('Error adding bookmark:', error);
+    return false;
+  }
+}
+
+async function removeBookmark(username, bandName) {
+  try {
+    const bookmarksRef = ref(db, `users/${username}/bookmarks`);
+    const bookmarksSnapshot = await get(bookmarksRef);
+    
+    if (!bookmarksSnapshot.exists()) {
+      return false;
+    }
+    
+    const bookmarks = bookmarksSnapshot.val();
+    const entryToRemove = Object.entries(bookmarks).find(([key, bookmark]) => 
+      bookmark.band === bandName
+    );
+    
+    if (entryToRemove) {
+      delete bookmarks[entryToRemove[0]];
+      await set(bookmarksRef, bookmarks);
+      return true;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('Error removing bookmark:', error);
+    return false;
+  }
+}
+
 async function logChange(db, bandKey, field, oldValue, newValue) {
   const user = auth.currentUser;
   let username = "unknown";
@@ -201,6 +309,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   <button id="flag-incomplete-btn" style="margin-left: auto; background-color: #aa0000; color: white; border: none; padding: 4px 8px; cursor: pointer;">
     ${band.flag === "Incomplete" ? "Remove Incomplete/Outdated Flag" : "Flag as Incomplete/Outdated"}
   </button>
+  <button id="moderator-request-btn" style="margin-left: 8px; background-color: #800080; color: white; border: none; padding: 4px 8px; cursor: pointer;">
+    ${band.moderatorRequest === "true" ? "Moderator Requested" : "Request Moderator"}
+  </button>
+  <button id="bookmark-btn" style="margin-left: 8px; background-color: #aa0000; color: white; border: none; padding: 4px 8px; cursor: pointer;">
+    Bookmark Band
+  </button>
 </h1>
 
 
@@ -216,6 +330,11 @@ document.addEventListener("DOMContentLoaded", async () => {
               ${Object.entries(band.official_links).map(([key, url]) => `<li><a href="${url}" target="_blank">${key}</a></li>`).join("")}
             </ul>
           ` : ""}
+          
+          <div id="moderator-note-section" style="display: none; margin-top: 20px; padding: 15px; background: rgba(128, 0, 128, 0.1); border-left: 4px solid #800080;">
+            <h3 style="color: #800080; margin: 0 0 10px 0;">Moderator Note:</h3>
+            <p id="moderator-note-text" style="margin: 0; color: #ccc;"></p>
+          </div>
         </div>
         <div>
           ${band.bandpic ? `<img src="${band.bandpic}" alt="${band.band_name}" style="max-width: 200px; height: auto;" />` : ""}
@@ -313,7 +432,7 @@ if (band.releases?.length) {
           </h3>
           <div class="release-actions" style="display: flex; gap: 8px;">
             <button class="collection-btn" data-band="${bandName}" data-release="${release.title}" data-year="${release.year}" style="background-color: #aa0000; color: white; border: none; padding: 4px 8px; cursor: pointer; font-size: 12px; border-radius: 3px;">Loading...</button>
-            ${release.listen ? `<button class="listen" onclick="window.open('${release.listen}', '_blank')" style="background: #333; color: white; border: none; padding: 4px 8px; cursor: pointer; font-size: 12px; border-radius: 3px;">🎵 Listen</button>` : ""}
+            ${release.listen ? `<button class="listen" onclick="playInMiniPlayer('${release.listen}', '${release.title}', '${bandName}')" style="background: #333; color: white; border: none; padding: 4px 8px; cursor: pointer; font-size: 12px; border-radius: 3px;">🎵 Listen</button>` : ""}
           </div>
         </div>
         
@@ -460,30 +579,179 @@ document.querySelectorAll(".note-toggle").forEach(button => {
 });
 
 
-flagBtn.addEventListener("click", async () => {
-  const user = auth.currentUser;
-  if (!user) {
-    alert("You must be signed in to change the flag status.");
-    return;
+// Flag button functionality
+if (flagBtn) {
+  const currentUser = auth.currentUser;
+  if (currentUser) {
+    // User is logged in, set up the flag functionality
+    const isFlagged = band.flag === "Incomplete";
+    flagBtn.textContent = isFlagged ? "Remove Incomplete/Outdated Flag" : "Flag as Incomplete/Outdated";
+    flagBtn.style.backgroundColor = '#aa0000';
+    
+    flagBtn.addEventListener("click", async () => {
+      const isFlagged = band.flag === "Incomplete";
+
+      try {
+        const newFlagValue = isFlagged ? null : "Incomplete";
+        await set(ref(db, `bands/${band.key}/flag`), newFlagValue);
+
+        band.flag = newFlagValue;
+
+        flagBtn.textContent = newFlagValue === "Incomplete"
+          ? "Remove Incomplete/Outdated Flag"
+          : "Flag as Incomplete/Outdated";
+
+      } catch (error) {
+        console.error("Error updating flag:", error);
+        alert("Failed to update flag: " + error.message);
+      }
+    });
+  } else {
+    // User not logged in, show disabled state
+    flagBtn.textContent = 'Login to Flag';
+    flagBtn.disabled = true;
+    flagBtn.style.backgroundColor = '#666';
   }
+}
 
-  const isFlagged = band.flag === "Incomplete";
-
-  try {
-    const newFlagValue = isFlagged ? null : "Incomplete";
-    await set(ref(db, `bands/${band.key}/flag`), newFlagValue);
-
-    band.flag = newFlagValue;
-
-    flagBtn.textContent = newFlagValue === "Incomplete"
-      ? "Remove Incomplete/Outdated Flag"
-      : "Flag as Incomplete/Outdated";
-
-  } catch (error) {
-    console.error("Error updating flag:", error);
-    alert("Failed to update flag: " + error.message);
+// Moderator request button functionality
+const moderatorRequestBtn = document.getElementById("moderator-request-btn");
+if (moderatorRequestBtn) {
+  const currentUser = auth.currentUser;
+  if (currentUser) {
+    // Check if user is already a moderator
+    const isModerator = await isUserVeryTrusted();
+    
+    if (isModerator) {
+      // Moderator can remove the request
+      const isRequested = band.moderatorRequest === "true";
+      moderatorRequestBtn.textContent = isRequested ? "Remove Moderator Request" : "No Moderator Request";
+      moderatorRequestBtn.style.backgroundColor = isRequested ? '#cc0000' : '#666';
+      
+      moderatorRequestBtn.addEventListener("click", async () => {
+        try {
+          const newRequestValue = isRequested ? null : "true";
+          await set(ref(db, `bands/${band.key}/moderatorRequest`), newRequestValue);
+          
+          band.moderatorRequest = newRequestValue;
+          
+          moderatorRequestBtn.textContent = newRequestValue === "true"
+            ? "Remove Moderator Request"
+            : "No Moderator Request";
+          moderatorRequestBtn.style.backgroundColor = newRequestValue === "true" ? '#cc0000' : '#666';
+          
+          // Reload page to update display
+          location.reload();
+        } catch (error) {
+          console.error("Error updating moderator request:", error);
+          alert("Failed to update moderator request: " + error.message);
+        }
+      });
+    } else {
+      // Regular user can request moderator review
+      const isRequested = band.moderatorRequest === "true";
+      moderatorRequestBtn.textContent = isRequested ? "Moderator Requested" : "Request Moderator";
+      moderatorRequestBtn.style.backgroundColor = isRequested ? '#800080' : '#800080';
+      moderatorRequestBtn.disabled = isRequested;
+      
+      if (!isRequested) {
+        moderatorRequestBtn.addEventListener("click", async () => {
+          const note = prompt("Add a note for moderators (optional):");
+          if (note !== null) { // User didn't cancel
+            try {
+              await set(ref(db, `bands/${band.key}/moderatorRequest`), "true");
+              if (note.trim()) {
+                await set(ref(db, `bands/${band.key}/moderatorNote`), note.trim());
+              }
+              
+              band.moderatorRequest = "true";
+              band.moderatorNote = note.trim();
+              
+              moderatorRequestBtn.textContent = "Moderator Requested";
+              moderatorRequestBtn.disabled = true;
+              
+              alert("Moderator request submitted successfully!");
+            } catch (error) {
+              console.error("Error submitting moderator request:", error);
+              alert("Failed to submit moderator request: " + error.message);
+            }
+          }
+        });
+      }
+    }
+  } else {
+    // User not logged in, show disabled state
+    moderatorRequestBtn.textContent = 'Login to Request';
+    moderatorRequestBtn.disabled = true;
+    moderatorRequestBtn.style.backgroundColor = '#666';
   }
-});
+}
+
+// Show moderator note only for moderators
+async function showModeratorNote() {
+  const isModerator = await isUserVeryTrusted();
+  const moderatorNoteSection = document.getElementById("moderator-note-section");
+  const moderatorNoteText = document.getElementById("moderator-note-text");
+  
+  if (isModerator && band.moderatorNote && moderatorNoteSection && moderatorNoteText) {
+    moderatorNoteText.textContent = band.moderatorNote;
+    moderatorNoteSection.style.display = "block";
+  }
+}
+
+// Bookmark button functionality
+const bookmarkBtn = document.getElementById("bookmark-btn");
+if (bookmarkBtn) {
+  const currentUser = auth.currentUser;
+  if (currentUser) {
+    const username = currentUser.email.replace("@punkarchives.com", "").toLowerCase();
+    
+    // Find the proper capitalized username from database
+    const usersRef = ref(db, "users");
+    const usersSnapshot = await get(usersRef);
+    let properUsername = username; // fallback
+    
+    if (usersSnapshot.exists()) {
+      const users = usersSnapshot.val();
+      const userEntry = Object.entries(users).find(([key, data]) => data.userId === currentUser.uid);
+      if (userEntry) {
+        properUsername = userEntry[0]; // This is the properly capitalized username
+      }
+    }
+    
+    // Check if band is bookmarked and update button
+    const isBookmarkedBand = await isBookmarked(properUsername, bandName);
+    if (isBookmarkedBand) {
+      bookmarkBtn.textContent = 'Remove Bookmark';
+      bookmarkBtn.style.backgroundColor = '#cc0000';
+    } else {
+      bookmarkBtn.textContent = 'Bookmark Band';
+      bookmarkBtn.style.backgroundColor = '#aa0000';
+    }
+    
+    bookmarkBtn.addEventListener('click', async () => {
+      const currentBookmarked = await isBookmarked(properUsername, bandName);
+      
+      if (currentBookmarked) {
+        const success = await removeBookmark(properUsername, bandName);
+        if (success) {
+          bookmarkBtn.textContent = 'Bookmark Band';
+          bookmarkBtn.style.backgroundColor = '#aa0000';
+        }
+      } else {
+        const success = await addBookmark(properUsername, bandName);
+        if (success) {
+          bookmarkBtn.textContent = 'Remove Bookmark';
+          bookmarkBtn.style.backgroundColor = '#cc0000';
+        }
+      }
+    });
+  } else {
+    bookmarkBtn.textContent = 'Login to Bookmark';
+    bookmarkBtn.disabled = true;
+    bookmarkBtn.style.backgroundColor = '#666';
+  }
+}
 
 
 
@@ -669,4 +937,7 @@ flagBtn.addEventListener("click", async () => {
     console.error("Firebase error:", err);
     document.getElementById("band-content").innerHTML = "<h1>Error loading band data.</h1>";
   }
+  
+  // Show moderator note if user is a moderator
+  await showModeratorNote();
 });

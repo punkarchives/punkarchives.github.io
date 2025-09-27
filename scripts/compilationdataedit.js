@@ -29,36 +29,12 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-// Helper function to check if user is very trusted
-async function isUserVeryTrusted() {
-    const user = auth.currentUser;
-    if (!user) return false;
-    
-    try {
-        const lowercaseUsername = user.email.replace("@punkarchives.com", "").toLowerCase();
-        const properUsername = user.email.replace("@punkarchives.com", "");
-        
-        const possiblePaths = [
-            `users/${user.uid}`,
-            `users/${properUsername}`,
-            `users/${lowercaseUsername}`,
-            `users/nxdx`
-        ];
-        
-        for (const path of possiblePaths) {
-            const userRef = ref(db, path);
-            const userSnapshot = await get(userRef);
-            if (userSnapshot.exists()) {
-                const userData = userSnapshot.val();
-                return userData.verytrusted === "true";
-            }
-        }
-        return false;
-    } catch (error) {
-        console.error("Error checking verytrusted status:", error);
-        return false;
+auth.onAuthStateChanged((user) => {
+    if (!user) {
+        // User not logged in, redirect to login page or homepage
+        window.location.href = '/login.html';
     }
-}
+});
 
 async function logChange(db, labelKey, field, oldValue, newValue) {
     const user = auth.currentUser;
@@ -72,8 +48,7 @@ async function logChange(db, labelKey, field, oldValue, newValue) {
         timestamp: new Date().toISOString()
     };
     try {
-        await push(ref(db, `logs/${labelKey}`), logEntry);
-        console.log("Change logged:", logEntry);
+        await set(push(ref(db, 'logs')), logEntry);
     } catch (error) {
         console.error("Logging error:", error);
     }
@@ -204,6 +179,7 @@ function attachEditListeners() {
 
                                 modal.innerHTML = `
                                     <div style="
+                                        background: #333;
                                         padding: 20px;
                                         border-radius: 8px;
                                         width: 80%;
@@ -385,25 +361,12 @@ function attachEditListeners() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-    const labelContainer = document.getElementById("label-content");
-auth.onAuthStateChanged((user) => {
-  if (!user) {
-    // User not logged in, redirect to login page or homepage
-    window.location.href = '/login.html';
-  }
-});
-    console.log("DOM fully loaded.");
-    if (!labelContainer) {
-        console.error("label-content element is missing in the DOM.");
-        return;
-    }
-
     const urlParams = new URLSearchParams(window.location.search);
     const labelName = urlParams.get("label");
-    const labelName2 = urlParams.get("label");
+    const compilationTitle = urlParams.get("compilation");
 
-    if (!labelName) {
-        labelContainer.innerHTML = "<h2>No label selected. Add ?label=label Name to the URL.</h2>";
+    if (!labelName || !compilationTitle) {
+        document.getElementById("compilation-content").innerHTML = "<h2>No label or compilation selected. Add ?label=Label Name&compilation=Compilation Title to the URL.</h2>";
         return;
     }
 
@@ -417,160 +380,110 @@ auth.onAuthStateChanged((user) => {
             key,
             ...val
         }));
-        const label = labels.find(b => b.label_name.toLowerCase() === labelName.toLowerCase());
+        const label = labels.find(l => l.label_name === labelName);
         if (!label) {
-            labelContainer.innerHTML = `<h2>label '${labelName}' not found.</h2>`;
+            document.getElementById("compilation-content").innerHTML = `<h2>Label '${labelName}' not found.</h2>`;
             return;
         }
 
-        let labelHTML = `<h1>${label.label_name} <a href="label.html?label=${encodeURIComponent(labelName2)}"><font size="4" face="Arial">RETURN</font></a></h1>`;
-
-        const editableField = (key, val, labelKey) => `
-            <p><strong>${key.replace("_", " ")}:</strong>
-            <span class="editable-value" data-path="${key}" data-label="${labelKey}">${val ?? "N/A"}</span>
-            <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button></p>`;
-
-        labelHTML += ["location", "years_active", "description", "bands", "logo"]
-            .map(field => editableField(field, label[field], label.key)).join("");
-
-        if (label.compilations?.length) {
-            labelHTML += `<hr><h2>Compilations</h2><p>note: for compilation format, use either the first version or the vinyl version (assuming multiple were released at the same time)`;
-
-            const sortedReleases = label.compilations
-                .map((release, originalIndex) => ({
-                    ...release,
-                    originalIndex
-                }))
-                .sort((a, b) => {
-                    const yearA = parseInt(a.year) || 0;
-                    const yearB = parseInt(b.year) || 0;
-                    return yearA - yearB;
-                });
-
-            // Check if user is verytrusted once for all compilations
-            const isVeryTrusted = await isUserVeryTrusted();
-            
-            sortedReleases.forEach((r) => {
-                const isLocked = r.locked === true;
-                const titleStyle = isLocked ? 'style="color: green;"' : '';
-                const lockEmoji = isLocked ? ' 🔒' : '';
-                const lockButton = isVeryTrusted ? `<button class="lock-release-btn" data-release-index="${r.originalIndex}" data-label="${label.key}" data-current-locked="${isLocked}" style="background-color: ${isLocked ? '#ff6b6b' : '#8B0000'}; color: white; border: none; padding: 4px 8px; cursor: pointer; font-size: 12px; margin-left: 5px;">${isLocked ? '🔓 Unlock' : '🔒 Lock'}</button>` : '';
-
-                labelHTML += `
-      <div style="margin-bottom:20px">
-        <h3 ${titleStyle}><strong>Title:</strong> <span class="editable-value" data-path="compilations/${r.originalIndex}/title" data-label="${label.key}">${r?.title ?? "N/A"}${lockEmoji}</span>
-        ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''} ${lockButton}</h3>
-        <p><strong>Image Link:</strong> <span class="editable-value" data-path="compilations/${r.originalIndex}/cover_image" data-label="${label.key}">${r?.cover_image ?? "N/A"}</span>
-        ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
-        <p><strong>Artists:</strong> <span class="editable-value" data-path="compilations/${r.originalIndex}/artists" data-label="${label.key}">${r?.artists ?? "N/A"}</span>
-        ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
-        <p><strong>Label:</strong> <span class="editable-value" data-path="compilations/${r.originalIndex}/label" data-label="${label.key}">${r?.label ?? "N/A"}</span>
-        ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
-        <p><strong>Year:</strong> <span class="editable-value" data-path="compilations/${r.originalIndex}/year" data-label="${label.key}">${r?.year ?? "N/A"}</span>
-        ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
-        <p><strong>Type:</strong> <span class="editable-value" data-path="compilations/${r.originalIndex}/release_type" data-label="${label.key}">${r?.release_type ?? "N/A"}</span>
-        ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
-        <p><strong>Format:</strong> <span class="editable-value" data-path="compilations/${r.originalIndex}/physical_format" data-label="${label.key}">${r?.physical_format ?? "N/A"}</span>
-        ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
-        <p><strong>Limitation:</strong> <span class="editable-value" data-path="compilations/${r.originalIndex}/limitation" data-label="${label.key}">${r?.limitation ?? "N/A"}</span>
-        ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
-        <p><strong>Extra Info:</strong> <span class="editable-value" data-path="compilations/${r.originalIndex}/extra_info" data-label="${label.key}">${r?.extra_info ?? "N/A"}</span>
-        ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
-        <p><strong>YouTube Link:</strong> <span class="editable-value" data-path="compilations/${r.originalIndex}/listen" data-label="${label.key}">${r?.listen ?? "N/A"}</span>
-        ${!isLocked ? '<button class="edit-button trusted-only" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
-        <p><strong>Flag ('Delete' or 'Restore'):</strong> <span class="editable-value" data-path="compilations/${r.originalIndex}/flag" data-label="${label.key}">${r?.flag ?? "N/A"}</span>
-        ${!isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : ''}</p>
-        
-        <!-- Discogs Import Button -->
-        ${!isLocked ? `<button class="discogs-import-btn" data-release-index="${r.originalIndex}" data-label="${label.key}" data-release-title="${r?.title}" style="background: #aa0000; color: white; border: none; padding: 8px 16px; cursor: pointer; margin-top: 10px;">📥 Import Data From Discogs</button>
-        <span class="discogs-import-status" style="color: #666; font-size: 14px; margin-left: 10px;"></span>` : ''}
-        
-        <h4>Tracklist:</h4>
-        <ol>`;
-
-                if (r.tracks && Object.keys(r.tracks).length > 0) {
-                    Object.entries(r.tracks).forEach(([trackIndex, trackData]) => {
-                        const editButtonHTML = !isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : '';
-                        const lyricsButtonHTML = !isLocked ? `<button class="lyrics-button" data-release-index="${r.originalIndex}" data-track-index="${trackIndex}" data-label="${label.key}" style="margin-left: 5px; display: inline-block; background-color: #8B0000; color: white; border: none; padding: 2px 6px; cursor: pointer;">📝 Lyrics</button>` : '';
-                        
-                        labelHTML += '<li><div>' +
-                            '<span class="editable-value" data-path="compilations/' + r.originalIndex + '/tracks/' + trackIndex + '/name" data-label="' + label.key + '">' + trackData.name + '</span>' +
-                            editButtonHTML +
-                            lyricsButtonHTML +
-                            '</div>';
-                        
-                        console.log(`Created lyrics button for track ${trackIndex}:`, trackData.name);
-                    });
-                }
-
-                labelHTML += `</ol>
-        <div style="margin-top:5px">
-            <button class="add-track-button" data-release-index="${r.originalIndex}" data-label="${label.key}" style="margin-right:5px">➕ Add Track</button>
-            <button class="add-multiple-tracks-button" data-release-index="${r.originalIndex}" data-label="${label.key}" data-count="2" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+2</button>
-            <button class="add-multiple-tracks-button" data-release-index="${r.originalIndex}" data-label="${label.key}" data-count="3" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+3</button>
-            <button class="add-multiple-tracks-button" data-release-index="${r.originalIndex}" data-label="${label.key}" data-count="4" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+4</button>
-            <button class="add-multiple-tracks-button" data-release-index="${r.originalIndex}" data-label="${label.key}" data-count="5" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+5</button>
-        </div>
-      </div>`;
-            });
+        // Find the specific compilation
+        const compilationIndex = label.compilations?.findIndex(c => c.title === compilationTitle);
+        if (compilationIndex === -1 || !label.compilations[compilationIndex]) {
+            document.getElementById("compilation-content").innerHTML = `<h2>Compilation '${compilationTitle}' not found.</h2>`;
+            return;
         }
 
-	
-            labelHTML += `<button id="addReleaseButton">Add New Compilation</button>`;
-        labelContainer.innerHTML = labelHTML;
-        console.log("label content loaded. Edit buttons should now be visible.");
-        attachEditListeners();
+        const compilation = label.compilations[compilationIndex];
 
-        document.getElementById("addReleaseButton")?.addEventListener("click", async () => {
-            const newRelease = {
-                title: "undefined",
-                cover_image: "undefined",
-                label: "undefined",
-                year: "undefined",
-                release_type: "undefined",
-                physical_format: "undefined",
-                limitation: "undefined",
-                extra_info: "undefined",
-		artists: "undefined"
-            };
-            try {
-                const nextIndex = label.compilations?.length || 0;
-                await set(ref(db, `labels/${label.key}/compilations/${nextIndex}`), newRelease);
-                await logChange(db, label.key, `releases/${nextIndex}`, "New Compilation Added", JSON.stringify(newRelease));
-                
-                // Award points to user for adding a compilation
-                const user = auth.currentUser;
-                if (user) {
-                    const lowercaseUsername = user.email.replace("@punkarchives.com", "").toLowerCase();
-                    
-                    // Find the proper capitalized username from database
-                    const usersRef = ref(db, "users");
-                    const usersSnapshot = await get(usersRef);
-                    let properUsername = lowercaseUsername; // fallback
-                    
-                    if (usersSnapshot.exists()) {
-                        const users = usersSnapshot.val();
-                        const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
-                        if (userEntry) {
-                            properUsername = userEntry[0]; // This is the properly capitalized username
-                        }
-                    }
-                    
-                    const userRef = ref(db, `users/${properUsername}/points`);
-                    const snapshot = await get(userRef);
-                    let currentPoints = 0;
-                    if (snapshot.exists()) {
-                        currentPoints = snapshot.val();
-                    }
+        let compilationHTML = `<h1>${compilation.title} <a href="compilation.html?label=${encodeURIComponent(labelName)}&compilation=${encodeURIComponent(compilationTitle)}"><font size="4" face="Arial">RETURN</font></a></h1>`;
 
-                    await set(userRef, currentPoints + 1);
+        const editableField = (key, val, labelKey, path) => `
+      <p><strong>${key.replace("_", " ")}:</strong>
+      <span class="editable-value" data-path="${path}" data-label="${labelKey}">${val ?? "N/A"}</span>
+      <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button></p>`;
+
+        // Basic compilation information
+        compilationHTML +=
+            editableField("Title", compilation.title, label.key, `compilations/${compilationIndex}/title`) +
+            editableField("Cover Image", compilation.cover_image, label.key, `compilations/${compilationIndex}/cover_image`) +
+            editableField("Artists", compilation.artists, label.key, `compilations/${compilationIndex}/artists`) +
+            editableField("Label", compilation.label, label.key, `compilations/${compilationIndex}/label`) +
+            editableField("Year", compilation.year, label.key, `compilations/${compilationIndex}/year`) +
+            editableField("Release Type", compilation.release_type, label.key, `compilations/${compilationIndex}/release_type`) +
+            editableField("Physical Format", compilation.physical_format, label.key, `compilations/${compilationIndex}/physical_format`) +
+            editableField("Limitation", compilation.limitation, label.key, `compilations/${compilationIndex}/limitation`) +
+            editableField("Extra Info", compilation.extra_info, label.key, `compilations/${compilationIndex}/extra_info`) +
+            editableField("YouTube Link", compilation.listen, label.key, `compilations/${compilationIndex}/listen`) +
+            editableField("Flag", compilation.flag, label.key, `compilations/${compilationIndex}/flag`);
+
+        // Extra Versions Section
+        compilationHTML += `<hr><h2>Extra Versions</h2>`;
+        compilationHTML += `<p><em>Add different versions (CD, Vinyl, Cassette, Rereleases) without cluttering the main compilation list.</em></p>`;
+        
+        if (compilation.extra_versions && Object.keys(compilation.extra_versions).length > 0) {
+            compilationHTML += `<div style="margin-bottom: 20px;">`;
+            Object.entries(compilation.extra_versions).forEach(([versionKey, version]) => {
+                compilationHTML += `
+                    <div style="border: 1px solid #ccc; margin-bottom: 15px; padding: 10px; background-color: rgba(0,0,0,0.1);">
+                        <h3>Version: ${version.format || 'Unknown Format'}</h3>
+                        <p><strong>Format:</strong> <span class="editable-value" data-path="compilations/${compilationIndex}/extra_versions/${versionKey}/format" data-label="${label.key}">${version.format ?? "N/A"}</span>
+                        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button></p>
+                        <p><strong>Label:</strong> <span class="editable-value" data-path="compilations/${compilationIndex}/extra_versions/${versionKey}/label" data-label="${label.key}">${version.label ?? "N/A"}</span>
+                        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button></p>
+                        <p><strong>Year:</strong> <span class="editable-value" data-path="compilations/${compilationIndex}/extra_versions/${versionKey}/year" data-label="${label.key}">${version.year ?? "N/A"}</span>
+                        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button></p>
+                        <p><strong>Limitation:</strong> <span class="editable-value" data-path="compilations/${compilationIndex}/extra_versions/${versionKey}/limitation" data-label="${label.key}">${version.limitation ?? "N/A"}</span>
+                        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button></p>
+                        <p><strong>Extra Info:</strong> <span class="editable-value" data-path="compilations/${compilationIndex}/extra_versions/${versionKey}/extra_info" data-label="${label.key}">${version.extra_info ?? "N/A"}</span>
+                        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button></p>
+                        <p><strong>Cover Image:</strong> <span class="editable-value" data-path="compilations/${compilationIndex}/extra_versions/${versionKey}/cover_image" data-label="${label.key}">${version.cover_image ?? "N/A"}</span>
+                        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button></p>
+                        ${version.cover_image ? `<div style="margin: 10px 0;"><img src="${version.cover_image}" alt="Version Cover" style="max-width: 150px; max-height: 150px; border: 1px solid #ccc;" /></div>` : ''}
+                        <button class="delete-version-button" data-version-key="${versionKey}" data-label="${label.key}" data-compilation-index="${compilationIndex}" style="background-color: #cc0000; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 10px;">🗑️ Delete Version</button>
+                    </div>
+                `;
+            });
+            compilationHTML += `</div>`;
+        } else {
+            compilationHTML += `<p>No extra versions added yet.</p>`;
+        }
+
+        compilationHTML += `<button id="addVersionButton" style="background-color: #aa0000; color: white; border: none; padding: 10px 20px; cursor: pointer; margin-top: 10px;">➕ Add Extra Version</button>`;
+
+        // Tracklist
+        compilationHTML += `<hr><h2>Tracklist:</h2><ol>`;
+        if (compilation.tracks && Object.keys(compilation.tracks).length > 0) {
+            Object.entries(compilation.tracks).forEach(([trackIndex, trackData]) => {
+                let trackName;
+                if (typeof trackData === 'object' && trackData !== null) {
+                    trackName = trackData.name || 'Unknown Track';
+                } else {
+                    trackName = trackData || 'Unknown Track';
                 }
-                
-                location.reload();
-            } catch (err) {
-                alert("Failed to add new compilation: " + err.message);
-            }
-        });
+                compilationHTML += `
+                    <li>
+                        <span class="editable-value" data-path="compilations/${compilationIndex}/tracks/${trackIndex}/name" data-label="${label.key}">${trackName}</span>
+                        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
+                        <button class="lyrics-button" data-release-index="${compilationIndex}" data-track-index="${trackIndex}" data-label="${label.key}" style="margin-left: 5px; display: inline-block; background-color: #8B0000; color: white; border: none; padding: 2px 6px; cursor: pointer;">📝 Lyrics</button>
+                    </li>
+                `;
+            });
+        }
+        compilationHTML += `</ol>`;
+
+        // Add track buttons
+        compilationHTML += `
+            <div style="margin-top:5px">
+                <button class="add-track-button" data-release-index="${compilationIndex}" data-label="${label.key}" style="margin-right:5px">➕ Add Track</button>
+                <button class="add-multiple-tracks-button" data-release-index="${compilationIndex}" data-label="${label.key}" data-count="2" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+2</button>
+                <button class="add-multiple-tracks-button" data-release-index="${compilationIndex}" data-label="${label.key}" data-count="3" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+3</button>
+                <button class="add-multiple-tracks-button" data-release-index="${compilationIndex}" data-label="${label.key}" data-count="4" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+4</button>
+                <button class="add-multiple-tracks-button" data-release-index="${compilationIndex}" data-label="${label.key}" data-count="5" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+5</button>
+            </div>
+        `;
+
+        document.getElementById("compilation-content").innerHTML = compilationHTML;
+        attachEditListeners();
 
         // Add event listeners for new functionality
         document.querySelectorAll(".add-track-button").forEach(button => {
@@ -616,6 +529,89 @@ auth.onAuthStateChanged((user) => {
                     location.reload();
                 } catch (err) {
                     alert("Failed to add tracks: " + err.message);
+                }
+            });
+        });
+
+        // Add version button functionality
+        document.getElementById("addVersionButton")?.addEventListener("click", async () => {
+            const versionKey = Date.now().toString();
+            const newVersion = {
+                format: "Unknown Format",
+                label: "N/A",
+                year: "N/A",
+                limitation: "N/A",
+                extra_info: "N/A",
+                cover_image: "N/A"
+            };
+            
+            try {
+                await set(ref(db, `labels/${label.key}/compilations/${compilationIndex}/extra_versions/${versionKey}`), newVersion);
+                await logChange(db, label.key, `compilations/${compilationIndex}/extra_versions/${versionKey}`, null, "New version added");
+                
+                // Award points to user for adding a version
+                const user = auth.currentUser;
+                if (user) {
+                    const lowercaseUsername = user.email.replace("@punkarchives.com", "").toLowerCase();
+                    
+                    // Find the proper capitalized username from database
+                    const usersRef = ref(db, "users");
+                    const usersSnapshot = await get(usersRef);
+                    let properUsername = lowercaseUsername; // fallback
+                    
+                    if (usersSnapshot.exists()) {
+                        const users = usersSnapshot.val();
+                        const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
+                        if (userEntry) {
+                            properUsername = userEntry[0]; // This is the properly capitalized username
+                        }
+                    }
+                    
+                    const userRef = ref(db, `users/${properUsername}/points`);
+                    const snapshot = await get(userRef);
+                    let currentPoints = 0;
+                    if (snapshot.exists()) {
+                        currentPoints = snapshot.val();
+                    }
+
+                    await set(userRef, currentPoints + 1);
+                    
+                    // Award monthly version points
+                    console.log('💿 Attempting to award monthly version points...');
+                    console.log('window.monthlyPoints available:', !!window.monthlyPoints);
+                    if (window.monthlyPoints && window.monthlyPoints.awardMonthlyVersionPoints) {
+                        console.log('✅ Calling awardMonthlyVersionPoints...');
+                        window.monthlyPoints.awardMonthlyVersionPoints();
+                    } else {
+                        console.log('❌ monthlyPoints or awardMonthlyVersionPoints not available');
+                    }
+                }
+                
+                location.reload();
+            } catch (error) {
+                console.error("Error adding version:", error);
+                alert("Failed to add version: " + error.message);
+            }
+        });
+
+        // Delete version button functionality
+        document.querySelectorAll(".delete-version-button").forEach(button => {
+            button.addEventListener("click", async () => {
+                const versionKey = button.getAttribute("data-version-key");
+                const labelKey = button.getAttribute("data-label");
+                const compilationIndex = button.getAttribute("data-compilation-index");
+                
+                if (!confirm("Are you sure you want to delete this version? This action cannot be undone.")) {
+                    return;
+                }
+                
+                try {
+                    await set(ref(db, `labels/${labelKey}/compilations/${compilationIndex}/extra_versions/${versionKey}`), null);
+                    await logChange(db, labelKey, `compilations/${compilationIndex}/extra_versions/${versionKey}`, "Version data", null);
+                    location.reload();
+                } catch (error) {
+                    console.error("Error deleting version:", error);
+                    alert("Failed to delete version: " + error.message);
                 }
             });
         });
@@ -699,31 +695,6 @@ auth.onAuthStateChanged((user) => {
                         document.body.removeChild(modal);
                     }
                 });
-            });
-        });
-
-        // Lock/unlock functionality
-        document.querySelectorAll(".lock-release-btn").forEach(button => {
-            button.addEventListener("click", async () => {
-                const releaseIndex = button.getAttribute("data-release-index");
-                const labelKey = button.getAttribute("data-label");
-                const currentLocked = button.getAttribute("data-current-locked") === "true";
-                const newLockedValue = !currentLocked;
-                
-                try {
-                    await set(ref(db, `labels/${labelKey}/compilations/${releaseIndex}/locked`), newLockedValue);
-                    await logChange(db, labelKey, `compilations/${releaseIndex}/locked`, currentLocked, newLockedValue);
-                    
-                    // Update button appearance
-                    button.setAttribute("data-current-locked", newLockedValue.toString());
-                    button.textContent = newLockedValue ? '🔓 Unlock' : '🔒 Lock';
-                    button.style.backgroundColor = newLockedValue ? '#ff6b6b' : '#8B0000';
-                    
-                    // Reload the page to update all UI elements
-                    location.reload();
-                } catch (err) {
-                    alert("Failed to update lock status: " + err.message);
-                }
             });
         });
 

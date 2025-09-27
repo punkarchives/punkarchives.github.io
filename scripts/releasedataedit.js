@@ -187,16 +187,20 @@ function attachEditListeners() {
             
             if (isStoryField) {
                 container.innerHTML = `
-                    <textarea class="edit-input" rows="8" style="width: 100%; min-height: 150px;">${currentValue}</textarea>
+                    <textarea class="edit-input" rows="8" style="width: 100%; min-height: 150px;"></textarea>
                     <button class="save-button" style="margin-left: 5px;">✅</button>
                     <button class="cancel-button" style="margin-left: 5px;">❌</button>
                 `;
+                // Set the value after creating the element to avoid quotation mark issues
+                container.querySelector(".edit-input").value = currentValue;
             } else {
                 container.innerHTML = `
-                    <input type="text" class="edit-input" value="${currentValue}" />
+                    <input type="text" class="edit-input" />
                     <button class="save-button" style="margin-left: 5px;">✅</button>
                     <button class="cancel-button" style="margin-left: 5px;">❌</button>
                 `;
+                // Set the value after creating the element to avoid quotation mark issues
+                container.querySelector(".edit-input").value = currentValue;
             }
 
             container.querySelector(".save-button").addEventListener("click", async () => {
@@ -352,12 +356,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <li>
                         <span class="editable-value" data-path="releases/${releaseIndex}/tracks/${trackIndex}/name" data-band="${band.key}">${trackName}</span>
                         <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
-                        <button class="lyrics-button" data-release-index="${releaseIndex}" data-track-index="${trackIndex}" data-band="${band.key}" style="margin-left: 5px; display: inline-block; background-color: #4ecdc4; color: white; border: none; padding: 2px 6px; cursor: pointer;">📝 Lyrics</button>
+                        <button class="lyrics-button" data-release-index="${releaseIndex}" data-track-index="${trackIndex}" data-band="${band.key}" style="margin-left: 5px; display: inline-block; background-color: #8B0000; color: white; border: none; padding: 2px 6px; cursor: pointer;">📝 Lyrics</button>
                     </li>
                 `;
             });
             releaseHTML += `</ol>`;
-            releaseHTML += `<button class="add-track-button" data-release-index="${releaseIndex}" data-band="${band.key}" style="margin-top:5px">➕ Add Track</button>`;
+            releaseHTML += `<div style="margin-top:5px">
+                <button class="add-track-button" data-release-index="${releaseIndex}" data-band="${band.key}" style="margin-right:5px">➕ Add Track</button>
+                <button class="add-multiple-tracks-button" data-release-index="${releaseIndex}" data-band="${band.key}" data-count="2" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+2</button>
+                <button class="add-multiple-tracks-button" data-release-index="${releaseIndex}" data-band="${band.key}" data-count="3" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+3</button>
+                <button class="add-multiple-tracks-button" data-release-index="${releaseIndex}" data-band="${band.key}" data-count="4" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+4</button>
+                <button class="add-multiple-tracks-button" data-release-index="${releaseIndex}" data-band="${band.key}" data-count="5" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+5</button>
+            </div>`;
         }
 
         document.getElementById("release-content").innerHTML = releaseHTML;
@@ -386,6 +396,44 @@ document.addEventListener("DOMContentLoaded", async () => {
                 // Add new version
                 await set(ref(db, `bands/${band.key}/releases/${releaseIndex}/extra_versions/${nextKey}`), newVersion);
                 await logChange(db, band.key, `releases/${releaseIndex}/extra_versions/${nextKey}`, "New Version Added", JSON.stringify(newVersion));
+                
+                // Award points to user for adding a version
+                const user = auth.currentUser;
+                if (user) {
+                    const lowercaseUsername = user.email.replace("@punkarchives.com", "").toLowerCase();
+                    
+                    // Find the proper capitalized username from database
+                    const usersRef = ref(db, "users");
+                    const usersSnapshot = await get(usersRef);
+                    let properUsername = lowercaseUsername; // fallback
+                    
+                    if (usersSnapshot.exists()) {
+                        const users = usersSnapshot.val();
+                        const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
+                        if (userEntry) {
+                            properUsername = userEntry[0]; // This is the properly capitalized username
+                        }
+                    }
+                    
+                    const userRef = ref(db, `users/${properUsername}/points`);
+                    const snapshot = await get(userRef);
+                    let currentPoints = 0;
+                    if (snapshot.exists()) {
+                        currentPoints = snapshot.val();
+                    }
+
+                    await set(userRef, currentPoints + 1);
+                    
+                    // Award monthly version points
+                    console.log('💿 Attempting to award monthly version points...');
+                    console.log('window.monthlyPoints available:', !!window.monthlyPoints);
+                    if (window.monthlyPoints && window.monthlyPoints.awardMonthlyVersionPoints) {
+                        console.log('✅ Calling awardMonthlyVersionPoints...');
+                        window.monthlyPoints.awardMonthlyVersionPoints();
+                    } else {
+                        console.log('❌ monthlyPoints or awardMonthlyVersionPoints not available');
+                    }
+                }
                 
                 location.reload();
             } catch (err) {
@@ -431,6 +479,32 @@ document.addEventListener("DOMContentLoaded", async () => {
                     location.reload();
                 } catch (err) {
                     alert("Failed to add track: " + err.message);
+                }
+            });
+        });
+
+        // Add event listeners for multiple track buttons
+        document.querySelectorAll(".add-multiple-tracks-button").forEach(button => {
+            button.addEventListener("click", async () => {
+                const releaseIndex = button.getAttribute("data-release-index");
+                const bandKey = button.getAttribute("data-band");
+                const count = parseInt(button.getAttribute("data-count"));
+
+                const tracklistRef = ref(db, `bands/${bandKey}/releases/${releaseIndex}/tracks`);
+                const snapshot = await get(tracklistRef);
+                const currentTracks = snapshot.exists() ? snapshot.val() : {};
+
+                const nextIndex = Object.keys(currentTracks).length;
+
+                try {
+                    for (let i = 0; i < count; i++) {
+                        const newTrack = { name: "undefined" };
+                        await set(ref(db, `bands/${bandKey}/releases/${releaseIndex}/tracks/${nextIndex + i}`), newTrack);
+                        await logChange(db, bandKey, `releases/${releaseIndex}/tracks/${nextIndex + i}`, "Track added", JSON.stringify(newTrack));
+                    }
+                    location.reload();
+                } catch (err) {
+                    alert("Failed to add tracks: " + err.message);
                 }
             });
         });

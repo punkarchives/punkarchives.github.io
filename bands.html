@@ -84,6 +84,14 @@
                       document.write(`<button onclick="scrollToLetter('${letter}')" style="background-color: #aa0000; color: white; border: none; padding: 5px 10px; cursor: pointer;">${letter}</button>`);
                   });
                   document.write('</div>');
+                  document.write('<div style="margin: 10px 0;">');
+                  document.write('<label style="color: white; margin-right: 10px;">');
+                  document.write('<input type="checkbox" id="show-flagged-toggle" checked style="margin-right: 5px;">');
+                  document.write('Show flagged bands (🚩)');
+                  document.write('</label>');
+                  document.write('<label style="color: white; margin-right: 10px;">');
+                  document.write('</label>');
+                  document.write('</div>');
                </script>
             </div>
             <font color="#ffffff">
@@ -95,5 +103,6 @@
          <p>Is this page incomplete? Help by submitting info.</p>
       </center>
       <script src="scripts/bandlist.js" type="module"></script>
+      <script src="scripts/miniplayer.js"></script>
    </body>
 </html>

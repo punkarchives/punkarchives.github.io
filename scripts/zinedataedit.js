@@ -71,10 +71,12 @@ function createEditableField(container, label, value, dataPath, zineKey) {
     const oldValue = span.textContent;
     container.innerHTML = `
       <strong>${label}:</strong>
-      <input type="text" value="${oldValue}" class="edit-input" />
+      <input type="text" class="edit-input" />
       <button class="save-button" style="margin-left:5px;">✅</button>
       <button class="cancel-button" style="margin-left:5px;">❌</button>
     `;
+    // Set the value after creating the element to avoid quotation mark issues
+    container.querySelector(".edit-input").value = oldValue;
 
     container.querySelector(".save-button").addEventListener("click", async () => {
       const newValue = container.querySelector(".edit-input").value;
@@ -160,10 +162,12 @@ function createEditableIssue(issue, issueIndex, zineKey, container) {
 
       p.innerHTML = `
         <strong>${capitalize(dataPath.split("/").pop())}:</strong>
-        <input type="text" value="${oldValue}" class="edit-input" />
+        <input type="text" class="edit-input" />
         <button class="save-button" style="margin-left:5px;">✅</button>
         <button class="cancel-button" style="margin-left:5px;">❌</button>
       `;
+      // Set the value after creating the element to avoid quotation mark issues
+      p.querySelector(".edit-input").value = oldValue;
 
       p.querySelector(".save-button").addEventListener("click", async () => {
         const newValue = p.querySelector(".edit-input").value;

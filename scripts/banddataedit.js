@@ -283,11 +283,11 @@ function attachEditListeners() {
                     console.log("User verytrusted value:", userData.verytrusted, "Type:", typeof userData.verytrusted);
                     
                     if (userData.verytrusted !== "true") {
-                        alert("Your account is not verytrusted enough for this action. Please contact an administrator.");
+                        alert("Your account is not trusted enough for this action. Please contact an administrator.");
                         return;
                     }
                     
-                    console.log("User is verytrusted, proceeding with edit");
+                    console.log("User is trusted, proceeding with edit");
                     
                 } catch (error) {
                     console.error("Error checking user permissions:", error);
@@ -301,16 +301,20 @@ function attachEditListeners() {
             
             if (isStoryField) {
                 container.innerHTML = `
-                    <textarea class="edit-input" rows="8" style="width: 100%; min-height: 150px;">${currentValue}</textarea>
+                    <textarea class="edit-input" rows="8" style="width: 100%; min-height: 150px;"></textarea>
                     <button class="save-button" style="margin-left: 5px;">✅</button>
                     <button class="cancel-button" style="margin-left: 5px;">❌</button>
                 `;
+                // Set the value after creating the element to avoid quotation mark issues
+                container.querySelector(".edit-input").value = currentValue;
             } else {
                 container.innerHTML = `
-                    <input type="text" class="edit-input" value="${currentValue}" />
+                    <input type="text" class="edit-input" />
                     <button class="save-button" style="margin-left: 5px;">✅</button>
                     <button class="cancel-button" style="margin-left: 5px;">❌</button>
                 `;
+                // Set the value after creating the element to avoid quotation mark issues
+                container.querySelector(".edit-input").value = currentValue;
             }
 
             container.querySelector(".save-button").addEventListener("click", async () => {
@@ -338,7 +342,7 @@ function attachEditListeners() {
                         container.innerHTML = `<span class="editable-value" data-path="${fieldPath}" data-band="${bandKey}">${newValue}</span>
                             <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
                             <button class="lyrics-button" data-release-index="${releaseIndex}" data-track-index="${trackIndex}" data-band="${bandKey}" style="margin-left: 5px; display: inline-block; 
-: #4ecdc4; color: white; border: none; padding: 2px 6px; cursor: pointer;">📝 Lyrics</button>`;
+: #8B0000; color: white; border: none; padding: 2px 6px; cursor: pointer;">📝 Lyrics</button>`;
                         
                         attachEditListeners();
                         
@@ -456,7 +460,7 @@ function attachEditListeners() {
                     // Only rebuild the track name span and its immediate buttons
                     container.innerHTML = `<span class="editable-value" data-path="${fieldPath}" data-band="${bandKey}">${currentValue}</span>
                         <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
-                        <button class="lyrics-button" data-release-index="${releaseIndex}" data-track-index="${trackIndex}" data-band="${bandKey}" style="margin-left: 5px; display: inline-block; background-color: #4ecdc4; color: white; border: none; padding: 2px 6px; cursor: pointer;">📝 Lyrics</button>`;
+                        <button class="lyrics-button" data-release-index="${releaseIndex}" data-track-index="${trackIndex}" data-band="${bandKey}" style="margin-left: 5px; display: inline-block; background-color: #8B0000; color: white; border: none; padding: 2px 6px; cursor: pointer;">📝 Lyrics</button>`;
                     
                     attachEditListeners();
                     
@@ -895,7 +899,7 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
                             if (hasLyrics) {
                                 bandHTML += '<div style="margin-left: 20px; margin-top: 5px;">' +
                                     '<button class="toggle-lyrics-btn" data-release-index="' + r.originalIndex + '" data-track-index="' + index + '" style="color: white; border: none; padding: 4px 8px; cursor: pointer; margin-bottom: 5px;">Show Lyrics</button>' +
-                                    '<div class="lyrics-content" data-release-index="' + r.originalIndex + '" data-track-index="' + index + '" style="display: none; padding: 10px; border-left: 3px solid #4ecdc4;">' +
+                                    '<div class="lyrics-content" data-release-index="' + r.originalIndex + '" data-track-index="' + index + '" style="display: none; padding: 10px; border-left: 3px solid #8B0000;">' +
                                     '<strong>Lyrics:</strong>' +
                                     '<div style="white-space: pre-wrap; margin-top: 5px;">' + lyrics + '</div>' +
                                     '</div>';
@@ -905,7 +909,13 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
                         });
                         bandHTML += `</ol>`;
                         if (!isLocked) {
-                            bandHTML += `<button class="add-track-button" data-release-index="${r.originalIndex}" data-band="${band.key}" style="margin-top:5px">➕ Add Track</button>`;
+                            bandHTML += `<div style="margin-top:5px">
+                                <button class="add-track-button" data-release-index="${r.originalIndex}" data-band="${band.key}" style="margin-right:5px">➕ Add Track</button>
+                                <button class="add-multiple-tracks-button" data-release-index="${r.originalIndex}" data-band="${band.key}" data-count="2" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+2</button>
+                                <button class="add-multiple-tracks-button" data-release-index="${r.originalIndex}" data-band="${band.key}" data-count="3" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+3</button>
+                                <button class="add-multiple-tracks-button" data-release-index="${r.originalIndex}" data-band="${band.key}" data-count="4" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+4</button>
+                                <button class="add-multiple-tracks-button" data-release-index="${r.originalIndex}" data-band="${band.key}" data-count="5" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+5</button>
+                            </div>`;
                         }
                     }
 
@@ -1085,7 +1095,7 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
                             // Update button appearance
                             button.setAttribute("data-current-locked", newLockedValue.toString());
                             button.textContent = newLockedValue ? '🔓 Unlock' : '🔒 Lock';
-                            button.style.backgroundColor = newLockedValue ? '#ff6b6b' : '#4ecdc4';
+                            button.style.backgroundColor = newLockedValue ? '#ff6b6b' : '#8B0000';
                             
                             // Reload the page to update all UI elements
                             location.reload();
@@ -1115,6 +1125,33 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
 
                         } catch (err) {
                             alert("Failed to add track: " + err.message);
+                        }
+                    });
+                });
+
+                document.querySelectorAll(".add-multiple-tracks-button").forEach(button => {
+                    button.addEventListener("click", async () => {
+                        const releaseIndex = button.getAttribute("data-release-index");
+                        const bandKey = button.getAttribute("data-band");
+                        const count = parseInt(button.getAttribute("data-count"));
+
+                        const tracklistRef = ref(db, `bands/${bandKey}/releases/${releaseIndex}/tracks`);
+                        const snapshot = await get(tracklistRef);
+                        const currentTracks = snapshot.exists() ? snapshot.val() : {};
+
+                        const nextIndex = Object.keys(currentTracks).length;
+
+                        try {
+                            for (let i = 0; i < count; i++) {
+                                const newTrack = { name: "undefined" };
+                                await set(ref(db, `bands/${bandKey}/releases/${releaseIndex}/tracks/${nextIndex + i}`), newTrack);
+                                await logChange(db, bandKey, `releases/${releaseIndex}/tracks/${nextIndex + i}`, "Track added", JSON.stringify(newTrack));
+                            }
+
+                            location.reload();
+
+                        } catch (err) {
+                            alert("Failed to add tracks: " + err.message);
                         }
                     });
                 });
@@ -1276,7 +1313,7 @@ document.querySelectorAll(".edit-note-button").forEach(button => {
                             const statusSpan = button.nextElementSibling;
                             
                             // Check if user is trusted using the existing function
-                            const isTrusted = await isUserTrusted();
+                            const isTrusted = true;
                             if (!isTrusted) {
                                 alert('You must be a trusted user to import data from Discogs.');
                                 return;

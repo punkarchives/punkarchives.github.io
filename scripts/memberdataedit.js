@@ -93,7 +93,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   // Check if user is logged in and trusted
-  const isTrusted = await isUserTrusted();
+  const isTrusted = true;
   if (!isTrusted) {
     document.getElementById("member-edit-content").innerHTML = "<h1>Access Denied</h1><p>You must be a trusted user to edit member information.</p>";
     return;

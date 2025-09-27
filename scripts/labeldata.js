@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         </div>
       </div>
 
-<h2>Artists:</h2>
+<h2>Notable Artists:</h2>
 <ul>
   ${(label.bands || "")
     .split(",")
@@ -88,17 +88,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     let releases = [];
 
-    bands.forEach(band => {
-      (band.releases || []).forEach(release => {
-        if (release.label === labelName) {
-          releases.push({
-            ...release,
-            artist: band.band_name
-          });
-        }
-      });
-    });
-
     if (label.compilations) {
       Object.values(label.compilations).forEach(compilation => {
         releases.push({
@@ -116,7 +105,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       return yearA - yearB;
     });
 
-    let releasesHTML = "<h2>Releases:</h2>";
+    let releasesHTML = "<h2>Compilations:</h2>";
 
     releases.forEach((release, index) => {
     let statusText = "";
@@ -126,30 +115,66 @@ document.addEventListener("DOMContentLoaded", async function () {
       statusText = ` <span style="color: green; font-weight: bold;">[Marked for Restore]</span>`;
     }
       releasesHTML += `
-        <div style="margin-bottom: 10px;">
-          <u>
-          <h3 class="release-title" data-image="${release.cover_image}" style="margin-bottom: 5px; cursor: pointer; display: inline-block;">
-            <a href="release.html?band=${encodeURIComponent(release.artist)}&release=${encodeURIComponent(release.title)}" style="color: inherit; text-decoration: inherit;">
-              ${release.title}${statusText}
-            </a>
-          </h3>
-          </u>
-          <button class="download-image" data-image="${release.cover_image}" style="margin-left: 10px;">Download Image</button>
-          <table class="release-details" style="border-collapse: collapse; border: 2px solid #aa0000;">
-            <tr><td style="border: 1px solid #aa0000;"><strong>Artist(s):</strong></td><td style="border: 1px solid #aa0000;">${release.artist}</td></tr>
-            <tr><td style="border: 1px solid #aa0000;"><strong>Label:</strong></td><td style="border: 1px solid #aa0000;">${formatMultipleLabels(release.label)}</td></tr>
-            <tr><td style="border: 1px solid #aa0000;"><strong>Release Date:</strong></td><td style="border: 1px solid #aa0000;">${release.year || "Unknown"}</td></tr>
-            <tr><td style="border: 1px solid #aa0000;"><strong>Type:</strong></td><td style="border: 1px solid #aa0000;">${release.release_type || "N/A"}</td></tr>
-            <tr><td style="border: 1px solid #aa0000;"><strong>Format:</strong></td><td style="border: 1px solid #aa0000;">${release.physical_format || "N/A"}</td></tr>
-            <tr><td style="border: 1px solid #aa0000;"><strong>Limitation:</strong></td><td style="border: 1px solid #aa0000;">${release.limitation || "N/A"}</td></tr>
-            <tr><td style="border: 1px solid #aa0000;"><strong>Extra Info:</strong></td><td style="border: 1px solid #aa0000;">${release.extra_info || "N/A"}</td></tr>
-          </table>
+        <div class="release-item" style="margin-bottom: 15px; padding: 15px; background: rgba(15,15,15); border-left: 4px solid #aa0000;">
+          <div class="release-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 class="release-title" data-image="${release.cover_image}" style="margin: 0; cursor: pointer;">
+              <a href="compilation.html?label=${encodeURIComponent(labelName)}&compilation=${encodeURIComponent(release.title)}" style="color: #aa0000; text-decoration: none; font-size: 18px;">
+                ${release.title}${statusText}
+              </a>
+            </h3>
+            <div class="release-actions" style="display: flex; gap: 8px;">
+              ${release.listen ? `<button class="listen" onclick="playInMiniPlayer('${release.listen}', '${release.title}', '${labelName}')" style="background: #333; color: white; border: none; padding: 4px 8px; cursor: pointer; font-size: 12px; border-radius: 3px;">🎵 Listen</button>` : ""}
+            </div>
+          </div>
+          
+          <div class="release-info" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 10px;">
+            <div class="info-item">
+              <span class="info-label" style="color: #aa0000; font-weight: bold;">Artist(s):</span>
+              <span class="info-value">${release.artist}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label" style="color: #aa0000; font-weight: bold;">Label:</span>
+              <span class="info-value">${formatMultipleLabels(release.label)}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label" style="color: #aa0000; font-weight: bold;">Year:</span>
+              <span class="info-value">${release.year || "N/A"}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label" style="color: #aa0000; font-weight: bold;">Type:</span>
+              <span class="info-value">${release.release_type || "N/A"}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label" style="color: #aa0000; font-weight: bold;">Format:</span>
+              <span class="info-value">${release.physical_format || "N/A"}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label" style="color: #aa0000; font-weight: bold;">Limitation:</span>
+              <span class="info-value">${release.limitation || "N/A"}</span>
+            </div>
+          </div>
+          
+          <div class="release-extra" style="margin-top: 10px;">
+            <button class="toggle-tracks" data-index="${index}" style="background: #333; color: white; border: 1px solid #aa0000; padding: 6px 12px; cursor: pointer; font-size: 12px; border-radius: 3px;">Show Tracklist</button>
+            <ol class="tracklist" id="tracklist-${index}" style="display: none; margin-top: 10px; padding-left: 20px; list-style-type: decimal;">
+              ${release.tracks?.map(track => {
+                // Handle both string and object track data
+                let trackName;
+                if (typeof track === 'object' && track !== null) {
+                  trackName = track.name || 'Unknown Track';
+                } else {
+                  trackName = track || 'Unknown Track';
+                }
+                return `<li style="margin-bottom: 5px; color: #ccc;">${trackName}</li>`;
+              }).join("")}
+            </ol>
+          </div>
         </div>
       `;
     });
 
     if (releases.length === 0) {
-      releasesHTML += "<p>No releases found for this label.</p>";
+      releasesHTML += "<p>No compilations found for this label.</p>";
     }
 
     document.getElementById("label-content").innerHTML += releasesHTML;
@@ -189,6 +214,15 @@ document.addEventListener("DOMContentLoaded", async function () {
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
+        });
+      });
+
+      document.querySelectorAll(".toggle-tracks").forEach(button => {
+        button.addEventListener("click", function () {
+          const index = this.getAttribute("data-index");
+          const tracklist = document.getElementById(`tracklist-${index}`);
+          tracklist.style.display = tracklist.style.display === "none" ? "block" : "none";
+          this.textContent = tracklist.style.display === "none" ? "Show Tracklist" : "Hide Tracklist";
         });
       });
     }, 100);

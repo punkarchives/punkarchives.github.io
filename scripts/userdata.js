@@ -94,9 +94,7 @@ async function generateAchievementsHTML(username, userData) {
       { emoji: "⭐", text: "Reporter - Wrote 5 reviews", threshold: 5 },
       { emoji: "📝", text: "Snark - Wrote 25 reviews", threshold: 25 },
       { emoji: "📷", text: "Paparazzi - Wrote 50 reviews", threshold: 50 },
-      { emoji: "📰", text: "Journalist - Wrote 100 reviews", threshold: 100 },
-      { emoji: "💯", text: "Perfect Score - Gave a 10/10 rating to a release", threshold: "perfect_score" },
-      { emoji: "🎨", text: "Variety Seeker - Reviewed releases from 20 different bands", threshold: "variety" }
+      { emoji: "💯", text: "Perfect Score - Gave a 10/10 rating to a release", threshold: "perfect_score" }
     ],
     collection: [
       { emoji: "💿", text: "Collector - Added 10 items to your collection", threshold: 10 },
@@ -108,6 +106,12 @@ async function generateAchievementsHTML(username, userData) {
       { emoji: "👑", text: "OG Archivist - Joined Punk Archives in 2025", threshold: "og_2025" },
       { emoji: "🎂", text: "Anniversary - Been a member for 1 year", threshold: 1 },
       { emoji: "🏅", text: "Veteran - Been a member for 2+ years", threshold: 2 }
+    ],
+    final: [
+      { emoji: "🧠", text: "Walking Encyclopedia - Gained 100,000 points", threshold: 100000 },
+      { emoji: "📢", text: "Voice Of The Masses - Got 100+ Likes On A Review", threshold: "voice_masses" },
+      { emoji: "🎸", text: "Crazy Fan - Collected your favorite band's discography", threshold: "crazy_fan" },
+      { emoji: "👴", text: "Oldhead - Been a member for 5+ years", threshold: 5 }
     ]
   };
   
@@ -119,7 +123,9 @@ async function generateAchievementsHTML(username, userData) {
     hasPerfectScore: false,
     uniqueBands: 0,
     yearsSinceJoin: 0,
-    joinYear: null
+    joinYear: null,
+    hasVoiceOfMasses: false,
+    hasCrazyFan: false
   };
   
   // Get review stats
@@ -135,6 +141,7 @@ async function generateAchievementsHTML(username, userData) {
       userStats.reviews = userReviews.length;
       userStats.hasPerfectScore = userReviews.some(review => review.rating === 10);
       userStats.uniqueBands = new Set(userReviews.map(review => review.band)).size;
+      userStats.hasVoiceOfMasses = userReviews.some(review => (review.likes || 0) >= 100);
     }
   } catch (error) {
     console.error('Error checking review stats:', error);
@@ -147,6 +154,31 @@ async function generateAchievementsHTML(username, userData) {
     if (collectionSnapshot.exists()) {
       const collection = collectionSnapshot.val();
       userStats.collection = Object.values(collection).length;
+      
+      // Check for "Crazy Fan" achievement - collected all releases from favorite band
+      if (userData.favoriteBand) {
+        // Count how many releases from favorite band are in collection
+        const favoriteBandCollectionCount = Object.values(collection).filter(item => 
+          item.band === userData.favoriteBand
+        ).length;
+        
+        // Get favorite band's total release count
+        const bandsRef = ref(db, 'bands');
+        const bandsSnapshot = await get(bandsRef);
+        if (bandsSnapshot.exists()) {
+          const bands = bandsSnapshot.val();
+          const favoriteBandData = Object.values(bands).find(band => band.band_name === userData.favoriteBand);
+          
+          if (favoriteBandData && favoriteBandData.releases) {
+            const totalReleases = Object.values(favoriteBandData.releases).filter(release => 
+              release.title && release.title !== "undefined"
+            ).length;
+            
+            // User has "Crazy Fan" if they've collected all releases from their favorite band
+            userStats.hasCrazyFan = favoriteBandCollectionCount >= totalReleases && totalReleases > 0;
+          }
+        }
+      }
     }
   } catch (error) {
     console.error('Error checking collection stats:', error);
@@ -156,7 +188,10 @@ async function generateAchievementsHTML(username, userData) {
   if (userData.creationDate) {
     const joinDate = new Date(userData.creationDate);
     const now = new Date();
-    userStats.yearsSinceJoin = now.getFullYear() - joinDate.getFullYear();
+    const diffTime = Math.abs(now - joinDate);
+    const diffYears = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 365));
+    
+    userStats.yearsSinceJoin = diffYears;
     userStats.joinYear = joinDate.getFullYear();
   }
   
@@ -168,8 +203,6 @@ async function generateAchievementsHTML(username, userData) {
       case 'reviews':
         if (achievement.threshold === 'perfect_score') {
           return userStats.hasPerfectScore;
-        } else if (achievement.threshold === 'variety') {
-          return userStats.uniqueBands >= 20;
         } else {
           return userStats.reviews >= achievement.threshold;
         }
@@ -181,18 +214,31 @@ async function generateAchievementsHTML(username, userData) {
         } else {
           return userStats.yearsSinceJoin >= achievement.threshold;
         }
+      case 'final':
+        if (achievement.threshold === 'voice_masses') {
+          return userStats.hasVoiceOfMasses;
+        } else if (achievement.threshold === 'crazy_fan') {
+          return userStats.hasCrazyFan;
+        } else if (achievement.threshold === 100000) {
+          return userStats.points >= 100000;
+        } else if (achievement.threshold === 5) {
+          return userStats.yearsSinceJoin >= 5;
+        } else {
+          return false;
+        }
       default:
         return false;
     }
   }
   
-  // Build HTML with categories
+
+
   let html = '';
   const categories = [
     { name: 'Points', key: 'points' },
     { name: 'Reviews', key: 'reviews' },
     { name: 'Collection', key: 'collection' },
-    { name: 'Account Age', key: 'account' }
+    { name: 'Account Age', key: 'account' },
   ];
   
   categories.forEach((category, index) => {
@@ -200,16 +246,23 @@ async function generateAchievementsHTML(username, userData) {
       html += '<br>';
     }
     
-    html += `<div style="margin-bottom: 8px;">
-      <strong style="color: #aa0000; font-size: 12px;">${category.name}:</strong><br>
-      ${allAchievements[category.key].map(achievement => {
-        const isEarned = isAchievementEarned(category.key, achievement);
-        const opacity = isEarned ? '1' : '0.1';
-        const cursor = isEarned ? 'pointer' : 'default';
-        
-        return `<span class="achievement" data-text="${achievement.text}" style="cursor: ${cursor}; font-size: 14px; margin-right: 3px; opacity: ${opacity};">${achievement.emoji}</span>`;
-      }).join('')}
-    </div>`;
+    const isFinalCategory = category.key === 'final';
+    const fontSize = isFinalCategory ? '20px' : '14px';
+    const marginBottom = isFinalCategory ? '12px' : '8px';
+    
+    html += `<div style="margin-bottom: ${marginBottom};">`;
+    
+    if (category.name) {
+      html += `<strong style="color: #aa0000; font-size: 12px;">${category.name}:</strong><br>`;
+    }
+    
+    html += `${allAchievements[category.key].map(achievement => {
+      const isEarned = isAchievementEarned(category.key, achievement);
+      const opacity = isEarned ? '1' : '0.1';
+      const cursor = isEarned ? 'pointer' : 'default';
+      
+      return `<span class="achievement" data-text="${achievement.text}" style="cursor: ${cursor}; font-size: ${fontSize}; margin-right: 3px; opacity: ${opacity};">${achievement.emoji}</span>`;
+    }).join('')}</div>`;
   });
   
   return html;
@@ -243,6 +296,12 @@ async function loadUserReviews(username) {
     let reviewsHTML = '';
     userReviews.forEach((review, index) => {
       const date = new Date(review.timestamp).toLocaleDateString();
+      // Get likes and dislikes counts
+      const likes = review.likes || {};
+      const dislikes = review.dislikes || {};
+      const likesCount = Object.keys(likes).length;
+      const dislikesCount = Object.keys(dislikes).length;
+
       reviewsHTML += `
         <div style="border: 1px solid #ccc; margin-bottom: 15px; padding: 10px; background-color: rgba(0,0,0,0.2); text-align: left;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -255,6 +314,14 @@ async function loadUserReviews(username) {
 
           </div>
           <div style="white-space: pre-wrap;">${review.review}</div>
+          <div style="display: flex; align-items: center; gap: 15px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #333;">
+            <span style="color: #666; display: flex; align-items: center; gap: 5px;">
+              👍 ${likesCount}
+            </span>
+            <span style="color: #666; display: flex; align-items: center; gap: 5px;">
+              👎 ${dislikesCount}
+            </span>
+          </div>
         </div>
       `;
     });

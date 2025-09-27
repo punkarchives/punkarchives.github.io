@@ -58,7 +58,7 @@ window.loadLeaderboard = function () {
 
         sortedUsers.forEach((user, index) => {
           const entry = document.createElement("p");
-          entry.textContent = `${user.username}: ${user.points}`;
+          entry.innerHTML = `<u><a href="user.html?user=${encodeURIComponent(user.username)}" style="color: #fff; text-decoration: none;">${user.username}: ${user.points}</a></u><br>`;
           leaderboardDiv.appendChild(entry);
         });
       } else {
@@ -71,10 +71,46 @@ window.loadLeaderboard = function () {
     });
 };
 
+// Function to display logged-in username
+window.displayUsername = function () {
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      const email = user.email;
+      const username = email.replace("@punkarchives.com", ""); // Extract username from email (lowercase)
+      
+      // Find the user in the database to get the proper capitalization
+      const usersRef = ref(db, "users");
+      get(usersRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          const users = snapshot.val();
+          // Find the user by matching the userId
+          const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
+          if (userEntry) {
+            const displayUsername = userEntry[0]; // This is the properly capitalized username
+            document.getElementById("logged-in-user").innerHTML = `<u><a href="user.html?user=${encodeURIComponent(displayUsername)}" style="color: #fff; text-decoration: none;">${displayUsername}</a></u>`;
+          } else {
+            // Fallback to lowercase username if no match found
+            document.getElementById("logged-in-user").innerHTML = `<u><a href="user.html?user=${encodeURIComponent(username)}" style="color: #fff; text-decoration: none;">${username}</a></u>`;
+          }
+        } else {
+          // Fallback to lowercase username if no users found
+          document.getElementById("logged-in-user").innerHTML = `<u><a href="user.html?user=${encodeURIComponent(username)}" style="color: #fff; text-decoration: none;">${username}</a></u>`;
+        }
+      }).catch((error) => {
+        // Fallback to lowercase username on error
+        document.getElementById("logged-in-user").innerHTML = `<u><a href="user.html?user=${encodeURIComponent(username)}" style="color: #fff; text-decoration: none;">${username}</a></u>`;
+      });
+    } else {
+      document.getElementById("logged-in-user").innerText = "Not logged in.";
+    }
+  });
+};
+
 // Run function when page loads
 window.onload = function () {
   console.log("Window loaded, running loadLeaderboard()"); // Debugging message
   loadLeaderboard();
+  displayUsername();
 };
     function slugify(name) {
       return name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
@@ -158,35 +194,35 @@ function addEntry(type) {
       alert(`${type.charAt(0).toUpperCase() + type.slice(1)} added.`);
       input.value = "";
 
-      // Only update points if a band is added
-      if (type === "band") {
-        const user = auth.currentUser;
-        if (user) {
-          const lowercaseUsername = user.email.replace("@punkarchives.com", "").toLowerCase();
+      // Update points for all types
+      const user = auth.currentUser;
+      if (user) {
+        const lowercaseUsername = user.email.replace("@punkarchives.com", "").toLowerCase();
+        
+        // Find the proper capitalized username from database
+        const usersRef = ref(db, "users");
+        get(usersRef).then((usersSnapshot) => {
+          let properUsername = lowercaseUsername; // fallback
           
-          // Find the proper capitalized username from database
-          const usersRef = ref(db, "users");
-          get(usersRef).then((usersSnapshot) => {
-            let properUsername = lowercaseUsername; // fallback
-            
-            if (usersSnapshot.exists()) {
-              const users = usersSnapshot.val();
-              const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
-              if (userEntry) {
-                properUsername = userEntry[0]; // This is the properly capitalized username
-              }
+          if (usersSnapshot.exists()) {
+            const users = usersSnapshot.val();
+            const userEntry = Object.entries(users).find(([key, data]) => data.userId === user.uid);
+            if (userEntry) {
+              properUsername = userEntry[0]; // This is the properly capitalized username
             }
-            
-            const userRef = ref(db, `users/${properUsername}/points`);
-            get(userRef).then((snapshot) => {
-              let currentPoints = 0;
-              if (snapshot.exists()) {
-                currentPoints = snapshot.val();
-              }
+          }
+          
+          const userRef = ref(db, `users/${properUsername}/points`);
+          get(userRef).then((snapshot) => {
+            let currentPoints = 0;
+            if (snapshot.exists()) {
+              currentPoints = snapshot.val();
+            }
 
-              set(userRef, currentPoints + 1);
-              
-              // Award monthly band points
+            set(userRef, currentPoints + 1);
+            
+            // Award monthly points based on type
+            if (type === "band") {
               console.log('🎸 Attempting to award monthly band points...');
               console.log('window.monthlyPoints available:', !!window.monthlyPoints);
               if (window.monthlyPoints && window.monthlyPoints.awardMonthlyBandPoints) {
@@ -195,14 +231,41 @@ function addEntry(type) {
               } else {
                 console.log('❌ monthlyPoints or awardMonthlyBandPoints not available');
               }
-            }).catch((error) => {
-              console.error("Error updating points:", error);
-            });
+            } else if (type === "label") {
+              console.log('🏷️ Attempting to award monthly label points...');
+              if (window.monthlyPoints && window.monthlyPoints.awardMonthlyLabelPoints) {
+                console.log('✅ Calling awardMonthlyLabelPoints...');
+                window.monthlyPoints.awardMonthlyLabelPoints();
+              } else {
+                console.log('❌ monthlyPoints or awardMonthlyLabelPoints not available');
+              }
+            } else if (type === "zine") {
+              console.log('📰 Attempting to award monthly zine points...');
+              if (window.monthlyPoints && window.monthlyPoints.awardMonthlyZinePoints) {
+                console.log('✅ Calling awardMonthlyZinePoints...');
+                window.monthlyPoints.awardMonthlyZinePoints();
+              } else {
+                console.log('❌ monthlyPoints or awardMonthlyZinePoints not available');
+              }
+            }
           }).catch((error) => {
-            console.error("Error finding user:", error);
+            console.error("Error updating points:", error);
           });
-        }
+        }).catch((error) => {
+          console.error("Error finding user:", error);
+        });
       }
+
+      // Redirect to the page of the thing they just added
+      setTimeout(() => {
+        if (type === "band") {
+          window.location.href = `band.html?band=${encodeURIComponent(name)}`;
+        } else if (type === "label") {
+          window.location.href = `label.html?label=${encodeURIComponent(name)}`;
+        } else if (type === "zine") {
+          window.location.href = `zine.html?zine=${encodeURIComponent(name)}`;
+        }
+      }, 1000); // Wait 1 second to show the alert
 
     })
     .catch(error => {
@@ -212,6 +275,120 @@ function addEntry(type) {
 }
 
     window.addEntry = addEntry;
+
+window.login = function () {
+  const originalUsername = document.getElementById("login-username").value;
+  const password = document.getElementById("login-password").value;
+  const username = originalUsername.toLowerCase(); // Normalize to lowercase for Firebase Auth
+
+  if (!originalUsername || !password) {
+    alert("Username and password are required!");
+    return;
+  }
+
+  // Try to find the user by checking both lowercase and original capitalization
+  const userRefLower = ref(db, "users/" + username);
+  const userRefOriginal = ref(db, "users/" + originalUsername);
+  
+  // First try lowercase lookup
+  get(userRefLower).then((snapshot) => {
+    if (snapshot.exists()) {
+      const fakeEmail = `${username}@punkarchives.com`;
+      signInWithEmailAndPassword(auth, fakeEmail, password)
+        .then((userCredential) => {
+          alert("Login successful!");
+        })
+        .catch((error) => {
+          alert("Login error: " + error.message);
+        });
+    } else {
+      // If not found with lowercase, try original capitalization
+      get(userRefOriginal).then((snapshot) => {
+        if (snapshot.exists()) {
+          const fakeEmail = `${username}@punkarchives.com`;
+          signInWithEmailAndPassword(auth, fakeEmail, password)
+            .then((userCredential) => {
+              alert("Login successful!");
+            })
+            .catch((error) => {
+              alert("Login error: " + error.message);
+            });
+        } else {
+          alert("Username not found.");
+        }
+      });
+    }
+  });
+};
+
+window.logout = function () {
+  signOut(auth)
+    .then(() => {
+      alert("You have logged out.");
+    })
+    .catch((error) => {
+      console.error("Logout error:", error);
+    });
+};
+
+window.signUp = function () {
+  const originalUsername = document.getElementById("signup-username").value.trim();
+  const password = document.getElementById("signup-password").value;
+  const username = originalUsername.toLowerCase(); // Normalize to lowercase for storage
+
+  if (!originalUsername || !password) {
+    alert("Username and password are required!");
+    return;
+  }
+
+  if (originalUsername.length > 15) {
+    alert("Username cannot be longer than 15 characters!");
+    return;
+  }
+
+  const fakeEmail = `${username}@punkarchives.com`;
+
+  // Disable the signup button to prevent multiple submissions
+  const signupButton = document.querySelector('button[onclick="signUp()"]');
+  if (signupButton) {
+    signupButton.disabled = true;
+    signupButton.textContent = "Creating Account...";
+  }
+
+  // First, try to create the Firebase account
+  createUserWithEmailAndPassword(auth, fakeEmail, password)
+    .then((userCredential) => {
+      // User created successfully, now create the user record in the database
+      const userRef = ref(db, "users/" + originalUsername);
+      const userData = {
+        userId: userCredential.user.uid,
+        points: 0,
+        monthly_bands_points: 0,
+        monthly_releases_points: 0,
+        monthly_bands_date: 'Never',
+        monthly_releases_date: 'Never'
+      };
+      
+      return set(userRef, userData);
+    })
+    .then(() => {
+      alert("Account created successfully!");
+      // Clear the form
+      document.getElementById("signup-username").value = "";
+      document.getElementById("signup-password").value = "";
+    })
+    .catch((error) => {
+      console.error("Signup error:", error);
+      alert("Signup error: " + error.message);
+    })
+    .finally(() => {
+      // Re-enable the signup button
+      if (signupButton) {
+        signupButton.disabled = false;
+        signupButton.textContent = "Sign Up";
+      }
+    });
+};
 
   </script>
 </head>
@@ -256,7 +433,7 @@ function addEntry(type) {
   </div>
 </center>
 
-<center><p><font size="3">Logged In As: </p><p class="log" id="logged-in-user">(you are logged in this part is just broken rn)</font></p></center>
+<center><p><font size="3">Logged In As: </p><p class="log" id="logged-in-user">Not logged in.</font></p></center>
 
 <button onclick="logout()">Log Out</button><br><br>
 </div>
@@ -282,5 +459,7 @@ function addEntry(type) {
       </div>
     </div>
   </div>
+  
+  <script src="scripts/miniplayer.js"></script>
 </body>
 </html>

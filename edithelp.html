@@ -29,6 +29,7 @@
          </ul>
       </div>
       <script src="scripts/randomband.js" type="module"></script></font>
+      <script src="scripts/miniplayer.js"></script>
       <div class="sidebar2">
          <center>
          <input type="text" id="signup-username" placeholder="Username" required><br>
@@ -65,26 +66,13 @@
          </div>
 
          <div class="news-item">
-            <h3><font color="#f00">What is flagging a release?</font></h3>
-            <p>On the editor page, you can flag releases as Delete or Restore.<br>
-• Delete: A moderator will review and remove the release.<br>
-• Restore: A moderator will revert the release to an earlier version.<br>
-Anyone with the right info can also restore it manually. To remove a flag, just change the value to anything other than "Delete" or "Restore."</p>
-         </div>
-
-         <div class="news-item">
-            <h3><font color="#f00">What is flagging a band?</font></h3>
-            <p>Flagging a band means the info on the page is incomplete, outdated, or just plain wrong. On the "All Bands" page, you'll see a flag icon next to the band name if it's been flagged. You can toggle this flag from the band's page.</p>
-         </div>
-
-         <div class="news-item">
-            <h3><font color="#f00">How do I delete something?</font></h3>
-            <p>Users can't delete anything directly. To delete a release, see "What is flagging a release?". To delete anything else, just rename it to something like "delete" or "please delete this" and a moderator will deal with it.</p>
-         </div>
-
-         <div class="news-item">
             <h3><font color="#f00">How do I add a new band, label, or zine?</font></h3>
-            <p>Go to the <a href="info.html">Add New</a> page. Choose what you're adding, enter the name, and click the button to submit. It will be automatically added and you can edit it from its page.</p>
+            <p>Go to the “Add New” page. Before adding a band, make sure you put "the" at the end of the band name (eg: Clash, The). This rule only applies to band names. Labels and zines can start with "The". Now choose what you're adding, enter the name, and click the button to submit. It will be automatically added and you can edit it from its page.</p>
+         </div>
+
+         <div class="news-item">
+            <h3><font color="#f00">I made a typo in the band name, what do I do?</font></h3>
+            <p>First, make sure not to edit anything. If you already edited something and don’t want to add it all again, a moderator can transfer the data for you. Add the band again, but make sure it’s spelled correctly. Then go to the band page with the typo and press “contact moderator”. The misspelled band will be deleted and its info will be transferred over if necessary.</p>
          </div>
 
          <div class="news-item">
@@ -110,13 +98,68 @@ Then paste that link where it's required.</p>
          </div>
 
          <div class="news-item">
+            <h3><font color="#f00">How do I add multiple versions of a release?</font></h3>
+            <p>Go to the page of your specified release (not the band page), press edit, and press “Add Extra Version”</p>
+         </div>
+
+         <div class="news-item">
+            <h3><font color="#f00">What do I do if an album was released by multiple record labels?</font></h3>
+            <p>In a scenario where 2 different labels put out the same pressing of a release, you can put multiple labels separated by commas on the release info. If different pressings of a release were put out by different labels, then you can just specify that when adding another version of a release.</p>
+         </div>
+		 
+		 <div class="news-item">
+            <h3><font color="#f00">How do I add the listen button to a release?</font></h3>
+            <p>Get a YouTube link for the release, and paste it into the “YouTube Link” field in the band’s edit page.</p>
+         </div>
+		 
+		 <div class="news-item">
             <h3><font color="#f00">Why aren't a band's releases sorting by date?</font></h3>
             <p>Currently the sorting feature only supports years. If the release date is anything other than a 4-digit year, then it won't get sorted.</p>
          </div>
 
          <div class="news-item">
-            <h3><font color="#f00">How do I add the listen button to a release?</font></h3>
-            <p>This feature is currently unable to be edited by users. A moderator will occasionally go and add some manually. If you <i>really</i> want a release to have it, then you can use the contact button to ask.</p>
+            <h3><font color="#f00">How does "Name" and "Real Name" work for band members?</font></h3>
+            <p>The name field is reserved for the name the member is known by while performing in that band. This could be a stage name, like Johnny Rotten, or just the member’s real name. The real name field has to be the member’s real name, with no exceptions. This is so the member’s individual page that lists all of the bands they were in works without counting stage names as separate people.</p>
+         </div>
+
+         <div class="news-item">
+            <h3><font color="#f00">Is this band punk enough to be added?</font></h3>
+            <p>I don’t really care about gatekeeping here. There will never be a large debate about whether a band can be added or not. As long as you’re adding a band with good intentions, and they aren’t collectively agreed upon as not punk (like pop or country), then go ahead. I’ve even let Rare Americans slide, but that was about my limit.</p>
+         </div>
+		 
+		 <div class="news-item">
+            <h3><font color="#f00">Are Nazi bands allowed?</font></h3>
+            <p>You can’t add upcoming shows for these bands or support their ideologies, but archiving them is allowed. Don't abuse this by spamming the site with these bands though. This primarily exists so bands who only became controversial later-on can still be added. Also note that obviously satire bands like Anal Cunt are not Nazi bands.</p>
+         </div>
+		 
+		 <div class="news-item">
+            <h3><font color="#f00">Is NSFW allowed?</font></h3>
+            <p>NSFW is allowed when archiving (as long as it won't get anyone in legal trouble), so don’t worry about your goregrind album covers or noisecore song titles. This of course is restricted to archiving though. You can’t just go and make one of the images on the home page hardcore porn.</p>
+         </div>
+		 
+		 <div class="news-item">
+            <h3><font color="#f00">What is flagging a release?</font></h3>
+            <p>On the editor page, you can flag releases as Delete or Restore.<br>
+• Delete: A moderator will review and remove the release.<br>
+• Restore: A moderator will revert the release to an earlier version.<br>
+After flagging a release select the “Request Moderator” button if available.<br>
+Anyone with the right info can also restore it manually. To remove a flag, just change the value to anything other than "Delete" or "Restore."
+</p>
+         </div>
+		 
+		 <div class="news-item">
+            <h3><font color="#f00">What is flagging a band?</font></h3>
+            <p>If a band is flagged it means the info on the page is incomplete, outdated, or just plain wrong. On the "All Bands" page, you'll see a flag icon next to the band name if it's been flagged. You can toggle this flag from the band's page. Also note that you shouldn’t flag bands as incomplete if the missing info can’t be found anywhere.</p>
+         </div>
+		 
+		 <div class="news-item">
+            <h3><font color="#f00">How do I delete something?</font></h3>
+            <p>Users can't delete anything directly. To delete a release, see "What is flagging a release?". To delete a band, set the description to “delete this band” and select the “Request Moderator” button. To delete anything else, just rename it to something like "delete" or "please delete this" and select the “Request Moderator” button if available.</p>
+         </div>
+		 
+		 <div class="news-item">
+            <h3><font color="#f00">How do I earn points?</font></h3>
+            <p>Points are earned by adding bands and releases. These actions give you 1 point each. The main purpose of these points is just to show how active you are on the site, though the top 3 users get to control an image at the bottom of the home page.</p>
          </div>
 
          <h2></h2>
