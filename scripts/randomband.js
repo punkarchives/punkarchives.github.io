@@ -34,11 +34,35 @@ const firebaseConfig = {
 
       // Function to check if a band has valid genre information
       function hasValidGenre(band) {
-        return band.genres && 
-               typeof band.genres === 'string' &&
-               band.genres.trim() !== '' && 
-               band.genres !== 'undefined' && 
-               band.genres !== 'N/A';
+        const genres = band.genres || band.Genres; // Check both lowercase and capitalized
+        if (!genres) return false;
+        
+        // Handle string genres
+        if (typeof genres === 'string') {
+          const trimmed = genres.trim();
+          return trimmed !== '' && 
+                 trimmed.toLowerCase() !== 'undefined' && 
+                 trimmed !== 'N/A';
+        }
+        
+        // Handle array genres
+        if (Array.isArray(genres)) {
+          if (genres.length === 0) return false;
+          // Check if any genre is "undefined" (case-insensitive)
+          const hasUndefined = genres.some(g => 
+            (typeof g === 'string' && g.trim().toLowerCase() === 'undefined') ||
+            g === 'undefined'
+          );
+          if (hasUndefined) return false;
+          // Check if all genres are empty or "N/A"
+          const allInvalid = genres.every(g => 
+            !g || 
+            (typeof g === 'string' && (g.trim() === '' || g.trim() === 'N/A'))
+          );
+          return !allInvalid;
+        }
+        
+        return false;
       }
 
       // Try to find a band with genre info by checking random bands one by one

@@ -109,7 +109,7 @@ async function generateAchievementsHTML(username, userData) {
     ],
     final: [
       { emoji: "🧠", text: "Walking Encyclopedia - Gained 100,000 points", threshold: 100000 },
-      { emoji: "📢", text: "Voice Of The Masses - Got 100+ Likes On A Review", threshold: "voice_masses" },
+      { emoji: "📢", text: "Voice Of The Masses - Got 100+ likes on a review", threshold: "voice_masses" },
       { emoji: "🎸", text: "Crazy Fan - Collected your favorite band's discography", threshold: "crazy_fan" },
       { emoji: "👴", text: "Oldhead - Been a member for 5+ years", threshold: 5 }
     ]
@@ -246,11 +246,7 @@ async function generateAchievementsHTML(username, userData) {
       html += '<br>';
     }
     
-    const isFinalCategory = category.key === 'final';
-    const fontSize = isFinalCategory ? '20px' : '14px';
-    const marginBottom = isFinalCategory ? '12px' : '8px';
-    
-    html += `<div style="margin-bottom: ${marginBottom};">`;
+    html += `<div style="margin-bottom: 8px;">`;
     
     if (category.name) {
       html += `<strong style="color: #aa0000; font-size: 12px;">${category.name}:</strong><br>`;
@@ -261,9 +257,20 @@ async function generateAchievementsHTML(username, userData) {
       const opacity = isEarned ? '1' : '0.1';
       const cursor = isEarned ? 'pointer' : 'default';
       
-      return `<span class="achievement" data-text="${achievement.text}" style="cursor: ${cursor}; font-size: ${fontSize}; margin-right: 3px; opacity: ${opacity};">${achievement.emoji}</span>`;
+      return `<span class="achievement" data-text="${achievement.text}" style="cursor: ${cursor}; font-size: 14px; margin-right: 3px; opacity: ${opacity};">${achievement.emoji}</span>`;
     }).join('')}</div>`;
   });
+  
+  // Add final achievements in their own row
+  html += '</div></div>';
+  html += `<div style="margin-bottom: 12px;">`;
+  html += `${allAchievements.final.map(achievement => {
+    const isEarned = isAchievementEarned('final', achievement);
+    const opacity = isEarned ? '1' : '0.1';
+    const cursor = isEarned ? 'pointer' : 'default';
+    
+    return `<span class="achievement" data-text="${achievement.text}" style="cursor: ${cursor}; font-size: 20px; margin-right: 3px; opacity: ${opacity};">${achievement.emoji}</span>`;
+  }).join('')}</div>`;
   
   return html;
 }
@@ -484,7 +491,7 @@ document.addEventListener("DOMContentLoaded", async () => {
              </div>
            </div>
          </div>
-         
+         <br>
            <div style="display: flex; width: 100%;">
              <button id="reviews-btn" style="flex: 1; background-color: #aa0000; color: white; border: none; padding: 12px 20%; cursor: pointer; font-size: 16px;">
                Reviews
@@ -626,7 +633,7 @@ document.addEventListener("DOMContentLoaded", async () => {
          tooltip.id = 'achievement-tooltip';
          tooltip.textContent = text;
          tooltip.style.cssText = `
-           position: absolute;
+           position: fixed;
            background: #111;
            color: white;
            padding: 8px 12px;
@@ -640,10 +647,21 @@ document.addEventListener("DOMContentLoaded", async () => {
          `;
          document.body.appendChild(tooltip);
          
-         // Position tooltip near mouse
+         // Position tooltip near element using fixed positioning
          const rect = e.target.getBoundingClientRect();
-         tooltip.style.left = rect.right + 10 + 'px';
+         tooltip.style.left = (rect.right + 10) + 'px';
          tooltip.style.top = rect.top + 'px';
+         
+         // Adjust if tooltip would go off-screen
+         const tooltipRect = tooltip.getBoundingClientRect();
+         if (tooltipRect.right > window.innerWidth) {
+           // Position to the left of the element instead
+           tooltip.style.left = (rect.left - tooltipRect.width - 10) + 'px';
+         }
+         if (tooltipRect.bottom > window.innerHeight) {
+           // Position above the element if needed
+           tooltip.style.top = (rect.top - tooltipRect.height) + 'px';
+         }
        });
        
        element.addEventListener('mouseleave', () => {

@@ -155,7 +155,7 @@ async function loadEvents() {
           <div style="display: flex; gap: 15px;">
             ${event.flyer ? `
               <div style="flex-shrink: 0;">
-                <img src="${event.flyer}" alt="Event flyer" style="width: 150px; height: 150px; object-fit: cover; border: 1px solid #aa0000;">
+                <img src="${event.flyer}" alt="Event flyer" style="width: 150px; object-fit: cover; border: 1px solid #aa0000;">
               </div>
             ` : ''}
             <div style="flex: 1;">

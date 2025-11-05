@@ -1,7 +1,7 @@
 // yes firebase api keys are meant to be public
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-auth.js";
-import { getDatabase, ref, set, get, child, push } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js";
+import { getDatabase, ref, set, get, child, push, update } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAoKv4PLrk4xvZF_IeUhfViwOLBYBv0czQ",
@@ -67,16 +67,32 @@ async function addToCollection(username, bandName, releaseId, releaseTitle, rele
     const collectionSnapshot = await get(collectionRef);
     
     let collection = collectionSnapshot.exists() ? collectionSnapshot.val() : {};
-    const collectionId = Object.keys(collection).length;
     
-    collection[collectionId] = {
+    // Find the next available index by finding the maximum numeric key and adding 1
+    // Convert all keys to numbers and filter out NaN values
+    const keys = Object.keys(collection)
+      .map(key => parseInt(key, 10))
+      .filter(key => !isNaN(key));
+    
+    // Find the maximum key, or start at 0 if collection is empty
+    const maxKey = keys.length > 0 ? Math.max(...keys) : -1;
+    let collectionId = maxKey + 1;
+    
+    // Double-check that this ID doesn't already exist (safety check)
+    while (collection[collectionId] !== undefined) {
+      collectionId++;
+    }
+    
+    // Use update() instead of set() to only update the specific path
+    // This prevents overwriting the entire collection object
+    const newItem = {
       band: bandName,
       releaseId: releaseId,
       releaseTitle: releaseTitle,
       releaseYear: releaseYear || "Unknown"
     };
     
-    await set(collectionRef, collection);
+    await update(collectionRef, { [collectionId]: newItem });
     return true;
   } catch (error) {
     console.error('Error adding to collection:', error);
@@ -331,14 +347,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             </ul>
           ` : ""}
           
+        <div>
+          ${band.bandpic ? `<img src="${band.bandpic}" alt="${band.band_name}" style="max-width: 200px; height: auto;" />` : ""}
+          ${band.logo ? `<img src="${band.logo}" alt="${band.band_name} Logo" style="max-width: 200px; height: auto;" />` : ""}
+        </div>
           <div id="moderator-note-section" style="display: none; margin-top: 20px; padding: 15px; background: rgba(128, 0, 128, 0.1); border-left: 4px solid #800080;">
             <h3 style="color: #800080; margin: 0 0 10px 0;">Moderator Note:</h3>
             <p id="moderator-note-text" style="margin: 0; color: #ccc;"></p>
           </div>
-        </div>
-        <div>
-          ${band.bandpic ? `<img src="${band.bandpic}" alt="${band.band_name}" style="max-width: 200px; height: auto;" />` : ""}
-          ${band.logo ? `<img src="${band.logo}" alt="${band.band_name} Logo" style="max-width: 200px; height: auto;" />` : ""}
         </div>
       </div>
     `;

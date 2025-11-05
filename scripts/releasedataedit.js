@@ -152,6 +152,25 @@ function attachEditListeners() {
             const currentValue = span.textContent;
             const container = span.parentElement;
             
+            // Safety check: Prevent editing if release is locked
+            // Extract release index from fieldPath if it's a release field
+            if (fieldPath && fieldPath.startsWith("releases/")) {
+                const releaseIndexMatch = fieldPath.match(/^releases\/(\d+)(?:\/|$)/);
+                if (releaseIndexMatch) {
+                    const releaseIndex = releaseIndexMatch[1];
+                    try {
+                        const releaseRef = ref(db, `bands/${bandKey}/releases/${releaseIndex}/locked`);
+                        const releaseSnapshot = await get(releaseRef);
+                        if (releaseSnapshot.exists() && releaseSnapshot.val() === true) {
+                            alert("This release is locked and cannot be edited.");
+                            return;
+                        }
+                    } catch (error) {
+                        console.error("Error checking release lock status:", error);
+                    }
+                }
+            }
+            
             // Check if this is a trusted-only field and verify user permissions
             if (this.classList.contains("trusted-only")) {
                 const user = auth.currentUser;
@@ -287,12 +306,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const release = band.releases[releaseIndex];
 
-        let releaseHTML = `<h1>${release.title} <a href="release.html?band=${encodeURIComponent(bandName)}&release=${encodeURIComponent(releaseTitle)}"><font size="4" face="Arial">RETURN</font></a></h1>`;
+        // Check if release is locked
+        const isLocked = release.locked === true;
+        const lockEmoji = isLocked ? ' 🔒' : '';
+        const titleStyle = isLocked ? 'style="color: green;"' : '';
 
-        const editableField = (key, val, bandKey, path) => `
+        let releaseHTML = `<h1 ${titleStyle}>${release.title}${lockEmoji} <a href="release.html?band=${encodeURIComponent(bandName)}&release=${encodeURIComponent(releaseTitle)}"><font size="4" face="Arial">RETURN</font></a></h1>`;
+
+        const editableField = (key, val, bandKey, path, isTrustedOnly = false) => {
+            const editButton = !isLocked ? `<button class="edit-button ${isTrustedOnly ? 'trusted-only' : ''}" style="margin-left: 5px; display: inline-block;">✏️</button>` : '';
+            return `
       <p><strong>${key.replace("_", " ")}:</strong>
       <span class="editable-value" data-path="${path}" data-band="${bandKey}">${val ?? "N/A"}</span>
-      <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button></p>`;
+      ${editButton}</p>`;
+        };
 
         // Basic release information
         releaseHTML += editableField("Title", release.title, band.key, `releases/${releaseIndex}/title`);
@@ -303,8 +330,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         releaseHTML += editableField("Physical Format", release.physical_format, band.key, `releases/${releaseIndex}/physical_format`);
         releaseHTML += editableField("Limitation", release.limitation, band.key, `releases/${releaseIndex}/limitation`);
         releaseHTML += editableField("Extra Info", release.extra_info, band.key, `releases/${releaseIndex}/extra_info`);
-        releaseHTML += `<p><strong>YouTube Link:</strong> <span class="editable-value" data-path="releases/${releaseIndex}/listen" data-band="${band.key}">${release?.listen ?? "N/A"}</span>
-        <button class="edit-button trusted-only" style="margin-left: 5px; display: inline-block;">✏️</button></p>`;
+        releaseHTML += editableField("YouTube Link", release.listen, band.key, `releases/${releaseIndex}/listen`, true);
         releaseHTML += editableField("Flag", release.flag, band.key, `releases/${releaseIndex}/flag`);
 
         // Add cover image preview if available
@@ -319,23 +345,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (release.extra_versions && Object.keys(release.extra_versions).length > 0) {
             releaseHTML += `<div style="margin-bottom: 20px;">`;
             Object.entries(release.extra_versions).forEach(([versionKey, version]) => {
+                const versionEditButton = !isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : '';
+                const versionDeleteButton = !isLocked ? `<button class="delete-version-button" data-version-key="${versionKey}" data-band="${band.key}" data-release-index="${releaseIndex}" style="background-color: #cc0000; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 10px;">🗑️ Delete Version</button>` : '';
                 releaseHTML += `
                     <div style="border: 1px solid #ccc; margin-bottom: 15px; padding: 10px; background-color: rgba(0,0,0,0.1);">
                         <h3>Version: ${version.format || 'Unknown Format'}</h3>
                         <p><strong>Format:</strong> <span class="editable-value" data-path="releases/${releaseIndex}/extra_versions/${versionKey}/format" data-band="${band.key}">${version.format ?? "N/A"}</span>
-                        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button></p>
+                        ${versionEditButton}</p>
                         <p><strong>Label:</strong> <span class="editable-value" data-path="releases/${releaseIndex}/extra_versions/${versionKey}/label" data-band="${band.key}">${version.label ?? "N/A"}</span>
-                        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button></p>
+                        ${versionEditButton}</p>
                         <p><strong>Year:</strong> <span class="editable-value" data-path="releases/${releaseIndex}/extra_versions/${versionKey}/year" data-band="${band.key}">${version.year ?? "N/A"}</span>
-                        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button></p>
+                        ${versionEditButton}</p>
                         <p><strong>Limitation:</strong> <span class="editable-value" data-path="releases/${releaseIndex}/extra_versions/${versionKey}/limitation" data-band="${band.key}">${version.limitation ?? "N/A"}</span>
-                        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button></p>
+                        ${versionEditButton}</p>
                         <p><strong>Extra Info:</strong> <span class="editable-value" data-path="releases/${releaseIndex}/extra_versions/${versionKey}/extra_info" data-band="${band.key}">${version.extra_info ?? "N/A"}</span>
-                        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button></p>
+                        ${versionEditButton}</p>
                         <p><strong>Cover Image:</strong> <span class="editable-value" data-path="releases/${releaseIndex}/extra_versions/${versionKey}/cover_image" data-band="${band.key}">${version.cover_image ?? "N/A"}</span>
-                        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button></p>
+                        ${versionEditButton}</p>
                         ${version.cover_image ? `<div style="margin: 10px 0;"><img src="${version.cover_image}" alt="Version Cover" style="max-width: 150px; max-height: 150px; border: 1px solid #ccc;" /></div>` : ''}
-                        <button class="delete-version-button" data-version-key="${versionKey}" data-band="${band.key}" data-release-index="${releaseIndex}" style="background-color: #cc0000; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 10px;">🗑️ Delete Version</button>
+                        ${versionDeleteButton}
                     </div>
                 `;
             });
@@ -344,7 +372,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             releaseHTML += `<p>No extra versions added yet.</p>`;
         }
 
-        releaseHTML += `<button id="addVersionButton" style="background-color: #aa0000; color: white; border: none; padding: 10px 20px; cursor: pointer; margin-top: 10px;">➕ Add Extra Version</button>`;
+        if (!isLocked) {
+            releaseHTML += `<button id="addVersionButton" style="background-color: #aa0000; color: white; border: none; padding: 10px 20px; cursor: pointer; margin-top: 10px;">➕ Add Extra Version</button>`;
+        }
 
         // Tracklist section
         if (release.tracks && Object.keys(release.tracks).length > 0) {
@@ -352,29 +382,35 @@ document.addEventListener("DOMContentLoaded", async () => {
             releaseHTML += `<ol>`;
             Object.entries(release.tracks).forEach(([trackIndex, trackData]) => {
                 const trackName = typeof trackData === 'object' ? trackData.name : trackData;
+                const trackEditButton = !isLocked ? '<button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>' : '';
+                const trackLyricsButton = !isLocked ? `<button class="lyrics-button" data-release-index="${releaseIndex}" data-track-index="${trackIndex}" data-band="${band.key}" style="margin-left: 5px; display: inline-block; background-color: #8B0000; color: white; border: none; padding: 2px 6px; cursor: pointer;">📝 Lyrics</button>` : '';
                 releaseHTML += `
                     <li>
                         <span class="editable-value" data-path="releases/${releaseIndex}/tracks/${trackIndex}/name" data-band="${band.key}">${trackName}</span>
-                        <button class="edit-button" style="margin-left: 5px; display: inline-block;">✏️</button>
-                        <button class="lyrics-button" data-release-index="${releaseIndex}" data-track-index="${trackIndex}" data-band="${band.key}" style="margin-left: 5px; display: inline-block; background-color: #8B0000; color: white; border: none; padding: 2px 6px; cursor: pointer;">📝 Lyrics</button>
+                        ${trackEditButton}
+                        ${trackLyricsButton}
                     </li>
                 `;
             });
             releaseHTML += `</ol>`;
-            releaseHTML += `<div style="margin-top:5px">
-                <button class="add-track-button" data-release-index="${releaseIndex}" data-band="${band.key}" style="margin-right:5px">➕ Add Track</button>
-                <button class="add-multiple-tracks-button" data-release-index="${releaseIndex}" data-band="${band.key}" data-count="2" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+2</button>
-                <button class="add-multiple-tracks-button" data-release-index="${releaseIndex}" data-band="${band.key}" data-count="3" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+3</button>
-                <button class="add-multiple-tracks-button" data-release-index="${releaseIndex}" data-band="${band.key}" data-count="4" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+4</button>
-                <button class="add-multiple-tracks-button" data-release-index="${releaseIndex}" data-band="${band.key}" data-count="5" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+5</button>
-            </div>`;
+            if (!isLocked) {
+                releaseHTML += `<div style="margin-top:5px">
+                    <button class="add-track-button" data-release-index="${releaseIndex}" data-band="${band.key}" style="margin-right:5px">➕ Add Track</button>
+                    <button class="add-multiple-tracks-button" data-release-index="${releaseIndex}" data-band="${band.key}" data-count="2" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+2</button>
+                    <button class="add-multiple-tracks-button" data-release-index="${releaseIndex}" data-band="${band.key}" data-count="3" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+3</button>
+                    <button class="add-multiple-tracks-button" data-release-index="${releaseIndex}" data-band="${band.key}" data-count="4" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+4</button>
+                    <button class="add-multiple-tracks-button" data-release-index="${releaseIndex}" data-band="${band.key}" data-count="5" style="margin-right:3px; padding: 2px 6px; font-size: 12px;">+5</button>
+                </div>`;
+            }
         }
 
         document.getElementById("release-content").innerHTML = releaseHTML;
         attachEditListeners();
 
         // Add event listeners for version management
-        document.getElementById("addVersionButton").addEventListener("click", async () => {
+        const addVersionButton = document.getElementById("addVersionButton");
+        if (addVersionButton && !isLocked) {
+            addVersionButton.addEventListener("click", async () => {
             const newVersion = {
                 format: "undefined",
                 label: "undefined",
@@ -439,11 +475,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             } catch (err) {
                 alert("Failed to add new version: " + err.message);
             }
-        });
+            });
+        }
 
         // Add event listeners for delete version buttons
-        document.querySelectorAll(".delete-version-button").forEach(button => {
-            button.addEventListener("click", async () => {
+        if (!isLocked) {
+            document.querySelectorAll(".delete-version-button").forEach(button => {
+                button.addEventListener("click", async () => {
                 const versionKey = button.getAttribute("data-version-key");
                 const bandKey = button.getAttribute("data-band");
                 const releaseIndex = button.getAttribute("data-release-index");
@@ -457,12 +495,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                         alert("Failed to delete version: " + err.message);
                     }
                 }
+                });
             });
-        });
+        }
 
         // Add event listeners for add track buttons
-        document.querySelectorAll(".add-track-button").forEach(button => {
-            button.addEventListener("click", async () => {
+        if (!isLocked) {
+            document.querySelectorAll(".add-track-button").forEach(button => {
+                button.addEventListener("click", async () => {
                 const releaseIndex = button.getAttribute("data-release-index");
                 const bandKey = button.getAttribute("data-band");
 
@@ -482,10 +522,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             });
         });
+        }
 
         // Add event listeners for multiple track buttons
-        document.querySelectorAll(".add-multiple-tracks-button").forEach(button => {
-            button.addEventListener("click", async () => {
+        if (!isLocked) {
+            document.querySelectorAll(".add-multiple-tracks-button").forEach(button => {
+                button.addEventListener("click", async () => {
                 const releaseIndex = button.getAttribute("data-release-index");
                 const bandKey = button.getAttribute("data-band");
                 const count = parseInt(button.getAttribute("data-count"));
@@ -508,10 +550,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             });
         });
+        }
 
         // Add event listeners for lyrics buttons
-        document.querySelectorAll(".lyrics-button").forEach(button => {
-            button.addEventListener("click", async () => {
+        if (!isLocked) {
+            document.querySelectorAll(".lyrics-button").forEach(button => {
+                button.addEventListener("click", async () => {
                 const releaseIndex = button.getAttribute("data-release-index");
                 const trackIndex = button.getAttribute("data-track-index");
                 const bandKey = button.getAttribute("data-band");
@@ -592,6 +636,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
             });
         });
+        }
 
     } catch (err) {
         console.error("Firebase error:", err);

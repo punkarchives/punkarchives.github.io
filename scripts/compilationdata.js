@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-auth.js";
-import { getDatabase, ref, set, get, child, push } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js";
+import { getDatabase, ref, set, get, child, push, update } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAoKv4PLrk4xvZF_IeUhfViwOLBYBv0czQ",
@@ -133,16 +133,32 @@ async function addToCollection(username, labelName, compilationId, compilationTi
     const collectionSnapshot = await get(collectionRef);
     
     let collection = collectionSnapshot.exists() ? collectionSnapshot.val() : {};
-    const collectionId = Object.keys(collection).length;
     
-    collection[collectionId] = {
+    // Find the next available index by finding the maximum numeric key and adding 1
+    // Convert all keys to numbers and filter out NaN values
+    const keys = Object.keys(collection)
+      .map(key => parseInt(key, 10))
+      .filter(key => !isNaN(key));
+    
+    // Find the maximum key, or start at 0 if collection is empty
+    const maxKey = keys.length > 0 ? Math.max(...keys) : -1;
+    let collectionId = maxKey + 1;
+    
+    // Double-check that this ID doesn't already exist (safety check)
+    while (collection[collectionId] !== undefined) {
+      collectionId++;
+    }
+    
+    // Use update() instead of set() to only update the specific path
+    // This prevents overwriting the entire collection object
+    const newItem = {
       label: labelName,
       compilationId: compilationId,
       compilationTitle: compilationTitle,
       compilationYear: compilationYear || "Unknown"
     };
     
-    await set(collectionRef, collection);
+    await update(collectionRef, { [collectionId]: newItem });
     return true;
   } catch (error) {
     console.error('Error adding to collection:', error);

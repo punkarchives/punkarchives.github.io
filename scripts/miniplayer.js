@@ -215,6 +215,35 @@ class MiniPlayer {
 
     let playerContainer = document.getElementById('miniplayer-player');
     
+    // If player already exists, load the new video
+    if (this.player && playerContainer) {
+      // Stop current playback and load new video
+      try {
+        // Reset time tracking for new video
+        this.currentTime = 0;
+        this.stopTimeTracking();
+        
+        // Load new video and start playing
+        this.player.loadVideoById(this.currentVideoId, 0, 'default');
+        
+        // Ensure video starts playing
+        setTimeout(() => {
+          if (this.player && this.player.playVideo) {
+            this.player.playVideo();
+          }
+        }, 100);
+        
+        return;
+      } catch (error) {
+        console.error('Error loading new video:', error);
+        // If loadVideoById fails, destroy and recreate
+        this.player.destroy();
+        this.player = null;
+        playerContainer.remove();
+        playerContainer = null;
+      }
+    }
+    
     if (!playerContainer) {
       // Create player container
       const miniplayer = document.getElementById('miniplayer');
@@ -249,7 +278,7 @@ class MiniPlayer {
           events: {
             'onReady': (event) => {
               console.log('Player ready');
-              // Restore saved time if available
+              // Restore saved time if available (only for same video)
               if (this.currentTime > 0) {
                 event.target.seekTo(this.currentTime, true);
               }
